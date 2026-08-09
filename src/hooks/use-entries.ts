@@ -1,0 +1,132 @@
+'use client'
+
+import { useCallback, useEffect, useState } from 'react'
+import { useSupabase } from './use-supabase'
+import { type Category } from '../components/CategoryPicker'
+import type { Entry, StoredEntry } from '../types/entry'
+import { calculateAccumulation, invalidateAccumulationCache, readAccumulationCache, writeAccumulationCache } from '../lib/entry-utils'
+
+export function useEntries(userId?: string) {
+  const { getSupabase } = useSupabase()
+  const [entries, setEntries] = useState<Entry[]>([])
+  const [accumulation, setAccumulation] = useState<number | null>(null)
+  const [loadedUserId, setLoadedUserId] = useState<string | null>(null)
+  const [persistenceError, setPersistenceError] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadEntries() {
+      if (!userId) return
+      setLoadedUserId(null)
+      setPersistenceError('')
+
+      try {
+        const supabase = await getSupabase()
+        const { data, error } = await supabase
+          .from('entries')
+          .select('id, type, amount, occurred_at, title, category')
+          .eq('user_id', userId)
+          .order('occurred_at', { ascending: false })
+
+        if (error) throw error
+
+        const nextEntries = ((data ?? []) as StoredEntry[]).map(entry => ({
+          ...entry,
+          amount: Number(entry.amount),
+          occurredAt: entry.occurred_at.slice(0, 16),
+          title: entry.title ?? '',
+          category: (entry.category ?? 'Other') as Category,
+        }))
+        if (!cancelled) {
+          setEntries(nextEntries)
+          const cachedAccumulation = readAccumulationCache(userId)
+          if (cachedAccumulation === null) {
+            const nextAccumulation = calculateAccumulation(nextEntries)
+            setAccumulation(nextAccumulation)
+            writeAccumulationCache(userId, nextAccumulation)
+          } else {
+            setAccumulation(cachedAccumulation)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load entries from Supabase', error)
+        if (!cancelled) {
+          setEntries([])
+          setAccumulation(null)
+          setPersistenceError('Could not load your records. Please try again.')
+        }
+      } finally {
+        if (!cancelled) setLoadedUserId(userId)
+      }
+    }
+
+    loadEntries()
+    return () => { cancelled = true }
+  }, [getSupabase, userId])
+
+  const saveEntry = useCallback(async (entry: Entry, isEditing: boolean) => {
+    if (!userId) return false
+    setPersistenceError('')
+    setIsSaving(true)
+    try {
+      const supabase = await getSupabase()
+      const payload = {
+        id: entry.id,
+        type: entry.type,
+        amount: entry.amount,
+        occurred_at: entry.occurredAt,
+        title: entry.title,
+        category: entry.category ?? 'Other',
+        user_id: userId,
+        updated_at: new Date().toISOString(),
+      }
+      const result = isEditing
+        ? await supabase.from('entries').update(payload).eq('id', entry.id).eq('user_id', userId)
+        : await supabase.from('entries').insert(payload)
+      if (result.error) throw result.error
+
+      const nextEntries = isEditing
+        ? entries.map(item => item.id === entry.id ? entry : item)
+        : [entry, ...entries]
+      invalidateAccumulationCache(userId)
+      const nextAccumulation = calculateAccumulation(nextEntries)
+      setEntries(nextEntries)
+      setAccumulation(nextAccumulation)
+      writeAccumulationCache(userId, nextAccumulation)
+      return true
+    } catch (error) {
+      console.error('Failed to save entry to Supabase', error)
+      setPersistenceError('Could not save this record. Please try again.')
+      return false
+    } finally {
+      setIsSaving(false)
+    }
+  }, [entries, getSupabase, userId])
+
+  const removeEntry = useCallback(async (id: string) => {
+    if (!userId) return
+    setPersistenceError('')
+    setDeletingEntryId(id)
+    try {
+      const supabase = await getSupabase()
+      const { error } = await supabase.from('entries').delete().eq('id', id).eq('user_id', userId)
+      if (error) throw error
+      const nextEntries = entries.filter(entry => entry.id !== id)
+      invalidateAccumulationCache(userId)
+      const nextAccumulation = calculateAccumulation(nextEntries)
+      setEntries(nextEntries)
+      setAccumulation(nextAccumulation)
+      writeAccumulationCache(userId, nextAccumulation)
+    } catch (error) {
+      console.error('Failed to delete entry from Supabase', error)
+      setPersistenceError('Could not delete this record. Please try again.')
+    } finally {
+      setDeletingEntryId(null)
+    }
+  }, [entries, getSupabase, userId])
+
+  return { entries, accumulation, loadedUserId, persistenceError, isSaving, deletingEntryId, saveEntry, removeEntry }
+}

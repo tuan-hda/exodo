@@ -42,6 +42,9 @@
 }
 
 .app-shell { @apply min-h-dvh overflow-hidden bg-white; }
+.loading-shell { @apply grid place-items-center; }
+.loading-state { @apply inline-flex items-center gap-2 font-mono text-[11px] text-muted; }
+.loading-spinner { @apply animate-spin; }
 .topbar { @apply mx-auto flex h-[78px] w-[min(1180px,calc(100%-48px))] items-center justify-between border-b border-line; }
 .wordmark { @apply inline-flex items-center gap-2.5 text-[17px] font-extrabold tracking-[-.06em] text-ink no-underline; }
 .wordmark-mark { @apply grid size-[25px] place-items-center rounded-full bg-ink text-[13px] font-extrabold text-white; }
@@ -61,12 +64,16 @@ h1 { @apply mb-0 text-[clamp(46px,7vw,78px)] font-semibold leading-[.98] trackin
 h1 em { @apply not-italic text-ink; }
 .intro-copy, .section-heading > p:last-child { @apply max-w-[250px] text-[13px] leading-[1.7] text-muted; }
 .intro-copy { @apply mb-2 max-w-[240px] text-sm; }
-.today-panel { @apply flex min-h-[250px] items-center justify-between rounded-[28px] border-2 border-line-strong bg-soft px-[43px] py-[35px] text-ink transition-colors duration-300; }
+.summary-grid { @apply grid grid-cols-1 gap-3.5; animation: page-rise .55s cubic-bezier(.16, 1, .3, 1) 80ms both; }
+.today-panel, .accumulation-panel { @apply flex min-h-[250px] items-center justify-between rounded-[28px] border-2 border-line-strong bg-soft px-[43px] py-[35px] text-ink transition-colors duration-300; }
+.accumulation-panel { @apply min-h-[180px] border bg-white; }
 .today-panel.is-over { @apply border-ink bg-white; }
 .today-label { @apply mb-[19px] block font-mono text-[11px] uppercase tracking-[.12em]; }
 .today-copy strong { @apply block text-[clamp(52px,9vw,94px)] font-semibold leading-[.9] tracking-[-.09em]; }
+.accumulation-copy strong { @apply block text-[clamp(34px,4vw,54px)] font-semibold leading-[.95] tracking-[-.08em]; }
 .today-detail { @apply mt-5 block font-mono text-[11px]; }
 .today-mark { @apply grid justify-items-end gap-[13px] font-mono text-[11px] uppercase; }
+.accumulation-mark { @apply grid justify-items-end gap-3 font-mono text-[10px] uppercase text-muted; }
 .mark-circle { @apply grid size-[52px] place-items-center rounded-full border border-line-strong; }
 .capture-grid, .month-section, .activity-section { @apply pt-[106px]; }
 .capture-grid { @apply grid grid-cols-[.9fr_1.1fr] gap-20; }
@@ -117,25 +124,35 @@ h1 em { @apply not-italic text-ink; }
 .activity-name small { @apply mt-1 font-mono text-[10px] text-muted; }
 .activity-row > b { @apply font-mono text-xs font-normal; }
 .activity-row > b.income-text { @apply text-ink; }
-.remove-entry { @apply bg-transparent text-muted transition hover:text-danger; }
+.remove-entry { @apply bg-transparent text-muted transition hover:text-danger disabled:cursor-wait disabled:opacity-50; }
 .empty-activity { @apply grid justify-items-center gap-3 px-[45px] py-[45px] text-muted; }
 .empty-activity p { @apply m-0 text-[13px]; }
 .footer { @apply mx-auto mt-[110px] flex w-[min(1180px,calc(100%-48px))] justify-between border-t border-line pt-4; }
 .modal-backdrop { @apply fixed inset-0 z-[5] grid place-items-center overflow-y-auto bg-ink/20 p-5 backdrop-blur-[8px]; animation: popup-fade .2s ease-out both; }
 .composer { @apply max-h-[calc(100dvh-40px)] w-[min(430px,100%)] overflow-y-auto overscroll-contain rounded-[32px] border border-line-strong bg-white p-[26px] text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)]; animation: popup-rise .28s cubic-bezier(.16, 1, .3, 1) both; }
 .composer-heading { @apply mb-7 flex justify-between; }
+.composer-actions { @apply flex items-start gap-2; }
+.composer-type-indicator { @apply inline-flex items-center gap-1.5 rounded-[10px] border border-line-strong bg-soft px-2.5 py-1.5 font-mono text-[10px] font-normal uppercase tracking-[.06em] text-muted; }
+.composer.income .composer-type-indicator { @apply border-[#7fbe91] bg-[#dff3e5] text-[#176b3a]; }
 .composer .eyebrow { @apply text-muted; }
 .composer h2 { @apply m-0 text-[28px] tracking-[-.07em]; }
 .close-composer { @apply grid size-7 place-items-center rounded-full border border-line-strong bg-white text-ink; }
 .composer form { @apply grid gap-3; }
 .composer label { @apply grid gap-1.5 text-[11px] font-bold text-muted; }
 .composer input, .composer select { @apply w-full rounded-[14px] border border-line-strong bg-white px-3 py-2 text-[13px] text-ink outline-0 transition focus:border-ink; }
+.calculator-keypad { @apply hidden; }
+.calculator-display { @apply rounded-[14px] border border-line-strong bg-soft px-3 py-3 text-right font-mono text-[20px] text-ink; overflow-wrap: anywhere; }
+.calculator-keys { @apply mt-2 grid grid-cols-4 gap-1.5; }
+.calculator-key { @apply inline-flex min-h-11 items-center justify-center rounded-[12px] border border-line bg-soft font-mono text-sm text-ink transition hover:border-line-strong hover:bg-white active:scale-[.97] disabled:cursor-wait disabled:opacity-50; }
+.calculator-key.operator { @apply border-ink bg-ink text-white hover:bg-ink; }
+.calculator-key.utility { @apply bg-white text-muted; }
+.calculator-key.equals { @apply col-span-full; }
 .form-split { @apply grid grid-cols-2 gap-2.5; }
 .category-picker { @apply grid gap-2; }
 .category-picker-heading { @apply flex items-center justify-between text-[11px] font-bold text-muted; }
 .category-selected { @apply inline-flex items-center gap-1 rounded-[10px] bg-soft px-2 py-1 font-mono text-[10px] font-normal text-ink; }
 .category-grid { @apply grid w-full grid-cols-2 gap-2; }
-.category-button { @apply inline-flex min-h-10 w-full items-center justify-start gap-2 rounded-[12px] border border-line bg-soft px-3 py-2 text-left text-[11px] font-medium text-muted transition hover:border-line-strong hover:text-ink active:scale-[.98]; }
+.category-button { @apply inline-flex min-h-10 w-full items-center justify-start gap-2 rounded-[12px] border border-line bg-soft px-3 py-2 text-left text-[11px] font-medium text-muted transition hover:border-line-strong hover:text-ink active:scale-[.98] disabled:cursor-wait disabled:opacity-50; }
 .category-button.selected { @apply border-ink bg-ink text-white; }
 .allocation-note, .form-error { @apply m-0 rounded-[14px] border border-line bg-soft px-3 py-[11px] text-[11px] leading-[1.55] text-muted; }
 .form-error { @apply border-line-strong bg-soft text-danger; }
@@ -149,6 +166,7 @@ h1 em { @apply not-italic text-ink; }
   .intro { @apply grid-cols-1 gap-7 py-[72px] pb-[45px]; }
   .intro-copy { @apply mb-0; }
   .today-panel { @apply min-h-[220px] p-[26px]; }
+  .accumulation-panel { @apply min-h-[190px] p-[26px]; }
   .today-mark { @apply hidden; }
   .capture-grid { @apply grid-cols-1 gap-9 pt-[75px]; }
   .month-section, .activity-section { @apply pt-[75px]; }
@@ -167,4 +185,8 @@ h1 em { @apply not-italic text-ink; }
   .category-button { @apply min-h-9 gap-1.5 rounded-[10px] px-2.5 py-1.5 text-[10px]; }
   .modal-backdrop { @apply items-start p-3; }
   .composer { @apply max-h-[calc(100dvh-24px)] rounded-[24px] p-[23px]; }
+}
+@media (max-width: 700px) {
+  .amount-input { @apply hidden; }
+  .calculator-keypad { @apply block; }
 }
