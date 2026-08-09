@@ -121,8 +121,8 @@ h1 em { @apply not-italic text-ink; }
 .empty-activity { @apply grid justify-items-center gap-3 px-[45px] py-[45px] text-muted; }
 .empty-activity p { @apply m-0 text-[13px]; }
 .footer { @apply mx-auto mt-[110px] flex w-[min(1180px,calc(100%-48px))] justify-between border-t border-line pt-4; }
-.modal-backdrop { @apply fixed inset-0 z-[5] grid place-items-center bg-ink/20 p-5 backdrop-blur-[8px]; animation: popup-fade .2s ease-out both; }
-.composer { @apply w-[min(430px,100%)] rounded-[32px] border border-line-strong bg-white p-[26px] text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)]; animation: popup-rise .28s cubic-bezier(.16, 1, .3, 1) both; }
+.modal-backdrop { @apply fixed inset-0 z-[5] grid place-items-center overflow-y-auto bg-ink/20 p-5 backdrop-blur-[8px]; animation: popup-fade .2s ease-out both; }
+.composer { @apply max-h-[calc(100dvh-40px)] w-[min(430px,100%)] overflow-y-auto overscroll-contain rounded-[32px] border border-line-strong bg-white p-[26px] text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)]; animation: popup-rise .28s cubic-bezier(.16, 1, .3, 1) both; }
 .composer-heading { @apply mb-7 flex justify-between; }
 .composer .eyebrow { @apply text-muted; }
 .composer h2 { @apply m-0 text-[28px] tracking-[-.07em]; }
@@ -133,9 +133,9 @@ h1 em { @apply not-italic text-ink; }
 .form-split { @apply grid grid-cols-2 gap-2.5; }
 .category-picker { @apply grid gap-2; }
 .category-picker-heading { @apply flex items-center justify-between text-[11px] font-bold text-muted; }
-.category-selected { @apply inline-flex items-center gap-1 rounded-full bg-soft px-2 py-1 font-mono text-[10px] font-normal text-ink; }
-.category-grid { @apply mx-auto grid w-fit grid-cols-5 justify-items-center gap-1.5; }
-.category-button { @apply inline-flex size-11 items-center justify-center rounded-full border border-line bg-soft p-0 text-muted transition hover:border-line-strong hover:text-ink; }
+.category-selected { @apply inline-flex items-center gap-1 rounded-[10px] bg-soft px-2 py-1 font-mono text-[10px] font-normal text-ink; }
+.category-grid { @apply grid w-full grid-cols-2 gap-2; }
+.category-button { @apply inline-flex min-h-10 w-full items-center justify-start gap-2 rounded-[12px] border border-line bg-soft px-3 py-2 text-left text-[11px] font-medium text-muted transition hover:border-line-strong hover:text-ink active:scale-[.98]; }
 .category-button.selected { @apply border-ink bg-ink text-white; }
 .allocation-note, .form-error { @apply m-0 rounded-[14px] border border-line bg-soft px-3 py-[11px] text-[11px] leading-[1.55] text-muted; }
 .form-error { @apply border-line-strong bg-soft text-danger; }
@@ -163,5 +163,8 @@ h1 em { @apply not-italic text-ink; }
   .day-row { @apply grid-cols-[35px_22px_1fr_64px_44px]; }
   .day-allocation { @apply overflow-hidden text-ellipsis whitespace-nowrap; }
   .activity-row { @apply grid-cols-[30px_1fr_auto_20px] gap-[9px]; }
-  .composer { @apply p-[23px]; }
+  .category-grid { @apply gap-1.5; }
+  .category-button { @apply min-h-9 gap-1.5 rounded-[10px] px-2.5 py-1.5 text-[10px]; }
+  .modal-backdrop { @apply items-start p-3; }
+  .composer { @apply max-h-[calc(100dvh-24px)] rounded-[24px] p-[23px]; }
 }
