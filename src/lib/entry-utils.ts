@@ -21,6 +21,14 @@ export function formatShort(value: number) {
   return `${whole.format(Math.round(value))} ₫`
 }
 
+export function formatAmountExpression(value: string) {
+  return value.replace(/\d[\d,]*(?:\.\d*)?/g, token => {
+    const [integer, fraction] = token.split('.')
+    const grouped = Number(integer.replace(/,/g, '') || 0).toLocaleString('en-US')
+    return fraction === undefined ? grouped : `${grouped}.${fraction}`
+  })
+}
+
 export function monthDays(date: Date) {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
 }
