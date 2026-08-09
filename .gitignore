@@ -1,0 +1,26 @@
+# Dependencies and package-manager caches
+node_modules/
+.pnpm-store/
+
+# Next.js build output
+.next/
+out/
+dist/
+
+# Local tooling and generated artifacts
+*.tsbuildinfo
+coverage/
+.turbo/
+.vercel/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Local Clerk configuration
+.clerk/
+
+# OS files
+.DS_Store
