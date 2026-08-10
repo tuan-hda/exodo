@@ -161,6 +161,9 @@ h1 em { @apply not-italic text-ink; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
 @media (max-width: 700px) {
   .topbar, .footer, .page { @apply w-[calc(100%-32px)]; }
+  .composer input, .composer select { @apply text-base; }
+  .composer label { @apply text-xs; }
+  .category-selected { @apply text-[11px]; }
   .topbar { @apply h-[68px]; }
   .topbar-note { @apply hidden; }
   .intro { @apply grid-cols-1 gap-7 py-[72px] pb-[45px]; }
@@ -182,7 +185,7 @@ h1 em { @apply not-italic text-ink; }
   .day-allocation { @apply overflow-hidden text-ellipsis whitespace-nowrap; }
   .activity-row { @apply grid-cols-[30px_1fr_auto_20px] gap-[9px]; }
   .category-grid { @apply gap-1.5; }
-  .category-button { @apply min-h-9 gap-1.5 rounded-[10px] px-2.5 py-1.5 text-[10px]; }
+  .category-button { @apply min-h-9 gap-1.5 rounded-[10px] px-2.5 py-1.5 text-[11px]; }
   .modal-backdrop { @apply items-start p-3; }
   .composer { @apply max-h-[calc(100dvh-24px)] rounded-[24px] p-[23px]; }
 }
