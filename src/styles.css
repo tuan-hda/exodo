@@ -157,6 +157,10 @@ h1 em { @apply not-italic text-ink; }
 .allocation-note, .form-error { @apply m-0 rounded-[14px] border border-line bg-soft px-3 py-[11px] text-[11px] leading-[1.55] text-muted; }
 .form-error { @apply border-line-strong bg-soft text-danger; }
 .submit-record { @apply mt-1 min-h-[36px] rounded-full px-4 py-2; }
+.composer-submit-actions { @apply sticky bottom-0 grid grid-cols-2 gap-2.5 border-t border-line bg-white pt-3; }
+.cancel-composer, .composer-submit-actions .submit-record { @apply inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[14px] border px-4 py-3 text-sm font-bold transition active:scale-[.98] disabled:cursor-wait disabled:opacity-50; }
+.cancel-composer { @apply border-line-strong bg-white text-ink hover:border-ink; }
+.composer-submit-actions .submit-record { @apply mt-0 border-ink; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
 @media (max-width: 700px) {
@@ -164,6 +168,21 @@ h1 em { @apply not-italic text-ink; }
   .composer input, .composer select { @apply text-base; }
   .composer label { @apply text-xs; }
   .category-selected { @apply text-[11px]; }
+  .modal-backdrop { @apply items-stretch overflow-hidden p-0; }
+  .composer { @apply flex min-h-dvh max-h-dvh w-full flex-col overflow-y-auto rounded-none border-0 p-5 shadow-none; padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+  .composer form { @apply flex flex-1 flex-col gap-4; }
+  .composer-heading { @apply mb-5; }
+  .composer h2 { @apply text-[32px]; }
+  .composer-type-indicator { @apply px-3 py-2 text-[11px]; }
+  .close-composer { @apply size-10; }
+  .calculator-key { @apply min-h-[54px] text-base; }
+  .category-picker { @apply gap-3; }
+  .category-picker-heading { @apply text-sm; }
+  .category-selected { @apply px-3 py-2 text-xs; }
+  .category-grid { @apply gap-2.5; }
+  .category-button { @apply min-h-[50px] gap-2.5 rounded-[14px] px-3 text-sm; }
+  .composer-submit-actions { @apply mt-auto pt-4; }
+  .cancel-composer, .composer-submit-actions .submit-record { @apply min-h-[54px] rounded-[16px] text-base; }
   .topbar { @apply h-[68px]; }
   .topbar-note { @apply hidden; }
   .intro { @apply grid-cols-1 gap-7 py-[72px] pb-[45px]; }
@@ -185,7 +204,7 @@ h1 em { @apply not-italic text-ink; }
   .day-allocation { @apply overflow-hidden text-ellipsis whitespace-nowrap; }
   .activity-row { @apply grid-cols-[30px_1fr_auto_20px] gap-[9px]; }
   .category-grid { @apply gap-1.5; }
-  .category-button { @apply min-h-9 gap-1.5 rounded-[10px] px-2.5 py-1.5 text-[11px]; }
+  .category-button { @apply min-h-[50px] gap-2.5 rounded-[14px] px-3 text-sm; }
   .modal-backdrop { @apply items-start p-3; }
   .composer { @apply max-h-[calc(100dvh-24px)] rounded-[24px] p-[23px]; }
 }
