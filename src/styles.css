@@ -114,7 +114,14 @@ h1 em { @apply not-italic text-ink; }
 .day-row strong { @apply text-right font-normal; }
 .day-row strong.negative { @apply text-danger; }
 .activity-heading svg { @apply text-muted; }
+.activity-tools { @apply mt-5 flex items-center justify-between gap-3; }
+.activity-search { @apply flex min-w-0 flex-1 items-center gap-2 rounded-[14px] border border-line-strong bg-white px-3 text-muted; }
+.activity-search input { @apply min-w-0 w-full border-0 bg-transparent px-0 py-2.5 text-sm text-ink outline-0 placeholder:text-muted; }
+.activity-count { @apply shrink-0 font-mono text-[10px] text-muted; }
 .activity-list { @apply mt-[9px] border-t border-line-strong; }
+.activity-pagination { @apply flex items-center justify-between border-t border-line pt-3; }
+.activity-pagination span { @apply font-mono text-[10px] text-muted; }
+.activity-pagination button { @apply grid size-8 place-items-center rounded-full border border-line-strong bg-white text-ink transition hover:border-ink disabled:cursor-not-allowed disabled:opacity-40; }
 .activity-row { @apply grid min-h-[67px] cursor-pointer grid-cols-[34px_1fr_auto_24px] items-center gap-[13px] border-b border-line transition-colors hover:bg-soft; }
 .activity-icon { @apply grid size-[29px] place-items-center rounded-full border border-line-strong bg-soft text-ink; }
 .activity-icon.income { @apply border-ink bg-ink text-white; }
@@ -138,8 +145,8 @@ h1 em { @apply not-italic text-ink; }
 .composer h2 { @apply m-0 text-[28px] tracking-[-.07em]; }
 .close-composer { @apply grid size-7 place-items-center rounded-full border border-line-strong bg-white text-ink; }
 .composer form { @apply grid gap-3; }
-.composer label { @apply grid gap-1.5 text-[11px] font-bold text-muted; }
-.composer input, .composer select { @apply w-full rounded-[14px] border border-line-strong bg-white px-3 py-2 text-[13px] text-ink outline-0 transition focus:border-ink; }
+.composer label { @apply grid min-w-0 gap-1.5 text-[11px] font-bold text-muted; }
+.composer input, .composer select { @apply min-w-0 max-w-full w-full rounded-[14px] border border-line-strong bg-white px-3 py-2 text-[13px] text-ink outline-0 transition focus:border-ink; }
 .calculator-keypad { @apply hidden; }
 .calculator-display { @apply rounded-[14px] border border-line-strong bg-soft px-3 py-3 text-right font-mono text-[20px] text-ink; overflow-wrap: anywhere; }
 .calculator-keys { @apply mt-2 grid grid-cols-4 gap-1.5; }
@@ -181,7 +188,7 @@ h1 em { @apply not-italic text-ink; }
   .category-selected { @apply px-3 py-2 text-xs; }
   .category-grid { @apply gap-2.5; }
   .category-button { @apply min-h-[50px] gap-2.5 rounded-[14px] px-3 text-sm; }
-  .composer-submit-actions { @apply mt-auto pt-4; margin-inline: -20px; padding-inline: 20px; }
+  .composer-submit-actions { @apply mt-auto pt-4; margin-inline: -20px; padding-inline: 20px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
   .cancel-composer, .composer-submit-actions .submit-record { @apply min-h-[54px] rounded-[16px] text-base; }
   .topbar { @apply h-[68px]; }
   .topbar-note { @apply hidden; }
