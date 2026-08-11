@@ -205,8 +205,8 @@ h1 em { @apply not-italic text-ink; }
   .activity-row { @apply grid-cols-[30px_1fr_auto_20px] gap-[9px]; }
   .category-grid { @apply gap-1.5; }
   .category-button { @apply min-h-[50px] gap-2.5 rounded-[14px] px-3 text-sm; }
-  .modal-backdrop { @apply items-start p-3; }
-  .composer { @apply max-h-[calc(100dvh-24px)] rounded-[24px] p-[23px]; }
+  .modal-backdrop { @apply items-stretch overflow-hidden p-0; }
+  .composer { @apply min-h-dvh max-h-dvh w-full rounded-none border-0 p-5 shadow-none; padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: max(20px, env(safe-area-inset-bottom)); }
 }
 @media (max-width: 700px) {
   .amount-input { @apply hidden; }

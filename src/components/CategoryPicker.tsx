@@ -25,6 +25,10 @@ export type Category = string
 export const expenseCategories: Category[] = ['Food', 'Groceries', 'Home', 'Transport', 'Health', 'Fun', 'Shopping', 'Subscriptions', 'Bills', 'Other']
 export const incomeCategories: Category[] = ['Salary', 'Freelance', 'Bonus', 'Refund', 'Other']
 
+export function defaultCategory(type: 'income' | 'expense'): Category {
+  return type === 'income' ? 'Salary' : 'Food'
+}
+
 export function categoryIcon(category: Category, size = 18) {
   const props = { size, weight: 'regular' as const }
   switch (category) {
