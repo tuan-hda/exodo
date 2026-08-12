@@ -49,7 +49,6 @@
 .footer { @apply font-mono text-[11px] tracking-[.06em] text-muted; }
 .auth-state { @apply grid min-h-dvh place-items-center bg-white p-6 text-center text-sm text-muted; }
 .submit-record { @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink bg-ink px-3.5 py-2.5 text-xs font-bold text-white transition duration-200 hover:-translate-y-0.5 hover:border-ink hover:bg-white hover:text-ink; }
-.account-menu { @apply relative; }
 .local-avatar { @apply grid size-9 place-items-center rounded-full border border-ink bg-ink text-xs font-bold tracking-[-.04em] text-white transition hover:bg-white hover:text-ink; }
 .local-avatar.small { @apply size-8 shrink-0 text-[11px]; }
 .account-popover { @apply absolute right-0 top-[calc(100%+12px)] z-20 w-[250px] rounded-[20px] border border-line-strong bg-white p-3 text-ink shadow-[0_18px_50px_rgb(21_21_21_/_0.16)]; }
@@ -66,6 +65,23 @@
 .tab-view { @apply pt-6; }
 .tab-view .month-section, .tab-view .activity-section { @apply pt-0; }
 .home-activity .activity-section { @apply pt-16; }
+.notifications-view { @apply mx-auto flex max-w-[460px] flex-col items-center py-16 text-center; }
+.notifications-icon { @apply mb-5 grid size-14 place-items-center rounded-full bg-soft text-ink; }
+.notifications-view .eyebrow { @apply mb-3; }
+.notifications-view h1 { @apply mb-4 text-[clamp(34px,5vw,52px)]; }
+.notifications-view > p:not(.eyebrow) { @apply max-w-[330px] text-sm leading-[1.7] text-muted; }
+.notifications-connect { @apply mt-5 inline-flex items-center gap-2 rounded-full border border-line-strong bg-white px-4 py-3 text-xs font-bold text-muted; }
+.account-view { @apply mx-auto flex max-w-[460px] flex-col items-center py-8 text-center; }
+.account-avatar-large { @apply mb-5 grid size-20 place-items-center rounded-full bg-ink text-2xl font-bold tracking-[-.06em] text-white; }
+.account-view .eyebrow { @apply mb-3; }
+.account-view h1 { @apply text-[clamp(34px,5vw,52px)]; }
+.account-email { @apply mt-3 text-sm text-muted; }
+.account-card { @apply mt-8 w-full rounded-[20px] border border-line bg-soft p-4 text-left; }
+.account-card > div { @apply flex items-center gap-3; }
+.account-card strong, .account-card small { @apply block; }
+.account-card strong { @apply text-sm font-semibold; }
+.account-card small { @apply mt-1 text-xs text-muted; }
+.account-signout-page { @apply mt-4 inline-flex items-center justify-center gap-2 rounded-[14px] border border-line-strong bg-white px-4 py-3; }
 .intro, .today-panel, .capture-grid, .month-section, .activity-section { animation: page-rise .55s cubic-bezier(.16, 1, .3, 1) both; }
 .today-panel { animation-delay: 80ms; }
 .capture-grid { animation-delay: 140ms; }
@@ -153,7 +169,6 @@ h1 em { @apply not-italic text-ink; }
 .mobile-nav > button:not(.mobile-nav-record) span { @apply font-mono text-[9px] uppercase tracking-[.04em]; }
 .mobile-nav > button.active { @apply text-ink; }
 .mobile-nav-record { @apply relative z-10 -mt-7 grid size-[54px] place-items-center rounded-full border-4 border-white bg-ink text-white shadow-[0_8px_24px_rgb(21_21_21_/_0.2)]; }
-.mobile-nav-profile .local-avatar { @apply size-7 text-[10px]; }
 #today, #month, #activity { scroll-margin-top: 90px; }
 .modal-backdrop { @apply fixed inset-0 z-[5] grid place-items-center max-w-[100vw] overflow-y-auto overflow-x-hidden bg-ink/20 p-5 backdrop-blur-[8px]; touch-action: pan-y; animation: popup-fade .2s ease-out both; }
 .composer { @apply max-h-[calc(100dvh-40px)] w-[min(430px,100%)] overflow-y-auto overscroll-contain rounded-[32px] border border-line-strong bg-white p-[26px] text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)]; animation: popup-rise .28s cubic-bezier(.16, 1, .3, 1) both; }
@@ -222,7 +237,7 @@ h1 em { @apply not-italic text-ink; }
   .footer { @apply mt-20; }
   .page { @apply pb-10; }
   .footer { @apply mb-5; }
-  .mobile-nav { @apply fixed inset-x-0 bottom-0 z-[4] grid grid-cols-4 items-center border-t border-line bg-white/95 px-4 pt-2 backdrop-blur-[16px]; display: grid; height: calc(68px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); }
+  .mobile-nav { @apply fixed inset-x-0 bottom-0 z-[4] grid grid-cols-5 items-center border-t border-line bg-white/95 px-4 pt-2 backdrop-blur-[16px]; display: grid; height: calc(68px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); }
   .mobile-nav-profile { @apply h-full; }
   .mobile-nav > button:not(.mobile-nav-record):active { @apply text-ink; }
   .mobile-nav .account-popover { @apply fixed right-3 top-auto; bottom: calc(68px + env(safe-area-inset-bottom) + 12px); }
