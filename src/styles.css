@@ -85,9 +85,8 @@
 .account-card strong { @apply text-sm font-semibold; }
 .account-card small { @apply mt-1 text-xs text-muted; }
 .account-signout-page { @apply mt-4 inline-flex items-center justify-center gap-2 rounded-[14px] border border-line-strong bg-white px-4 py-3; }
-.intro, .today-panel, .capture-grid, .month-section, .activity-section { animation: page-rise .55s cubic-bezier(.16, 1, .3, 1) both; }
+.intro, .today-panel, .month-section, .activity-section { animation: page-rise .55s cubic-bezier(.16, 1, .3, 1) both; }
 .today-panel { animation-delay: 80ms; }
-.capture-grid { animation-delay: 140ms; }
 .month-section { animation-delay: 200ms; }
 .activity-section { animation-delay: 260ms; }
 .intro { @apply grid grid-cols-[1.2fr_.8fr] items-end gap-10 pt-12 pb-14; }
@@ -107,19 +106,8 @@ h1 em { @apply not-italic text-ink; }
 .today-mark { @apply grid justify-items-end gap-[13px] font-mono text-[11px] uppercase; }
 .accumulation-mark { @apply grid justify-items-end gap-3 font-mono text-[10px] uppercase text-muted; }
 .mark-circle { @apply grid size-[52px] place-items-center rounded-full border border-line-strong; }
-.capture-grid, .month-section, .activity-section { @apply pt-[106px]; }
-.capture-grid { @apply grid grid-cols-[.9fr_1.1fr] gap-20; }
+.month-section, .activity-section { @apply pt-[106px]; }
 .section-heading h2 { @apply mb-[17px] text-[clamp(30px,4vw,44px)] font-semibold leading-none tracking-[-.07em]; }
-.capture-actions { @apply grid content-center gap-2.5; }
-.capture-button { @apply grid min-h-[87px] grid-cols-[48px_1fr_auto_auto] items-center gap-4 rounded-[22px] border border-line-strong bg-white px-[19px] py-4 text-left text-ink transition duration-200 hover:translate-x-1 hover:border-ink hover:bg-soft; }
-.capture-icon { @apply grid size-[42px] place-items-center rounded-full bg-ink text-white; }
-.capture-button.expense .capture-icon { @apply border border-ink bg-ink text-white; }
-.capture-button strong, .capture-button small { @apply block; }
-.capture-button strong { @apply text-sm font-semibold; }
-.capture-button small { @apply mt-1.5 text-[11px] text-muted; }
-.capture-arrow { @apply rotate-45 text-muted; }
-.capture-button kbd, .shortcut-hint kbd { @apply inline-flex min-w-5 items-center justify-center rounded-full border border-line-strong bg-soft px-1.5 py-0.5 font-mono text-[10px] font-normal text-muted; }
-.shortcut-hint { @apply flex items-center justify-end gap-1.5 font-mono text-[10px] text-muted; }
 .month-heading, .activity-heading { @apply flex items-end justify-between; }
 .month-controls { @apply flex gap-2; }
 .month-controls button { @apply size-[34px] rounded-full border border-line-strong bg-white text-[22px] leading-none text-ink transition hover:bg-ink hover:text-white; }
@@ -155,9 +143,7 @@ h1 em { @apply not-italic text-ink; }
 .activity-day h3 { @apply m-0 border-b border-line px-0 py-3 font-mono text-[10px] font-normal uppercase tracking-[.08em] text-muted; }
 .activity-day .activity-row { @apply border-b border-line; }
 .activity-day .activity-row:last-child { @apply border-b-0; }
-.activity-pagination { @apply flex items-center justify-between border-t border-line pt-3; }
-.activity-pagination span { @apply font-mono text-[10px] text-muted; }
-.activity-pagination button { @apply grid size-8 place-items-center rounded-full border border-line-strong bg-white text-ink transition hover:border-ink disabled:cursor-not-allowed disabled:opacity-40; }
+.activity-load-more { @apply h-8; }
 .activity-row { @apply grid min-h-[67px] cursor-pointer grid-cols-[34px_1fr_auto_24px] items-center gap-[13px] border-b border-line transition-colors hover:bg-soft; }
 .activity-icon { @apply grid size-[29px] place-items-center rounded-full border text-current; }
 .activity-icon.income { @apply border-ink bg-ink text-white; }
@@ -180,22 +166,42 @@ h1 em { @apply not-italic text-ink; }
 .modal-backdrop { @apply fixed inset-0 z-[5] grid place-items-center max-w-[100vw] overflow-y-auto overflow-x-hidden bg-ink/20 p-5 backdrop-blur-[8px]; touch-action: pan-y; animation: popup-fade .2s ease-out both; }
 .composer { @apply max-h-[calc(100dvh-40px)] w-[min(430px,100%)] overflow-y-auto overscroll-contain rounded-[32px] border border-line-strong bg-white p-[26px] text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)]; animation: popup-rise .28s cubic-bezier(.16, 1, .3, 1) both; }
 .composer-heading { @apply mb-7 flex justify-between; }
-.composer-actions { @apply flex items-start gap-2; }
+.composer-actions { @apply flex items-center gap-2; }
 .composer-type-indicator { @apply inline-flex items-center gap-1.5 rounded-[10px] border border-line-strong bg-soft px-2.5 py-1.5 font-mono text-[10px] font-normal uppercase tracking-[.06em] text-muted; }
 .composer.income .composer-type-indicator { @apply border-[#7fbe91] bg-[#dff3e5] text-[#176b3a]; }
 .composer .eyebrow { @apply text-muted; }
 .composer h2 { @apply m-0 text-[28px] tracking-[-.07em]; }
 .close-composer { @apply grid size-7 place-items-center rounded-full border border-line-strong bg-white text-ink; }
 .composer form { @apply grid gap-3; }
+.composer-progress { @apply mb-5 grid grid-cols-3 gap-2 border-b border-line pb-4; }
+.composer-progress span { @apply inline-flex items-center gap-1.5 font-mono text-[10px] text-muted; }
+.composer-progress i { @apply grid size-5 shrink-0 place-items-center rounded-full border border-line-strong bg-white not-italic; }
+.composer-progress span.active { @apply text-ink; }
+.composer-progress span.active i { @apply border-ink bg-ink text-white; }
+.composer-progress span.complete i { @apply border-ink bg-white text-ink; }
+.composer-step { @apply grid content-start gap-4; }
+.composer-step h3 { @apply m-0 text-[25px] tracking-[-.06em]; }
+.step-copy { @apply mt-2 max-w-[290px] text-[13px] leading-[1.6] text-muted; }
+.composer-step-actions { @apply sticky bottom-0 mt-2 grid grid-cols-2 gap-2.5 border-t border-line bg-white pt-3; }
+.composer-step-actions:has(> :only-child) { grid-template-columns: 1fr; }
+.step-back, .composer-step-actions .submit-record { @apply inline-flex min-h-[50px] items-center justify-center gap-2 rounded-[14px] border px-4 py-3 text-sm font-bold transition active:scale-[.98] disabled:cursor-wait disabled:opacity-50; }
+.step-back { @apply border-line-strong bg-white text-ink; }
+.review-card { @apply grid gap-3 rounded-[18px] border border-line-strong bg-soft p-4; }
+.review-amount { @apply flex items-end justify-between border-b border-line-strong pb-3; }
+.review-amount span, .review-row span { @apply font-mono text-[10px] uppercase tracking-[.08em] text-muted; }
+.review-amount strong { @apply text-[25px] font-semibold tracking-[-.06em]; }
+.review-row { @apply flex items-center justify-between; }
+.review-row strong { @apply text-sm font-medium; }
+.optional-label { @apply ml-1 font-mono text-[10px] font-normal uppercase tracking-[.06em] text-muted; }
 .composer label { @apply grid min-w-0 gap-1.5 text-[11px] font-bold text-muted; }
 .composer input, .composer select { @apply min-w-0 max-w-full w-full rounded-[14px] border border-line-strong bg-white px-3 py-2 text-[13px] text-ink outline-0 transition focus:border-ink; }
 .calculator-keypad { @apply hidden; }
 .calculator-display { @apply rounded-[14px] border border-line-strong bg-soft px-3 py-3 text-right font-mono text-[20px] text-ink; overflow-wrap: anywhere; }
 .calculator-keys { @apply mt-2 grid grid-cols-4 gap-1.5; }
 .calculator-key { @apply inline-flex min-h-11 items-center justify-center rounded-[12px] border border-line bg-soft font-mono text-sm text-ink transition hover:border-line-strong hover:bg-white active:scale-[.97] disabled:cursor-wait disabled:opacity-50; }
-.calculator-key.operator { @apply border-ink bg-ink text-white hover:bg-ink; }
+.calculator-key.operator { @apply border-line-strong bg-soft text-ink hover:border-line-strong hover:bg-white; }
 .calculator-key.utility { @apply bg-white text-muted; }
-.calculator-key.equals { @apply col-span-full; }
+.calculator-key.equals { @apply col-span-full border-ink bg-ink text-white hover:bg-ink; }
 .form-split { @apply grid grid-cols-2 gap-2.5; }
 .category-picker { @apply grid gap-2; }
 .category-picker-heading { @apply flex items-center justify-between text-[11px] font-bold text-muted; }
@@ -218,10 +224,6 @@ h1 em { @apply not-italic text-ink; }
 .allocation-note, .form-error { @apply m-0 rounded-[14px] border border-line bg-soft px-3 py-[11px] text-[11px] leading-[1.55] text-muted; }
 .form-error { @apply border-line-strong bg-soft text-danger; }
 .submit-record { @apply mt-1 min-h-[36px] rounded-full px-4 py-2; }
-.composer-submit-actions { @apply sticky bottom-0 grid grid-cols-2 gap-2.5 border-t border-line bg-white pt-3; }
-.cancel-composer, .composer-submit-actions .submit-record { @apply inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[14px] border px-4 py-3 text-sm font-bold transition active:scale-[.98] disabled:cursor-wait disabled:opacity-50; }
-.cancel-composer { @apply border-line-strong bg-white text-ink hover:border-ink; }
-.composer-submit-actions .submit-record { @apply mt-0 border-ink; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
 @media (max-width: 700px) {
@@ -233,7 +235,11 @@ h1 em { @apply not-italic text-ink; }
   .composer { @apply flex min-h-dvh max-h-dvh w-full min-w-0 flex-col overflow-y-auto overflow-x-hidden rounded-none border-0 p-5 shadow-none; padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: 0; touch-action: pan-y; }
   .composer form { @apply flex min-w-0 flex-1 flex-col gap-4; }
   .composer-heading { @apply mb-5; }
+  .composer-progress { @apply mb-2; }
+  .composer-progress span { @apply text-[9px]; }
   .composer h2 { @apply text-[32px]; }
+  .composer-step h3 { @apply text-[30px]; }
+  .composer-step { @apply min-h-full; }
   .composer-type-indicator { @apply px-3 py-2 text-[11px]; }
   .close-composer { @apply size-10; }
   .calculator-key { @apply min-h-[54px] text-base; }
@@ -242,14 +248,13 @@ h1 em { @apply not-italic text-ink; }
   .category-selected { @apply px-3 py-2 text-xs; }
   .category-grid { @apply gap-2.5; }
   .category-button { @apply min-h-[50px] gap-2.5 rounded-[14px] px-3 text-sm; }
-  .composer-submit-actions { @apply mt-auto pt-4; margin-inline: -20px; padding-inline: 20px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
-  .cancel-composer, .composer-submit-actions .submit-record { @apply min-h-[54px] rounded-[16px] text-base; }
+  .composer-step-actions { @apply mt-auto pt-4; margin-inline: -20px; padding-inline: 20px; padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .step-back, .composer-step-actions .submit-record { @apply min-h-[54px] rounded-[16px] text-base; }
   .intro { @apply grid-cols-1 gap-7 pt-8 pb-[45px]; }
   .intro-copy { @apply mb-0; }
   .today-panel { @apply min-h-[220px] p-[26px]; }
   .accumulation-panel { @apply min-h-[190px] p-[26px]; }
   .today-mark { @apply hidden; }
-  .capture-grid { @apply grid-cols-1 gap-9 pt-[75px]; }
   .month-section, .activity-section { @apply pt-[75px]; }
   .day-row { @apply grid-cols-[42px_24px_1fr_75px_52px] gap-2; }
   .day-allocation { @apply text-[10px]; }
