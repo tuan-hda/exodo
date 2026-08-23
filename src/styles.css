@@ -171,8 +171,9 @@ h1 em { @apply not-italic text-ink; }
 .mobile-nav > button.active { @apply text-ink; }
 .mobile-nav-record { @apply relative z-10 grid size-12 place-items-center self-center justify-self-center rounded-full border-0 bg-ink text-white shadow-[0_8px_24px_rgb(21_21_21_/_0.2)]; }
 #today, #month, #activity { scroll-margin-top: 90px; }
-.modal-backdrop { @apply fixed inset-0 z-[5] grid place-items-center max-w-[100vw] overflow-y-auto overflow-x-hidden bg-ink/20 p-5 backdrop-blur-[8px]; touch-action: pan-y; animation: popup-fade .2s ease-out both; }
-.composer { @apply max-h-[calc(100dvh-40px)] w-[min(430px,100%)] overflow-y-auto overscroll-contain rounded-[32px] border border-line-strong bg-white p-[26px] text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)]; animation: popup-rise .28s cubic-bezier(.16, 1, .3, 1) both; }
+.modal-backdrop { @apply fixed inset-0 z-[5] grid items-end justify-items-center max-w-[100vw] overflow-y-auto overflow-x-hidden bg-ink/20 p-5 backdrop-blur-[8px]; touch-action: pan-y; animation: popup-fade .2s ease-out both; }
+.composer { @apply max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-[28px] border border-line-strong bg-white p-[26px] text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)]; animation: popup-rise .28s cubic-bezier(.16, 1, .3, 1) both; }
+.sheet-handle { @apply mx-auto mb-5 h-1 w-10 rounded-full bg-line-strong; }
 .composer-heading { @apply mb-7 flex justify-between; }
 .composer-actions { @apply flex items-center gap-2; }
 .composer-type-indicator { @apply inline-flex items-center gap-1.5 rounded-[10px] border border-line-strong bg-soft px-2.5 py-1.5 font-mono text-[10px] font-normal uppercase tracking-[.06em] text-muted; }
@@ -239,15 +240,14 @@ h1 em { @apply not-italic text-ink; }
   .composer input, .composer select { @apply text-base; }
   .composer label { @apply text-xs; }
   .category-selected { @apply text-[11px]; }
-  .modal-backdrop { @apply items-stretch overflow-hidden p-0; }
-  .composer { @apply flex min-h-dvh max-h-dvh w-full min-w-0 flex-col overflow-y-auto overflow-x-hidden rounded-none border-0 p-5 shadow-none; padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: 0; touch-action: pan-y; }
+  .modal-backdrop { @apply items-end overflow-hidden p-0; }
+  .composer { @apply flex min-h-0 max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] w-full min-w-0 flex-col overflow-y-auto overflow-x-hidden rounded-t-[28px] rounded-b-none border-0 p-5 shadow-[0_-12px_40px_rgb(21_21_21_/_0.12)]; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: 0; touch-action: pan-y; }
   .composer form { @apply flex min-w-0 flex-1 flex-col gap-4; }
   .composer-heading { @apply mb-5; }
   .composer-progress { @apply mb-2; }
   .composer-progress span { @apply text-[9px]; }
   .composer h2 { @apply text-[32px]; }
   .composer-step h3 { @apply text-[30px]; }
-  .composer-step { @apply min-h-full; }
   .composer-type-indicator { @apply px-3 py-2 text-[11px]; }
   .close-composer { @apply size-10; }
   .calculator-key { @apply min-h-[54px] text-base; }
@@ -287,8 +287,8 @@ h1 em { @apply not-italic text-ink; }
   .activity-row { @apply grid-cols-[30px_1fr_auto_20px] gap-[9px]; }
   .category-grid { @apply gap-1.5; }
   .category-button { @apply min-h-[50px] gap-2.5 rounded-[14px] px-3 text-sm; }
-  .modal-backdrop { @apply items-stretch overflow-hidden p-0; }
-  .composer { @apply min-h-dvh max-h-dvh w-full min-w-0 rounded-none border-0 p-5 shadow-none; padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: 0; }
+  .modal-backdrop { @apply items-end overflow-hidden p-0; }
+  .composer { @apply max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] w-full min-w-0 rounded-t-[28px] rounded-b-none border-0 p-5; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: 0; }
 }
 @media (max-width: 700px) {
   .amount-input { @apply hidden; }
