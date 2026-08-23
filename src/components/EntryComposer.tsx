@@ -4,12 +4,12 @@ import { FormEvent, useEffect, useState } from 'react'
 import { ArrowDown, ArrowUp, CircleNotch, X } from '@phosphor-icons/react'
 import { CategoryPicker, defaultCategory, type Category } from './CategoryPicker'
 import { CalculatorKeypad } from './CalculatorKeypad'
-import { currentTime, evaluateExpression, formatAmountExpression, todayKey } from '../lib/entry-utils'
+import { evaluateExpression, formatAmountExpression, getCurrentTime, todayKey } from '../lib/entry-utils'
 import type { Entry, EntryType } from '../types/entry'
 
-export function EntryComposer({ entry, type, isSaving, onClose, onSave, onTypeChange }: { entry?: Entry; type: EntryType; isSaving: boolean; onClose: () => void; onSave: (entry: Entry) => Promise<boolean>; onTypeChange: (type: EntryType) => void }) {
+export function EntryComposer({ entry, type, isSaving, dayKey = todayKey, onClose, onSave, onTypeChange }: { entry?: Entry; type: EntryType; isSaving: boolean; dayKey?: string; onClose: () => void; onSave: (entry: Entry) => Promise<boolean>; onTypeChange: (type: EntryType) => void }) {
   const [amount, setAmount] = useState(entry ? String(entry.amount) : '')
-  const [occurredAt, setOccurredAt] = useState(entry?.occurredAt ?? `${todayKey}T${currentTime}`)
+  const [occurredAt, setOccurredAt] = useState(entry?.occurredAt ?? `${dayKey}T${getCurrentTime()}`)
   const [title, setTitle] = useState(entry?.title ?? '')
   const [category, setCategory] = useState<Category>(entry?.category ?? defaultCategory(type))
   const [error, setError] = useState('')

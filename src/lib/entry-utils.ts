@@ -6,8 +6,17 @@ const accumulationCacheTtl = 60 * 60 * 1000
 const entriesCacheTtl = 24 * 60 * 60 * 1000
 
 export const today = new Date()
-export const todayKey = today.toISOString().slice(0, 10)
-export const currentTime = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`
+
+export function getDayKey(date = new Date()) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
+
+export function getCurrentTime(date = new Date()) {
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+}
+
+export const todayKey = getDayKey(today)
+export const currentTime = getCurrentTime(today)
 
 type AccumulationCache = {
   value: number

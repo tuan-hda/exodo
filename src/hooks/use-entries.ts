@@ -10,11 +10,9 @@ export function useEntries(userId?: string) {
   const { getSupabase } = useSupabase()
   const [entries, setEntries] = useState<Entry[]>([])
   const [accumulation, setAccumulation] = useState<number | null>(null)
-  const [loadedUserId, setLoadedUserId] = useState<string | null>(null)
   const [persistenceError, setPersistenceError] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null)
-  const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -26,8 +24,6 @@ export function useEntries(userId?: string) {
         setEntries(cachedEntries)
         setAccumulation(calculateAccumulation(cachedEntries))
       }
-      setLoadedUserId(userId)
-      setIsRefreshing(true)
       setPersistenceError('')
 
       try {
@@ -68,8 +64,6 @@ export function useEntries(userId?: string) {
           }
           setPersistenceError('Could not load your records. Please try again.')
         }
-      } finally {
-        if (!cancelled) setIsRefreshing(false)
       }
     }
 
@@ -140,5 +134,5 @@ export function useEntries(userId?: string) {
     }
   }, [entries, getSupabase, userId])
 
-  return { entries, accumulation, loadedUserId, persistenceError, isSaving, isRefreshing, deletingEntryId, saveEntry, removeEntry }
+  return { entries, accumulation, persistenceError, isSaving, deletingEntryId, saveEntry, removeEntry }
 }

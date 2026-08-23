@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { dailyIncome, fromKey, toKey } from '../allocation'
-import { entryDate, formatShort, monthDays, todayKey } from '../lib/entry-utils'
+import { entryDate, formatShort, monthDays } from '../lib/entry-utils'
 import type { Entry } from '../types/entry'
 
-export function MonthView({ entries, viewMonth, selectedDay, onMonthChange, onSelectDay }: { entries: Entry[]; viewMonth: Date; selectedDay: string; onMonthChange: (delta: number) => void; onSelectDay: (day: string) => void }) {
+export function MonthView({ entries, viewMonth, selectedDay, todayKey, onMonthChange, onSelectDay }: { entries: Entry[]; viewMonth: Date; selectedDay: string; todayKey: string; onMonthChange: (delta: number) => void; onSelectDay: (day: string) => void }) {
   const allocationEntries = entries.map(entry => ({ type: entry.type, amount: entry.amount, date: entryDate(entry) }))
   const currentMonthEntries = entries.filter(entry => {
     const date = fromKey(entryDate(entry))
