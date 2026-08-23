@@ -144,6 +144,14 @@ h1 em { @apply not-italic text-ink; }
 .activity-day .activity-row { @apply border-b border-line; }
 .activity-day .activity-row:last-child { @apply border-b-0; }
 .activity-load-more { @apply h-8; }
+.activity-date-nav { @apply mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-y border-line py-2; }
+.activity-date-option { @apply inline-flex min-w-0 items-center gap-1 rounded-[12px] px-2 py-2 text-left font-mono text-[10px] text-muted transition hover:bg-soft hover:text-ink disabled:cursor-not-allowed disabled:opacity-35; }
+.activity-date-option.next { @apply justify-end text-right; }
+.activity-date-option span { @apply overflow-hidden text-ellipsis whitespace-nowrap; }
+.activity-date-current { @apply grid justify-items-center gap-0.5 px-3 text-center; }
+.activity-date-current span { @apply font-mono text-[9px] uppercase tracking-[.1em] text-muted; }
+.activity-date-current strong { @apply text-sm font-semibold text-ink; }
+.activity-end { @apply m-0 border-t border-line px-2 py-4 text-center font-mono text-[10px] uppercase tracking-[.08em] text-muted; }
 .activity-row { @apply grid min-h-[67px] cursor-pointer grid-cols-[34px_1fr_auto_24px] items-center gap-[13px] border-b border-line transition-colors hover:bg-soft; }
 .activity-icon { @apply grid size-[29px] place-items-center rounded-full border text-current; }
 .activity-icon.income { @apply border-ink bg-ink text-white; }
