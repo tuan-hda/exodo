@@ -46,6 +46,7 @@
 .loading-shell { @apply grid place-items-center; }
 .loading-state { @apply inline-flex items-center gap-2 font-mono text-[11px] text-muted; }
 .loading-spinner { @apply animate-spin; }
+.sync-status { @apply inline-flex items-center gap-1.5 pt-3 font-mono text-[10px] text-muted; }
 .footer { @apply font-mono text-[11px] tracking-[.06em] text-muted; }
 .auth-state { @apply grid min-h-dvh place-items-center bg-white p-6 text-center text-sm text-muted; }
 .submit-record { @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink bg-ink px-3.5 py-2.5 text-xs font-bold text-white transition duration-200 hover:-translate-y-0.5 hover:border-ink hover:bg-white hover:text-ink; }
@@ -148,11 +149,15 @@ h1 em { @apply not-italic text-ink; }
 .activity-search input { @apply min-w-0 w-full border-0 bg-transparent px-0 py-2.5 text-sm text-ink outline-0 placeholder:text-muted; }
 .activity-count { @apply shrink-0 font-mono text-[10px] text-muted; }
 .activity-list { @apply mt-[9px] border-t border-line-strong; }
+.activity-day { @apply border-b border-line-strong; }
+.activity-day h3 { @apply m-0 border-b border-line px-0 py-3 font-mono text-[10px] font-normal uppercase tracking-[.08em] text-muted; }
+.activity-day .activity-row { @apply border-b border-line; }
+.activity-day .activity-row:last-child { @apply border-b-0; }
 .activity-pagination { @apply flex items-center justify-between border-t border-line pt-3; }
 .activity-pagination span { @apply font-mono text-[10px] text-muted; }
 .activity-pagination button { @apply grid size-8 place-items-center rounded-full border border-line-strong bg-white text-ink transition hover:border-ink disabled:cursor-not-allowed disabled:opacity-40; }
 .activity-row { @apply grid min-h-[67px] cursor-pointer grid-cols-[34px_1fr_auto_24px] items-center gap-[13px] border-b border-line transition-colors hover:bg-soft; }
-.activity-icon { @apply grid size-[29px] place-items-center rounded-full border border-line-strong bg-soft text-ink; }
+.activity-icon { @apply grid size-[29px] place-items-center rounded-full border text-current; }
 .activity-icon.income { @apply border-ink bg-ink text-white; }
 .activity-name strong, .activity-name small { @apply block; }
 .activity-name strong, .activity-row > b { @apply text-ink; }
@@ -165,10 +170,10 @@ h1 em { @apply not-italic text-ink; }
 .empty-activity p { @apply m-0 text-[13px]; }
 .footer { @apply mx-auto mt-[110px] flex w-[min(1180px,calc(100%-48px))] justify-between border-t border-line pt-4; }
 .mobile-nav { @apply hidden; }
-.mobile-nav > button:not(.mobile-nav-record), .mobile-nav-profile { @apply flex min-w-0 flex-col items-center justify-center gap-1 bg-transparent text-muted no-underline; }
+.mobile-nav > button:not(.mobile-nav-record), .mobile-nav-profile { @apply flex h-12 min-w-0 flex-col items-center justify-center gap-1 bg-transparent text-muted no-underline; }
 .mobile-nav > button:not(.mobile-nav-record) span { @apply font-mono text-[9px] uppercase tracking-[.04em]; }
 .mobile-nav > button.active { @apply text-ink; }
-.mobile-nav-record { @apply relative z-10 -mt-7 grid size-[54px] place-items-center rounded-full border-4 border-white bg-ink text-white shadow-[0_8px_24px_rgb(21_21_21_/_0.2)]; }
+.mobile-nav-record { @apply relative z-10 grid size-12 place-items-center self-center rounded-full border-0 bg-ink text-white shadow-[0_8px_24px_rgb(21_21_21_/_0.2)]; }
 #today, #month, #activity { scroll-margin-top: 90px; }
 .modal-backdrop { @apply fixed inset-0 z-[5] grid place-items-center max-w-[100vw] overflow-y-auto overflow-x-hidden bg-ink/20 p-5 backdrop-blur-[8px]; touch-action: pan-y; animation: popup-fade .2s ease-out both; }
 .composer { @apply max-h-[calc(100dvh-40px)] w-[min(430px,100%)] overflow-y-auto overscroll-contain rounded-[32px] border border-line-strong bg-white p-[26px] text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)]; animation: popup-rise .28s cubic-bezier(.16, 1, .3, 1) both; }
@@ -196,6 +201,18 @@ h1 em { @apply not-italic text-ink; }
 .category-grid { @apply grid w-full grid-cols-2 gap-2; }
 .category-button { @apply inline-flex min-h-10 w-full items-center justify-start gap-2 rounded-[12px] border border-line bg-soft px-3 py-2 text-left text-[11px] font-medium text-muted transition hover:border-line-strong hover:text-ink active:scale-[.98] disabled:cursor-wait disabled:opacity-50; }
 .category-button.selected { @apply border-ink bg-ink text-white; }
+.category-dining { @apply border-[#efb6a1] bg-[#fff0ea] text-[#a84528]; }
+.category-groceries { @apply border-[#b9d7b0] bg-[#edf8e9] text-[#397631]; }
+.category-shopping { @apply border-[#c9b9e8] bg-[#f3effd] text-[#694b9c]; }
+.category-transit { @apply border-[#a9c9e8] bg-[#edf6ff] text-[#31658e]; }
+.category-entertainment { @apply border-[#e9c88c] bg-[#fff7e5] text-[#936a18]; }
+.category-bill-fees { @apply border-[#c5cbd3] bg-[#f1f3f6] text-[#58616d]; }
+.category-gifts { @apply border-[#efb5cf] bg-[#fff0f7] text-[#a7436e]; }
+.category-travel { @apply border-[#a9d8d5] bg-[#ebf9f8] text-[#28716d]; }
+.category-beverage { @apply border-[#d9bd9e] bg-[#fbf1e6] text-[#8b5a2b]; }
+.category-salary { @apply border-[#7fbe91] bg-[#dff3e5] text-[#176b3a]; }
+.category-income { @apply border-[#a8c7e8] bg-[#eaf3ff] text-[#275f96]; }
+.category-other, .category-food { @apply border-line-strong bg-soft text-muted; }
 .allocation-note, .form-error { @apply m-0 rounded-[14px] border border-line bg-soft px-3 py-[11px] text-[11px] leading-[1.55] text-muted; }
 .form-error { @apply border-line-strong bg-soft text-danger; }
 .submit-record { @apply mt-1 min-h-[36px] rounded-full px-4 py-2; }
@@ -237,7 +254,7 @@ h1 em { @apply not-italic text-ink; }
   .footer { @apply mt-20; }
   .page { @apply pb-10; }
   .footer { @apply mb-5; }
-  .mobile-nav { @apply fixed inset-x-0 bottom-0 z-[4] grid grid-cols-5 items-center border-t border-line bg-white/95 px-4 pt-2 backdrop-blur-[16px]; display: grid; height: calc(68px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); }
+  .mobile-nav { @apply fixed inset-x-0 bottom-0 z-[4] grid grid-cols-5 items-center gap-1 border-t border-line bg-white/95 px-3 pt-2 backdrop-blur-[16px]; display: grid; height: calc(68px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); }
   .mobile-nav-profile { @apply h-full; }
   .mobile-nav > button:not(.mobile-nav-record):active { @apply text-ink; }
   .mobile-nav .account-popover { @apply fixed right-3 top-auto; bottom: calc(68px + env(safe-area-inset-bottom) + 12px); }

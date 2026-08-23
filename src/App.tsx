@@ -17,7 +17,7 @@ import type { Entry, EntryType } from './types/entry'
 
 function App() {
   const { user } = useUser()
-  const { entries, accumulation, loadedUserId, persistenceError, isSaving, deletingEntryId, saveEntry, removeEntry } = useEntries(user?.id)
+  const { entries, accumulation, persistenceError, isSaving, isRefreshing, deletingEntryId, saveEntry, removeEntry } = useEntries(user?.id)
   const [composerOpen, setComposerOpen] = useState(false)
   const [composerType, setComposerType] = useState<EntryType>('expense')
   const [editingEntry, setEditingEntry] = useState<Entry | undefined>()
@@ -78,10 +78,9 @@ function App() {
     return saved
   }
 
-  if (loadedUserId !== user?.id) return <div className="app-shell loading-shell" aria-busy="true"><div className="loading-state"><CircleNotch className="loading-spinner" size={18} /><span>Loading records</span></div></div>
-
   return <div className="app-shell"><main id="top" className="page">
     <nav className="desktop-tabs" aria-label="Primary navigation"><button className={activeTab === 'today' ? 'active' : ''} type="button" onClick={() => navigateTab('today')}>Today</button><button className={activeTab === 'month' ? 'active' : ''} type="button" onClick={() => navigateTab('month')}>Month</button><button className={activeTab === 'notifications' ? 'active' : ''} type="button" onClick={() => navigateTab('notifications')}>Notifications</button><button className={activeTab === 'account' ? 'active' : ''} type="button" onClick={() => navigateTab('account')}>Account</button></nav>
+    {isRefreshing && <p className="sync-status" role="status"><CircleNotch className="loading-spinner" size={13} /> Updating from Exodo…</p>}
     {persistenceError && <p className="form-error" role="alert">{persistenceError}</p>}
     {activeTab === 'today' && <><section className="intro"><div><p className="eyebrow">{today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p><h1>Spend what today<br /><em>makes possible.</em></h1></div><p className="intro-copy">Income becomes a daily allowance. Each expense makes the rest of today visible.</p></section><SummaryPanels entries={entries} accumulation={accumulation} /><section className="capture-grid"><div className="section-heading"><p className="eyebrow">make a note</p><h2>Keep the record<br />light.</h2><p>Two entries are enough to start: what came in, and what went out.</p></div><div className="capture-actions"><button className="capture-button income" onClick={() => openComposer('income')}><span className="capture-icon"><ArrowDown size={20} weight="bold" /></span><span><strong>Add income</strong><small>Spread it across its month</small></span><kbd>I</kbd><ArrowUp className="capture-arrow" size={18} /></button><button className="capture-button expense" onClick={() => openComposer('expense')}><span className="capture-icon"><ArrowUp size={20} weight="bold" /></span><span><strong>Add expense</strong><small>Subtract it from today</small></span><kbd>N</kbd><ArrowUp className="capture-arrow" size={18} /></button><div className="shortcut-hint"><span>Shortcuts</span><kbd>←</kbd><kbd>→</kbd><span>month</span><kbd>Esc</kbd><span>close</span></div></div></section><div className="home-activity"><ActivityList entries={entries} deletingEntryId={deletingEntryId} onEdit={entry => openComposer(entry.type, entry)} onRemove={removeEntry} /></div></>}
     {activeTab === 'month' && <section className="tab-view"><MonthView entries={entries} viewMonth={viewMonth} selectedDay={selectedDay} onMonthChange={moveMonth} onSelectDay={setSelectedDay} /></section>}

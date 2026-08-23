@@ -3,6 +3,7 @@ import type { Entry } from '../types/entry'
 const money = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 })
 const whole = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 0 })
 const accumulationCacheTtl = 60 * 60 * 1000
+const entriesCacheTtl = 24 * 60 * 60 * 1000
 
 export const today = new Date()
 export const todayKey = today.toISOString().slice(0, 10)
@@ -43,6 +44,24 @@ export function calculateAccumulation(entries: Entry[]) {
 
 function accumulationCacheKey(userId: string) {
   return `exodo.accumulation.${userId}`
+}
+
+function entriesCacheKey(userId: string) {
+  return `exodo.entries.${userId}`
+}
+
+export function readEntriesCache(userId: string) {
+  try {
+    const cached = JSON.parse(localStorage.getItem(entriesCacheKey(userId)) ?? 'null') as { entries?: Entry[]; cachedAt?: number } | null
+    if (!cached?.entries || !cached.cachedAt || Date.now() - cached.cachedAt > entriesCacheTtl) return null
+    return cached.entries
+  } catch {
+    return null
+  }
+}
+
+export function writeEntriesCache(userId: string, entries: Entry[]) {
+  localStorage.setItem(entriesCacheKey(userId), JSON.stringify({ entries, cachedAt: Date.now() }))
 }
 
 export function readAccumulationCache(userId: string) {

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useSupabase } from './use-supabase'
 import { type Category } from '../components/CategoryPicker'
 import type { Entry, StoredEntry } from '../types/entry'
-import { calculateAccumulation, invalidateAccumulationCache, readAccumulationCache, writeAccumulationCache } from '../lib/entry-utils'
+import { calculateAccumulation, invalidateAccumulationCache, readAccumulationCache, readEntriesCache, writeAccumulationCache, writeEntriesCache } from '../lib/entry-utils'
 
 export function useEntries(userId?: string) {
   const { getSupabase } = useSupabase()
@@ -14,13 +14,20 @@ export function useEntries(userId?: string) {
   const [persistenceError, setPersistenceError] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
     let cancelled = false
 
     async function loadEntries() {
       if (!userId) return
-      setLoadedUserId(null)
+      const cachedEntries = readEntriesCache(userId)
+      if (cachedEntries) {
+        setEntries(cachedEntries)
+        setAccumulation(calculateAccumulation(cachedEntries))
+      }
+      setLoadedUserId(userId)
+      setIsRefreshing(true)
       setPersistenceError('')
 
       try {
@@ -42,6 +49,7 @@ export function useEntries(userId?: string) {
         }))
         if (!cancelled) {
           setEntries(nextEntries)
+          writeEntriesCache(userId, nextEntries)
           const cachedAccumulation = readAccumulationCache(userId)
           if (cachedAccumulation === null) {
             const nextAccumulation = calculateAccumulation(nextEntries)
@@ -54,12 +62,14 @@ export function useEntries(userId?: string) {
       } catch (error) {
         console.error('Failed to load entries from Supabase', error)
         if (!cancelled) {
-          setEntries([])
-          setAccumulation(null)
+          if (!cachedEntries) {
+            setEntries([])
+            setAccumulation(null)
+          }
           setPersistenceError('Could not load your records. Please try again.')
         }
       } finally {
-        if (!cancelled) setLoadedUserId(userId)
+        if (!cancelled) setIsRefreshing(false)
       }
     }
 
@@ -95,6 +105,7 @@ export function useEntries(userId?: string) {
       const nextAccumulation = calculateAccumulation(nextEntries)
       setEntries(nextEntries)
       setAccumulation(nextAccumulation)
+      writeEntriesCache(userId, nextEntries)
       writeAccumulationCache(userId, nextAccumulation)
       return true
     } catch (error) {
@@ -119,6 +130,7 @@ export function useEntries(userId?: string) {
       const nextAccumulation = calculateAccumulation(nextEntries)
       setEntries(nextEntries)
       setAccumulation(nextAccumulation)
+      writeEntriesCache(userId, nextEntries)
       writeAccumulationCache(userId, nextAccumulation)
     } catch (error) {
       console.error('Failed to delete entry from Supabase', error)
@@ -128,5 +140,5 @@ export function useEntries(userId?: string) {
     }
   }, [entries, getSupabase, userId])
 
-  return { entries, accumulation, loadedUserId, persistenceError, isSaving, deletingEntryId, saveEntry, removeEntry }
+  return { entries, accumulation, loadedUserId, persistenceError, isSaving, isRefreshing, deletingEntryId, saveEntry, removeEntry }
 }
