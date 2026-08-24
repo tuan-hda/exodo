@@ -175,7 +175,7 @@ h1 em { @apply not-italic text-ink; }
 .mobile-nav > button.active { @apply text-ink; }
 .mobile-nav-record { @apply relative z-10 grid size-12 place-items-center self-center justify-self-center rounded-full border-0 bg-ink text-white shadow-[0_8px_24px_rgb(21_21_21_/_0.2)]; }
 #today, #month, #activity { scroll-margin-top: 90px; }
-.composer { @apply max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-[28px] border border-line-strong bg-white p-[26px] text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)]; }
+.composer { @apply max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-[28px] border border-line-strong bg-white p-[26px] text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)]; margin-inline: auto; }
 .sheet-safe-area { padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: max(16px, env(safe-area-inset-bottom)); }
 .sheet-handle { @apply mx-auto mb-5 h-1 w-10 rounded-full bg-line-strong; }
 .composer-heading { @apply mb-7 flex justify-between; }
@@ -195,9 +195,9 @@ h1 em { @apply not-italic text-ink; }
 .composer-step { @apply grid content-start gap-4; }
 .composer-step h3 { @apply m-0 text-[25px] tracking-[-.06em]; }
 .step-copy { @apply mt-2 max-w-[290px] text-[13px] leading-[1.6] text-muted; }
-.composer-step-actions { @apply sticky bottom-0 mt-2 grid grid-cols-2 gap-2.5 border-t border-line bg-white pt-3; }
+.composer-step-actions { @apply sticky bottom-0 mt-2 grid grid-cols-2 items-stretch gap-2.5 border-t border-line bg-white pt-3; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .composer-step-actions:has(> :only-child) { grid-template-columns: 1fr; }
-.step-back, .composer-step-actions .submit-record { @apply inline-flex min-h-[50px] items-center justify-center gap-2 rounded-[14px] border px-4 py-3 text-sm font-bold transition active:scale-[.98] disabled:cursor-wait disabled:opacity-50; }
+.step-back, .composer-step-actions .submit-record { @apply inline-flex min-h-[50px] w-full items-center justify-center gap-2 rounded-[14px] border px-4 py-3 text-sm font-bold transition active:scale-[.98] disabled:cursor-wait disabled:opacity-50; margin-top: 0; }
 .step-back { @apply border-line-strong bg-white text-ink; }
 .review-card { @apply grid gap-3 rounded-[18px] border border-line-strong bg-soft p-4; }
 .review-amount { @apply flex items-end justify-between border-b border-line-strong pb-3; }
@@ -244,7 +244,7 @@ h1 em { @apply not-italic text-ink; }
   .composer input, .composer select { @apply text-base; }
   .composer label { @apply text-xs; }
   .category-selected { @apply text-[11px]; }
-  .composer { @apply flex min-h-0 max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] w-full min-w-0 flex-col overflow-y-auto overflow-x-hidden rounded-t-[28px] rounded-b-none border-0 p-5 shadow-[0_-12px_40px_rgb(21_21_21_/_0.12)]; padding-top: max(16px, env(safe-area-inset-top)); touch-action: pan-y; }
+  .composer { @apply flex min-h-0 max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] w-full min-w-0 flex-col overflow-y-auto overflow-x-hidden rounded-t-[28px] rounded-b-none border-0 p-5 shadow-[0_-12px_40px_rgb(21_21_21_/_0.12)]; padding-top: max(16px, env(safe-area-inset-top)); margin-inline: 0; touch-action: pan-y; }
   .sheet-safe-area { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
   .composer form { @apply flex min-w-0 flex-1 flex-col gap-4; }
   .composer-heading { @apply mb-5; }
@@ -291,7 +291,7 @@ h1 em { @apply not-italic text-ink; }
   .activity-row { @apply grid-cols-[30px_1fr_auto_20px] gap-[9px]; }
   .category-grid { @apply gap-1.5; }
   .category-button { @apply min-h-[50px] gap-2.5 rounded-[14px] px-3 text-sm; }
-  .composer { @apply max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] w-full min-w-0 rounded-t-[28px] rounded-b-none border-0 p-5; padding-top: max(16px, env(safe-area-inset-top)); }
+  .composer { @apply max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] w-full min-w-0 rounded-t-[28px] rounded-b-none border-0 p-5; padding-top: max(16px, env(safe-area-inset-top)); margin-inline: 0; }
 }
 @media (max-width: 700px) {
   .amount-input { @apply hidden; }
