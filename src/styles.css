@@ -244,7 +244,7 @@ h1 em { @apply not-italic text-ink; }
   .composer input, .composer select { @apply text-base; }
   .composer label { @apply text-xs; }
   .category-selected { @apply text-[11px]; }
-  .composer { @apply flex min-h-0 max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] w-full min-w-0 flex-col overflow-y-auto overflow-x-hidden rounded-t-[28px] rounded-b-none border-0 p-5 shadow-[0_-12px_40px_rgb(21_21_21_/_0.12)]; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: 0; touch-action: pan-y; }
+  .composer { @apply flex min-h-0 max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] w-full min-w-0 flex-col overflow-y-auto overflow-x-hidden rounded-t-[28px] rounded-b-none border-0 p-5 shadow-[0_-12px_40px_rgb(21_21_21_/_0.12)]; padding-top: max(16px, env(safe-area-inset-top)); touch-action: pan-y; }
   .sheet-safe-area { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
   .composer form { @apply flex min-w-0 flex-1 flex-col gap-4; }
   .composer-heading { @apply mb-5; }
@@ -291,7 +291,7 @@ h1 em { @apply not-italic text-ink; }
   .activity-row { @apply grid-cols-[30px_1fr_auto_20px] gap-[9px]; }
   .category-grid { @apply gap-1.5; }
   .category-button { @apply min-h-[50px] gap-2.5 rounded-[14px] px-3 text-sm; }
-  .composer { @apply max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] w-full min-w-0 rounded-t-[28px] rounded-b-none border-0 p-5; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: 0; }
+  .composer { @apply max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] w-full min-w-0 rounded-t-[28px] rounded-b-none border-0 p-5; padding-top: max(16px, env(safe-area-inset-top)); }
 }
 @media (max-width: 700px) {
   .amount-input { @apply hidden; }
