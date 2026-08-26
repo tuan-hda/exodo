@@ -134,5 +134,36 @@ export function useEntries(userId?: string) {
     }
   }, [entries, getSupabase, userId])
 
-  return { entries, accumulation, persistenceError, isSaving, deletingEntryId, saveEntry, removeEntry }
+  const refreshEntries = useCallback(async () => {
+    if (!userId) return false
+    try {
+      const supabase = await getSupabase()
+      const { data, error } = await supabase
+        .from('entries')
+        .select('id, type, amount, occurred_at, title, category')
+        .eq('user_id', userId)
+        .order('occurred_at', { ascending: false })
+      if (error) throw error
+      const nextEntries = ((data ?? []) as StoredEntry[]).map(entry => ({
+        ...entry,
+        amount: Number(entry.amount),
+        occurredAt: entry.occurred_at.slice(0, 16),
+        title: entry.title ?? '',
+        category: (entry.category ?? 'Other') as Category,
+      }))
+      const nextAccumulation = calculateAccumulation(nextEntries)
+      setEntries(nextEntries)
+      setAccumulation(nextAccumulation)
+      writeEntriesCache(userId, nextEntries)
+      writeAccumulationCache(userId, nextAccumulation)
+      setPersistenceError('')
+      return true
+    } catch (error) {
+      console.error('Failed to refresh entries from Supabase', error)
+      setPersistenceError('Could not refresh your records. Please try again.')
+      return false
+    }
+  }, [getSupabase, userId])
+
+  return { entries, accumulation, persistenceError, isSaving, deletingEntryId, saveEntry, removeEntry, refreshEntries }
 }
