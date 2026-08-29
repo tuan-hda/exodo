@@ -1,8 +1,8 @@
 import type { Entry, StoredEntry } from './types'
 import type { Category } from './category'
 
-const money = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 })
-const whole = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 0 })
+const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 })
+const whole = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
 const accumulationCacheTtl = 60 * 60 * 1000
 const entriesCacheTtl = 24 * 60 * 60 * 1000
 
@@ -35,6 +35,11 @@ export function formatAmountExpression(value: string) {
     const grouped = Number(integer.replace(/,/g, '') || 0).toLocaleString('en-US')
     return fraction === undefined ? grouped : `${grouped}.${fraction}`
   })
+}
+
+export function formatMoneyInput(value: string) {
+  const digits = value.replace(/\D/g, '')
+  return digits ? Number(digits).toLocaleString('en-US') : ''
 }
 
 export function monthDays(date: Date) {

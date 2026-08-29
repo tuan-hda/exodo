@@ -29,7 +29,7 @@ export function EntryComposer({
   onTypeChange: (type: EntryType) => void
 }) {
   const [step, setStep] = useState<ComposerStep>(1)
-  const [amount, setAmount] = useState(entry ? String(entry.amount) : '')
+  const [amount, setAmount] = useState(entry ? formatAmountExpression(String(entry.amount)) : '')
   const [occurredAt, setOccurredAt] = useState(entry?.occurredAt ?? `${dayKey}T${getCurrentTime()}`)
   const [title, setTitle] = useState(entry?.title ?? '')
   const [category, setCategory] = useState<Category>(entry?.category ?? defaultCategory(type))

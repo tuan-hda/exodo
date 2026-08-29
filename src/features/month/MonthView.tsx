@@ -2,6 +2,8 @@ import { useMemo } from 'react'
 import { dailyIncome, fromKey, toKey } from '../finance/allocation'
 import { entryDate, formatShort, monthDays } from '../entries/entry-utils'
 import type { Entry } from '../entries/types'
+import type { CategoryBudget } from '../budgets/types'
+import { BudgetProgress } from '../budgets/BudgetProgress'
 
 export function MonthView({
   entries,
@@ -10,6 +12,7 @@ export function MonthView({
   todayKey,
   onMonthChange,
   onSelectDay,
+  budgets,
 }: {
   entries: Entry[]
   viewMonth: Date
@@ -17,6 +20,7 @@ export function MonthView({
   todayKey: string
   onMonthChange: (delta: number) => void
   onSelectDay: (day: string) => void
+  budgets: CategoryBudget[]
 }) {
   const allocationEntries = entries.map((entry) => ({ type: entry.type, amount: entry.amount, date: entryDate(entry) }))
   const currentMonthEntries = entries.filter((entry) => {
@@ -105,6 +109,11 @@ export function MonthView({
           <b>{currentMonthEntries.length}</b> records
         </span>
       </div>
+      <BudgetProgress
+        budgets={budgets}
+        entries={entries}
+        monthStart={`${viewMonth.getFullYear()}-${String(viewMonth.getMonth() + 1).padStart(2, '0')}-`}
+      />
       <div className="day-list">
         {visibleDailyRows.map((row) => (
           <div

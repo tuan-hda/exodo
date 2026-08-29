@@ -1,6 +1,6 @@
-import { Bell, CalendarBlank, House, Plus, UserCircle } from '@phosphor-icons/react'
+import { Bell, CalendarBlank, Gear, House, Plus } from '@phosphor-icons/react'
 
-export type AppTab = 'today' | 'month' | 'notifications' | 'account'
+export type AppTab = 'today' | 'month' | 'notifications' | 'settings'
 
 export function MobileTabBar({
   activeTab,
@@ -31,9 +31,9 @@ export function MobileTabBar({
         <Bell size={20} weight={activeTab === 'notifications' ? 'fill' : 'regular'} />
         <span>Alerts</span>
       </button>
-      <button className={activeTab === 'account' ? 'active' : ''} type="button" onClick={() => onChange('account')}>
-        <UserCircle size={20} weight={activeTab === 'account' ? 'fill' : 'regular'} />
-        <span>Account</span>
+      <button className={activeTab === 'settings' ? 'active' : ''} type="button" onClick={() => onChange('settings')}>
+        <Gear size={20} weight={activeTab === 'settings' ? 'fill' : 'regular'} />
+        <span>Settings</span>
       </button>
     </nav>
   )

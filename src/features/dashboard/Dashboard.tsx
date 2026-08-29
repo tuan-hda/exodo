@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { ArrowClockwise } from '@phosphor-icons/react'
 import { fromKey, toKey } from '../finance/allocation'
-import { AccountView } from '../account/AccountView'
+import { SettingsView } from '../settings/SettingsView'
 import { ActivityList } from '../activity/ActivityList'
 import { EntryComposer } from '../entries/EntryComposer'
 import { MonthView } from '../month/MonthView'
@@ -15,6 +15,8 @@ import { useEntries } from '../entries/use-entries'
 import { useDayBoundary } from './use-day-boundary'
 import { usePullToRefresh } from '../../hooks/use-pull-to-refresh'
 import type { Entry, EntryType } from '../entries/types'
+import { useBudgets } from '../budgets/use-budgets'
+import { BudgetProgress } from '../budgets/BudgetProgress'
 
 function Dashboard() {
   const { user } = useUser()
@@ -29,6 +31,8 @@ function Dashboard() {
   const [viewMonth, setViewMonth] = useState(new Date(currentDay.getFullYear(), currentDay.getMonth(), 1, 12))
   const [selectedDay, setSelectedDay] = useState(currentDayKey)
   const [activeTab, setActiveTab] = useState<AppTab>('today')
+  const { budgets } = useBudgets(user?.id)
+  const currentMonthPrefix = `${currentDay.getFullYear()}-${String(currentDay.getMonth() + 1).padStart(2, '0')}-`
 
   useEffect(() => {
     setSelectedDay(currentDayKey)
@@ -130,10 +134,10 @@ function Dashboard() {
               Notifications
             </button>
             <button
-              className={activeTab === 'account' ? 'active' : ''}
+              className={activeTab === 'settings' ? 'active' : ''}
               type="button"
-              onClick={() => navigateTab('account')}>
-              Account
+              onClick={() => navigateTab('settings')}>
+              Settings
             </button>
           </nav>
         </header>
@@ -160,6 +164,7 @@ function Dashboard() {
               </p>
             </section>
             <SummaryPanels entries={entries} accumulation={accumulation} dayKey={currentDayKey} />
+            <BudgetProgress budgets={budgets} entries={entries} monthStart={currentMonthPrefix} />
             <div className="home-activity">
               <ActivityList
                 entries={entries}
@@ -180,6 +185,7 @@ function Dashboard() {
               todayKey={currentDayKey}
               onMonthChange={moveMonth}
               onSelectDay={setSelectedDay}
+              budgets={budgets}
             />
           </section>
         )}
@@ -188,9 +194,9 @@ function Dashboard() {
             <NotificationsView />
           </section>
         )}
-        {activeTab === 'account' && (
+        {activeTab === 'settings' && (
           <section className="tab-view">
-            <AccountView />
+            <SettingsView />
           </section>
         )}
       </main>
