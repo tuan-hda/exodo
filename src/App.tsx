@@ -18,7 +18,8 @@ import type { Entry, EntryType } from './types/entry'
 
 function App() {
   const { user } = useUser()
-  const { entries, accumulation, persistenceError, isSaving, deletingEntryId, saveEntry, removeEntry, refreshEntries } = useEntries(user?.id)
+  const { entries, accumulation, persistenceError, isSaving, deletingEntryId, saveEntry, removeEntry, refreshEntries } =
+    useEntries(user?.id)
   const { pullDistance, isRefreshing } = usePullToRefresh(refreshEntries)
   const currentDayKey = useDayBoundary()
   const currentDay = fromKey(currentDayKey)
@@ -32,9 +33,11 @@ function App() {
   useEffect(() => {
     setSelectedDay(currentDayKey)
     const nextDay = fromKey(currentDayKey)
-    setViewMonth(current => current.getMonth() === nextDay.getMonth() && current.getFullYear() === nextDay.getFullYear()
-      ? current
-      : new Date(nextDay.getFullYear(), nextDay.getMonth(), 1, 12))
+    setViewMonth((current) =>
+      current.getMonth() === nextDay.getMonth() && current.getFullYear() === nextDay.getFullYear()
+        ? current
+        : new Date(nextDay.getFullYear(), nextDay.getMonth(), 1, 12),
+    )
   }, [currentDayKey])
 
   useEffect(() => {
@@ -69,7 +72,7 @@ function App() {
   }
 
   function moveMonth(delta: number) {
-    setViewMonth(current => {
+    setViewMonth((current) => {
       const next = new Date(current.getFullYear(), current.getMonth() + delta, 1, 12)
       setSelectedDay(toKey(next))
       return next
@@ -90,14 +93,129 @@ function App() {
     return saved
   }
 
-  return <div className="app-shell">{(pullDistance > 0 || isRefreshing) && <div className={`pull-refresh-indicator ${isRefreshing ? 'refreshing' : ''}`} style={{ transform: `translateY(${pullDistance}px)` }} aria-live="polite"><ArrowClockwise size={17} className={isRefreshing ? 'loading-spinner' : ''} /><span>{isRefreshing ? 'Refreshing' : pullDistance >= 56 ? 'Release to refresh' : 'Pull to refresh'}</span></div>}<main id="top" className="page">
-    <header className="app-header"><a className="app-wordmark" href="#top">exodo / έξοδο</a><span className="app-header-current">{activeTab}</span><nav className="desktop-tabs" aria-label="Primary navigation"><button className={activeTab === 'today' ? 'active' : ''} type="button" onClick={() => navigateTab('today')}>Today</button><button className={activeTab === 'month' ? 'active' : ''} type="button" onClick={() => navigateTab('month')}>Month</button><button className={activeTab === 'notifications' ? 'active' : ''} type="button" onClick={() => navigateTab('notifications')}>Notifications</button><button className={activeTab === 'account' ? 'active' : ''} type="button" onClick={() => navigateTab('account')}>Account</button></nav></header>
-    {persistenceError && <p className="form-error" role="alert">{persistenceError}</p>}
-    {activeTab === 'today' && <><section className="intro"><div><p className="eyebrow">{currentDay.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p><h1>Spend what today<br /><em>makes possible.</em></h1></div><p className="intro-copy">Income becomes a daily allowance. Each expense makes the rest of today visible.</p></section><SummaryPanels entries={entries} accumulation={accumulation} dayKey={currentDayKey} /><div className="home-activity"><ActivityList entries={entries} todayKey={currentDayKey} deletingEntryId={deletingEntryId} onEdit={entry => openComposer(entry.type, entry)} onRemove={removeEntry} /></div></>}
-    {activeTab === 'month' && <section className="tab-view"><MonthView entries={entries} viewMonth={viewMonth} selectedDay={selectedDay} todayKey={currentDayKey} onMonthChange={moveMonth} onSelectDay={setSelectedDay} /></section>}
-    {activeTab === 'notifications' && <section className="tab-view"><NotificationsView /></section>}
-    {activeTab === 'account' && <section className="tab-view"><AccountView /></section>}
-  </main><footer className="footer"><span>exodo / έξοδο</span><span>money is a daily practice</span></footer><MobileTabBar activeTab={activeTab} onChange={navigateTab} onRecord={() => openComposer('expense')} />{composerOpen && <EntryComposer key={editingEntry?.id ?? composerType} entry={editingEntry} type={composerType} dayKey={currentDayKey} isSaving={isSaving} onClose={() => { setComposerOpen(false); setEditingEntry(undefined) }} onTypeChange={setComposerType} onSave={handleSave} />}</div>
+  return (
+    <div className="app-shell">
+      {(pullDistance > 0 || isRefreshing) && (
+        <div
+          className={`pull-refresh-indicator ${isRefreshing ? 'refreshing' : ''}`}
+          style={{ transform: `translateY(${pullDistance}px)` }}
+          aria-live="polite">
+          <ArrowClockwise size={17} className={isRefreshing ? 'loading-spinner' : ''} />
+          <span>{isRefreshing ? 'Refreshing' : pullDistance >= 56 ? 'Release to refresh' : 'Pull to refresh'}</span>
+        </div>
+      )}
+      <main id="top" className="page">
+        <header className="app-header">
+          <a className="app-wordmark" href="#top">
+            exodo / έξοδο
+          </a>
+          <span className="app-header-current">{activeTab}</span>
+          <nav className="desktop-tabs" aria-label="Primary navigation">
+            <button
+              className={activeTab === 'today' ? 'active' : ''}
+              type="button"
+              onClick={() => navigateTab('today')}>
+              Today
+            </button>
+            <button
+              className={activeTab === 'month' ? 'active' : ''}
+              type="button"
+              onClick={() => navigateTab('month')}>
+              Month
+            </button>
+            <button
+              className={activeTab === 'notifications' ? 'active' : ''}
+              type="button"
+              onClick={() => navigateTab('notifications')}>
+              Notifications
+            </button>
+            <button
+              className={activeTab === 'account' ? 'active' : ''}
+              type="button"
+              onClick={() => navigateTab('account')}>
+              Account
+            </button>
+          </nav>
+        </header>
+        {persistenceError && (
+          <p className="form-error" role="alert">
+            {persistenceError}
+          </p>
+        )}
+        {activeTab === 'today' && (
+          <>
+            <section className="intro">
+              <div>
+                <p className="eyebrow">
+                  {currentDay.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                </p>
+                <h1>
+                  Spend what today
+                  <br />
+                  <em>makes possible.</em>
+                </h1>
+              </div>
+              <p className="intro-copy">
+                Income becomes a daily allowance. Each expense makes the rest of today visible.
+              </p>
+            </section>
+            <SummaryPanels entries={entries} accumulation={accumulation} dayKey={currentDayKey} />
+            <div className="home-activity">
+              <ActivityList
+                entries={entries}
+                todayKey={currentDayKey}
+                deletingEntryId={deletingEntryId}
+                onEdit={(entry) => openComposer(entry.type, entry)}
+                onRemove={removeEntry}
+              />
+            </div>
+          </>
+        )}
+        {activeTab === 'month' && (
+          <section className="tab-view">
+            <MonthView
+              entries={entries}
+              viewMonth={viewMonth}
+              selectedDay={selectedDay}
+              todayKey={currentDayKey}
+              onMonthChange={moveMonth}
+              onSelectDay={setSelectedDay}
+            />
+          </section>
+        )}
+        {activeTab === 'notifications' && (
+          <section className="tab-view">
+            <NotificationsView />
+          </section>
+        )}
+        {activeTab === 'account' && (
+          <section className="tab-view">
+            <AccountView />
+          </section>
+        )}
+      </main>
+      <footer className="footer">
+        <span>exodo / έξοδο</span>
+        <span>money is a daily practice</span>
+      </footer>
+      <MobileTabBar activeTab={activeTab} onChange={navigateTab} onRecord={() => openComposer('expense')} />
+      {composerOpen && (
+        <EntryComposer
+          key={editingEntry?.id ?? composerType}
+          entry={editingEntry}
+          type={composerType}
+          dayKey={currentDayKey}
+          isSaving={isSaving}
+          onClose={() => {
+            setComposerOpen(false)
+            setEditingEntry(undefined)
+          }}
+          onTypeChange={setComposerType}
+          onSave={handleSave}
+        />
+      )}
+    </div>
+  )
 }
 
 export default App

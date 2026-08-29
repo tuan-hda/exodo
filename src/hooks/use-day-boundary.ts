@@ -13,10 +13,13 @@ export function useDayBoundary() {
       const now = new Date()
       const nextMidnight = new Date(now)
       nextMidnight.setHours(24, 0, 0, 0)
-      timeoutId = window.setTimeout(() => {
-        setDayKey(getDayKey())
-        scheduleNextReset()
-      }, Math.max(nextMidnight.getTime() - now.getTime(), 1000))
+      timeoutId = window.setTimeout(
+        () => {
+          setDayKey(getDayKey())
+          scheduleNextReset()
+        },
+        Math.max(nextMidnight.getTime() - now.getTime(), 1000),
+      )
     }
 
     scheduleNextReset()

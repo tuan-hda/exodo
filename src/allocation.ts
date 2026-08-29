@@ -14,9 +14,7 @@ export function fromKey(value: string) {
 
 export function allocateIncome(income: IncomeLike, dayKey: string) {
   const received = fromKey(income.date)
-  const start = received.getDate() <= 15
-    ? received
-    : new Date(received.getFullYear(), received.getMonth() + 1, 1, 12)
+  const start = received.getDate() <= 15 ? received : new Date(received.getFullYear(), received.getMonth() + 1, 1, 12)
   const end = new Date(start.getFullYear(), start.getMonth() + 1, 0, 12)
   const day = fromKey(dayKey)
   if (day < start || day > end) return 0
@@ -25,5 +23,7 @@ export function allocateIncome(income: IncomeLike, dayKey: string) {
 }
 
 export function dailyIncome(entries: Array<{ type: string; amount: number; date: string }>, key: string) {
-  return entries.filter(entry => entry.type === 'income').reduce((sum, income) => sum + allocateIncome({ ...income, type: 'income' }, key), 0)
+  return entries
+    .filter((entry) => entry.type === 'income')
+    .reduce((sum, income) => sum + allocateIncome({ ...income, type: 'income' }, key), 0)
 }

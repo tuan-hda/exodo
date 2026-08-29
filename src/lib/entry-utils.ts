@@ -5,8 +5,6 @@ const whole = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 0 })
 const accumulationCacheTtl = 60 * 60 * 1000
 const entriesCacheTtl = 24 * 60 * 60 * 1000
 
-export const today = new Date()
-
 export function getDayKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
@@ -15,8 +13,7 @@ export function getCurrentTime(date = new Date()) {
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
 }
 
-export const todayKey = getDayKey(today)
-export const currentTime = getCurrentTime(today)
+export const todayKey = getDayKey()
 
 type AccumulationCache = {
   value: number
@@ -32,7 +29,7 @@ export function formatShort(value: number) {
 }
 
 export function formatAmountExpression(value: string) {
-  return value.replace(/\d[\d,]*(?:\.\d*)?/g, token => {
+  return value.replace(/\d[\d,]*(?:\.\d*)?/g, (token) => {
     const [integer, fraction] = token.split('.')
     const grouped = Number(integer.replace(/,/g, '') || 0).toLocaleString('en-US')
     return fraction === undefined ? grouped : `${grouped}.${fraction}`
@@ -61,7 +58,10 @@ function entriesCacheKey(userId: string) {
 
 export function readEntriesCache(userId: string) {
   try {
-    const cached = JSON.parse(localStorage.getItem(entriesCacheKey(userId)) ?? 'null') as { entries?: Entry[]; cachedAt?: number } | null
+    const cached = JSON.parse(localStorage.getItem(entriesCacheKey(userId)) ?? 'null') as {
+      entries?: Entry[]
+      cachedAt?: number
+    } | null
     if (!cached?.entries || !cached.cachedAt || Date.now() - cached.cachedAt > entriesCacheTtl) return null
     return cached.entries
   } catch {
@@ -87,7 +87,10 @@ export function readAccumulationCache(userId: string) {
 }
 
 export function writeAccumulationCache(userId: string, value: number) {
-  localStorage.setItem(accumulationCacheKey(userId), JSON.stringify({ value, cachedAt: Date.now() } satisfies AccumulationCache))
+  localStorage.setItem(
+    accumulationCacheKey(userId),
+    JSON.stringify({ value, cachedAt: Date.now() } satisfies AccumulationCache),
+  )
 }
 
 export function invalidateAccumulationCache(userId: string) {

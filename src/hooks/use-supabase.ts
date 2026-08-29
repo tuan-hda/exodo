@@ -7,7 +7,10 @@ import { createClerkSupabaseClient } from '../lib/supabase'
 export function useSupabase() {
   const { session } = useSession()
 
-  return useMemo(() => ({
-    getSupabase: async () => createClerkSupabaseClient(async () => (await session?.getToken()) ?? null),
-  }), [session])
+  return useMemo(
+    () => ({
+      getSupabase: async () => createClerkSupabaseClient(async () => (await session?.getToken()) ?? null),
+    }),
+    [session],
+  )
 }
