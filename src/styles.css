@@ -289,10 +289,10 @@
   @apply flex items-center gap-2;
 }
 .budget-input-row input {
-  @apply min-w-0 flex-1 rounded-[14px] border border-line-strong px-3 py-3 text-base outline-0 focus:border-ink;
+  @apply h-[50px] min-w-0 flex-1 rounded-[14px] border border-line-strong px-3 py-3 text-base outline-0 focus:border-ink;
 }
 .budget-input-row .submit-record {
-  @apply mt-0 min-h-[46px] rounded-[14px];
+  @apply mt-0 h-[50px] min-h-[50px] rounded-[14px];
 }
 .settings-muted {
   @apply m-0 mt-4 font-mono text-[10px] uppercase tracking-[.06em] text-muted;

@@ -12,6 +12,16 @@ import { fromKey } from '../finance/allocation'
 import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
 import { entryDate, formatShort } from '../entries/entry-utils'
 import type { Entry } from '../entries/types'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../../components/ui/alert-dialog'
 
 type ActivityDay = { key: string; label: string; entries: Entry[] }
 type ActivityMonth = { key: string; label: string; entries: Entry[]; income: number; expense: number }
@@ -48,6 +58,7 @@ export function ActivityList({
   onRemove: (id: string) => void
 }) {
   const [query, setQuery] = useState('')
+  const [entryToDelete, setEntryToDelete] = useState<Entry | null>(null)
   const [selectedMonth, setSelectedMonth] = useState(todayKey.slice(0, 7))
   const normalizedQuery = query.trim().toLocaleLowerCase()
   const sortedEntries = [...entries].sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
@@ -186,7 +197,7 @@ export function ActivityList({
                       disabled={deletingEntryId === entry.id}
                       onClick={(event) => {
                         event.stopPropagation()
-                        onRemove(entry.id)
+                        setEntryToDelete(entry)
                       }}
                       aria-label={`Remove ${entry.title || entry.category || entry.type}`}>
                       {deletingEntryId === entry.id ? (
@@ -208,6 +219,28 @@ export function ActivityList({
           </div>
         )}
       </div>
+      <AlertDialog open={Boolean(entryToDelete)} onOpenChange={(open) => !open && setEntryToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this transaction?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {entryToDelete
+                ? `This will permanently remove ${entryToDelete.title || entryToDelete.category || entryToDelete.type}.`
+                : 'This transaction will be permanently removed.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (entryToDelete) onRemove(entryToDelete.id)
+                setEntryToDelete(null)
+              }}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   )
 }
