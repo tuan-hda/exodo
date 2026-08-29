@@ -3,20 +3,20 @@
 import { useEffect, useState } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { ArrowClockwise } from '@phosphor-icons/react'
-import { fromKey, toKey } from '../allocation'
-import { AccountView } from './AccountView'
-import { ActivityList } from './ActivityList'
-import { EntryComposer } from './EntryComposer'
-import { MonthView } from './MonthView'
-import { MobileTabBar, type AppTab } from './MobileTabBar'
-import { NotificationsView } from './NotificationsView'
+import { fromKey, toKey } from '../finance/allocation'
+import { AccountView } from '../account/AccountView'
+import { ActivityList } from '../activity/ActivityList'
+import { EntryComposer } from '../entries/EntryComposer'
+import { MonthView } from '../month/MonthView'
+import { MobileTabBar, type AppTab } from '../navigation/MobileTabBar'
+import { NotificationsView } from '../notifications/NotificationsView'
 import { SummaryPanels } from './SummaryPanels'
-import { useEntries } from '../hooks/use-entries'
-import { useDayBoundary } from '../hooks/use-day-boundary'
-import { usePullToRefresh } from '../hooks/use-pull-to-refresh'
-import type { Entry, EntryType } from '../types/entry'
+import { useEntries } from '../entries/use-entries'
+import { useDayBoundary } from './use-day-boundary'
+import { usePullToRefresh } from '../../hooks/use-pull-to-refresh'
+import type { Entry, EntryType } from '../entries/types'
 
-function App() {
+function Dashboard() {
   const { user } = useUser()
   const { entries, accumulation, persistenceError, isSaving, deletingEntryId, saveEntry, removeEntry, refreshEntries } =
     useEntries(user?.id)
@@ -218,4 +218,4 @@ function App() {
   )
 }
 
-export default App
+export default Dashboard

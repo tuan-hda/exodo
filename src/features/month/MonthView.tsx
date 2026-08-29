@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { dailyIncome, fromKey, toKey } from '../allocation'
-import { entryDate, formatShort, monthDays } from '../lib/entry-utils'
-import type { Entry } from '../types/entry'
+import { dailyIncome, fromKey, toKey } from '../finance/allocation'
+import { entryDate, formatShort, monthDays } from '../entries/entry-utils'
+import type { Entry } from '../entries/types'
 
 export function MonthView({
   entries,

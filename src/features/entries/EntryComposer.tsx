@@ -4,10 +4,10 @@ import { FormEvent, useEffect, useState } from 'react'
 import { ArrowDown, ArrowLeft, ArrowUp, Check, CircleNotch, X } from '@phosphor-icons/react'
 import { CategoryPicker, defaultCategory, type Category } from './CategoryPicker'
 import { CalculatorKeypad } from './CalculatorKeypad'
-import { Sheet, SheetContent, SheetTitle } from './ui/sheet'
-import { Button } from './ui/button'
-import { evaluateExpression, formatAmountExpression, formatMoney, getCurrentTime, todayKey } from '../lib/entry-utils'
-import type { Entry, EntryType } from '../types/entry'
+import { Sheet, SheetContent, SheetTitle } from '../../components/ui/sheet'
+import { Button } from '../../components/ui/button'
+import { evaluateExpression, formatAmountExpression, formatMoney, getCurrentTime, todayKey } from './entry-utils'
+import type { Entry, EntryType } from './types'
 
 type ComposerStep = 1 | 2 | 3
 

@@ -16,7 +16,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
           children
         ) : (
           <div className="auth-state">
-            <SignIn routing="hash" />
+            <SignIn routing="hash" fallbackRedirectUrl="/" />
           </div>
         )}
       </ClerkLoaded>

@@ -1,5 +1,5 @@
-import type { Entry, StoredEntry } from '../types/entry'
-import type { Category } from '../types/category'
+import type { Entry, StoredEntry } from './types'
+import type { Category } from './category'
 
 const money = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 })
 const whole = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 0 })

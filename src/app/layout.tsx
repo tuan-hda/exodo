@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
-import { PwaRegistration } from '../components/PwaRegistration'
+import { PwaRegistration } from '../features/pwa/PwaRegistration'
+import { getClerkAllowedRedirectOrigins } from '../lib/clerk-origins'
 import '../styles.css'
+
+const clerkAllowedRedirectOrigins = getClerkAllowedRedirectOrigins()
 
 export const metadata: Metadata = {
   title: 'Exodo — daily money practice',
@@ -28,7 +31,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      allowedRedirectOrigins={clerkAllowedRedirectOrigins.length ? clerkAllowedRedirectOrigins : undefined}
+      signInUrl="/sign-in"
+      signInFallbackRedirectUrl="/"
+      signUpFallbackRedirectUrl="/">
       <html lang="en">
         <body>
           <PwaRegistration />

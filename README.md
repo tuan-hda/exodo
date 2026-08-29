@@ -21,12 +21,11 @@ pnpm build         # verify the production build
 
 ## Structure
 
-- `src/app` — Next.js routes, layouts, and route handlers
-- `src/components` — reusable UI and feature components
-- `src/hooks` — client-side state and browser behavior
-- `src/lib` — integrations and shared application utilities
-- `src/types` — shared domain types
-- `src/allocation.ts` — daily income allocation rules and tests
+- `src/app` — thin Next.js route pages, layouts, and route handlers
+- `src/features` — business features, feature UI, hooks, types, and domain logic
+- `src/components` — reusable/common UI, including shadcn primitives
+- `src/hooks` — generic client-side state and browser behavior
+- `src/lib` — cross-feature integrations and shared utilities
 - `docs` — database migration notes
 
-Environment variables are documented in `.env.example`. Clerk handles authentication; Supabase is accessed with the authenticated Clerk token on the client and a server-only service role key for protected Gmail callbacks.
+Environment variables are documented in `.env.example`. For LAN testing, set `NEXT_PUBLIC_CLERK_ALLOWED_REDIRECT_ORIGINS` to the full origin(s) that should receive Clerk redirects, separated by commas. This single setting configures both Clerk redirects and Next.js development-origin checks. Clerk handles authentication; Supabase is accessed with the authenticated Clerk token on the client and a server-only service role key for protected Gmail callbacks.

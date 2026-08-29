@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Backspace } from '@phosphor-icons/react'
-import { evaluateExpression, formatAmountExpression } from '../lib/entry-utils'
+import { evaluateExpression, formatAmountExpression } from './entry-utils'
 
 export function CalculatorKeypad({
   amount,

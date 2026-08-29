@@ -8,10 +8,10 @@ import {
   X,
 } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { fromKey } from '../allocation'
-import { categoryClass, categoryIcon } from './CategoryPicker'
-import { entryDate, formatShort } from '../lib/entry-utils'
-import type { Entry } from '../types/entry'
+import { fromKey } from '../finance/allocation'
+import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
+import { entryDate, formatShort } from '../entries/entry-utils'
+import type { Entry } from '../entries/types'
 
 type ActivityDay = { key: string; label: string; entries: Entry[] }
 type ActivityMonth = { key: string; label: string; entries: Entry[]; income: number; expense: number }

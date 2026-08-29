@@ -1,7 +1,7 @@
-import { ArrowDown, ArrowUp, Check } from '@phosphor-icons/react'
-import { dailyIncome } from '../allocation'
-import { entryDate, formatMoney } from '../lib/entry-utils'
-import type { Entry } from '../types/entry'
+import { ArrowDown, Check } from '@phosphor-icons/react'
+import { dailyIncome } from '../finance/allocation'
+import { entryDate, formatMoney } from '../entries/entry-utils'
+import type { Entry } from '../entries/types'
 
 export function SummaryPanels({
   entries,
@@ -16,10 +16,6 @@ export function SummaryPanels({
   const todayIncome = dailyIncome(allocationEntries, dayKey)
   const todaySpent = entries
     .filter((entry) => entry.type === 'expense' && entryDate(entry) === dayKey)
-    .reduce((sum, entry) => sum + entry.amount, 0)
-  const monthKey = dayKey.slice(0, 7)
-  const monthIncome = entries
-    .filter((entry) => entry.type === 'income' && entryDate(entry).startsWith(monthKey))
     .reduce((sum, entry) => sum + entry.amount, 0)
   const availableToday = todayIncome - todaySpent
 
@@ -40,17 +36,6 @@ export function SummaryPanels({
           <div className="mark-circle">
             <Check size={24} weight="bold" />
           </div>
-        </div>
-      </section>
-      <section className="accumulation-panel month-income-panel" aria-label="Income this month">
-        <div className="accumulation-copy">
-          <span className="today-label">income this month</span>
-          <strong>{formatMoney(monthIncome)}</strong>
-          <span className="today-detail">income received this month</span>
-        </div>
-        <div className="accumulation-mark">
-          <span>this month</span>
-          <ArrowUp size={23} weight="bold" />
         </div>
       </section>
       <section className="accumulation-panel" aria-label="All-time accumulation">

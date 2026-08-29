@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { useSupabase } from './use-supabase'
-import type { Entry, StoredEntry } from '../types/entry'
+import { useSupabase } from '../../hooks/use-supabase'
+import type { Entry, StoredEntry } from './types'
 import {
   calculateAccumulation,
   invalidateAccumulationCache,
@@ -11,7 +11,7 @@ import {
   readEntriesCache,
   writeAccumulationCache,
   writeEntriesCache,
-} from '../lib/entry-utils'
+} from './entry-utils'
 
 export function useEntries(userId?: string) {
   const { getSupabase } = useSupabase()

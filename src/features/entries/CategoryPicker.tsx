@@ -12,9 +12,9 @@ import {
   ShoppingBag,
   Wallet,
 } from '@phosphor-icons/react'
-import type { Category } from '../types/category'
+import type { Category } from './category'
 
-export type { Category } from '../types/category'
+export type { Category } from './category'
 
 export const expenseCategories: Category[] = [
   'Dining',
