@@ -1,4 +1,4 @@
-import type { Category } from '../components/CategoryPicker'
+import type { Category } from './category'
 
 export type EntryType = 'income' | 'expense'
 

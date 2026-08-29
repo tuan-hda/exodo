@@ -1,4 +1,5 @@
-import type { Entry } from '../types/entry'
+import type { Entry, StoredEntry } from '../types/entry'
+import type { Category } from '../types/category'
 
 const money = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 })
 const whole = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 0 })
@@ -42,6 +43,16 @@ export function monthDays(date: Date) {
 
 export function entryDate(entry: Entry) {
   return entry.occurredAt.slice(0, 10)
+}
+
+export function normalizeStoredEntry(entry: StoredEntry): Entry {
+  return {
+    ...entry,
+    amount: Number(entry.amount),
+    occurredAt: entry.occurred_at.slice(0, 16),
+    title: entry.title ?? '',
+    category: (entry.category ?? 'Other') as Category,
+  }
 }
 
 export function calculateAccumulation(entries: Entry[]) {

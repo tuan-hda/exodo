@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useSupabase } from './use-supabase'
-import { type Category } from '../components/CategoryPicker'
 import type { Entry, StoredEntry } from '../types/entry'
 import {
   calculateAccumulation,
   invalidateAccumulationCache,
+  normalizeStoredEntry,
   readAccumulationCache,
   readEntriesCache,
   writeAccumulationCache,
@@ -21,6 +21,18 @@ export function useEntries(userId?: string) {
   const [isSaving, setIsSaving] = useState(false)
   const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null)
 
+  const fetchEntries = useCallback(async () => {
+    const supabase = await getSupabase()
+    const { data, error } = await supabase
+      .from('entries')
+      .select('id, type, amount, occurred_at, title, category')
+      .eq('user_id', userId)
+      .order('occurred_at', { ascending: false })
+
+    if (error) throw error
+    return ((data ?? []) as StoredEntry[]).map(normalizeStoredEntry)
+  }, [getSupabase, userId])
+
   useEffect(() => {
     let cancelled = false
 
@@ -34,22 +46,7 @@ export function useEntries(userId?: string) {
       setPersistenceError('')
 
       try {
-        const supabase = await getSupabase()
-        const { data, error } = await supabase
-          .from('entries')
-          .select('id, type, amount, occurred_at, title, category')
-          .eq('user_id', userId)
-          .order('occurred_at', { ascending: false })
-
-        if (error) throw error
-
-        const nextEntries = ((data ?? []) as StoredEntry[]).map((entry) => ({
-          ...entry,
-          amount: Number(entry.amount),
-          occurredAt: entry.occurred_at.slice(0, 16),
-          title: entry.title ?? '',
-          category: (entry.category ?? 'Other') as Category,
-        }))
+        const nextEntries = await fetchEntries()
         if (!cancelled) {
           setEntries(nextEntries)
           writeEntriesCache(userId, nextEntries)
@@ -78,7 +75,7 @@ export function useEntries(userId?: string) {
     return () => {
       cancelled = true
     }
-  }, [getSupabase, userId])
+  }, [fetchEntries, userId])
 
   const saveEntry = useCallback(
     async (entry: Entry, isEditing: boolean) => {
@@ -152,20 +149,7 @@ export function useEntries(userId?: string) {
   const refreshEntries = useCallback(async () => {
     if (!userId) return false
     try {
-      const supabase = await getSupabase()
-      const { data, error } = await supabase
-        .from('entries')
-        .select('id, type, amount, occurred_at, title, category')
-        .eq('user_id', userId)
-        .order('occurred_at', { ascending: false })
-      if (error) throw error
-      const nextEntries = ((data ?? []) as StoredEntry[]).map((entry) => ({
-        ...entry,
-        amount: Number(entry.amount),
-        occurredAt: entry.occurred_at.slice(0, 16),
-        title: entry.title ?? '',
-        category: (entry.category ?? 'Other') as Category,
-      }))
+      const nextEntries = await fetchEntries()
       const nextAccumulation = calculateAccumulation(nextEntries)
       setEntries(nextEntries)
       setAccumulation(nextAccumulation)
@@ -178,7 +162,7 @@ export function useEntries(userId?: string) {
       setPersistenceError('Could not refresh your records. Please try again.')
       return false
     }
-  }, [getSupabase, userId])
+  }, [fetchEntries, userId])
 
   return { entries, accumulation, persistenceError, isSaving, deletingEntryId, saveEntry, removeEntry, refreshEntries }
 }

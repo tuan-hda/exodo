@@ -1,4 +1,4 @@
-import App from '../App'
+import App from '../components/App'
 import { AuthGate } from '../components/AuthGate'
 
 export default function Page() {
