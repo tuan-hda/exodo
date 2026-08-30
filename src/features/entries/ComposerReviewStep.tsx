@@ -7,7 +7,7 @@ import type { Entry, EntryType } from './types'
 const errorClassName =
   'm-0 rounded-[14px] border border-line-strong bg-soft px-3 py-[11px] text-[11px] leading-[1.55] text-danger'
 const inputClassName =
-  'min-w-0 max-w-full w-full rounded-[14px] border border-line-strong bg-white px-3 py-2 text-base text-ink outline-0 transition focus:border-ink'
+  'h-11 min-w-0 max-w-full w-full rounded-[14px] border border-line-strong bg-white px-3 py-2 text-base text-ink outline-0 transition focus:border-ink'
 const saveButtonClassName =
   'h-10 min-h-10 w-auto rounded-xl border border-ink bg-ink px-4 py-2 text-sm font-bold text-white shadow-[0_2px_5px_rgb(21_21_21_/_0.08)] transition active:scale-[.98] flex-1'
 

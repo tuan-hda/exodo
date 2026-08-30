@@ -124,7 +124,7 @@ export function CategoryPicker({
             disabled={disabled}
             type="button"
             className={clsx(
-              'inline-flex min-h-10 w-full items-center justify-start gap-2 rounded-xl border px-3 py-2 text-left text-[11px] font-medium transition hover:border-line-strong hover:text-ink active:scale-[.98] disabled:cursor-wait disabled:opacity-50',
+              'inline-flex min-h-10 w-full items-center justify-start gap-2 rounded-xl border px-3 py-2 text-left text-[11px] font-medium transition hover:text-ink active:scale-[.98] disabled:cursor-wait disabled:opacity-50',
               value === item ? 'border-ink bg-ink text-white' : categoryClass(item),
             )}
             aria-label={item}

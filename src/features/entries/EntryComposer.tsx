@@ -150,7 +150,7 @@ export function EntryComposer({
                 className={clsx(
                   'grid size-5 shrink-0 place-items-center rounded-full border border-line-strong bg-white not-italic',
                   step > index + 1 && 'border-ink text-ink',
-                  step === index + 1 && 'border-ink bg-ink text-white',
+                  step === index + 1 && 'border-ink bg-white text-ink',
                 )}>
                 {step > index + 1 ? <Check size={11} weight="bold" /> : index + 1}
               </i>

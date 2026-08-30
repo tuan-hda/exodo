@@ -118,7 +118,7 @@ export function ActivityList({
             <MagnifyingGlass size={16} />
             <span className="sr-only">Search activity</span>
             <input
-              className="min-w-0 w-full border-0 bg-transparent px-0 py-2.5 text-base text-ink outline-0 placeholder:text-muted"
+              className="h-10 min-w-0 w-full border-0 bg-transparent px-0 text-base text-ink outline-0 placeholder:text-muted"
               value={query}
               onChange={(event) => updateQuery(event.target.value)}
               placeholder="Search activity"

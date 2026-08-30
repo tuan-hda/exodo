@@ -23,11 +23,7 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
 
   return (
     <section className="mx-auto max-w-[620px] pb-8">
-      <Button
-        variant="outline"
-        className="mt-8 text-xs font-semibold text-muted hover:border-ink hover:text-ink"
-        type="button"
-        onClick={onBack}>
+      <Button variant="outline" className="mt-8 text-xs font-semibold text-muted" type="button" onClick={onBack}>
         <ArrowLeft size={17} /> Settings
       </Button>
       <div className="mt-8">
@@ -41,8 +37,8 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
             key={item}
             type="button"
             className={clsx(
-              'inline-flex min-h-11 items-center gap-2 rounded-xl border border-line bg-soft px-3 text-left text-xs text-muted transition hover:border-line-strong hover:text-ink',
-              category === item && 'border-ink bg-ink text-white',
+              'inline-flex min-h-11 items-center gap-2 rounded-xl border border-line bg-soft px-3 text-left text-xs text-muted transition hover:text-ink',
+              category === item && 'border-ink bg-white text-ink',
             )}
             onClick={() => setCategory(item)}>
             <span className={categoryClass(item)}>{categoryIcon(item, 16)}</span>
@@ -54,18 +50,18 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
         <label className="text-[11px] font-bold text-muted" htmlFor="budget-amount">
           Monthly limit for {category}
         </label>
-        <div className="flex items-center gap-2">
+        <div className="grid gap-2">
           <input
             id="budget-amount"
             inputMode="numeric"
             value={amount}
             onChange={(event) => setAmount(formatMoneyInput(event.target.value))}
-            className="h-[50px] min-w-0 flex-1 rounded-[14px] border border-line-strong px-3 py-3 text-base outline-0 focus:border-ink"
+            className="h-11 min-w-0 w-full rounded-[14px] border border-line-strong px-3 py-2 text-base outline-0 focus:border-ink"
             placeholder={currentBudget ? Number(currentBudget.amount).toLocaleString('en-US') : '0'}
           />
           <Button
             variant="outline"
-            className="mt-1 min-h-[36px] text-xs font-bold text-ink hover:-translate-y-0.5 hover:border-[#bdbdbd] active:translate-y-0 disabled:pointer-events-none"
+            className="h-10 min-h-10 w-full text-xs font-bold text-ink disabled:pointer-events-none"
             type="button"
             onClick={handleSave}
             disabled={isSaving || !amount.trim()}>

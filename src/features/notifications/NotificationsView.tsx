@@ -32,10 +32,7 @@ export function NotificationsView() {
           : 'Connect your Gmail so Exodo can find transaction alerts for your review.'}
       </p>
       {status !== 'loading' && (
-        <Button
-          asChild
-          variant="outline"
-          className="mt-5 text-xs font-bold text-muted hover:border-[#bdbdbd] hover:text-ink">
+        <Button asChild variant="outline" className="mt-5 text-xs font-bold text-muted">
           <a href="/api/gmail/connect">
             <EnvelopeSimple size={17} /> {connected ? 'Reconnect Gmail' : 'Connect Gmail'}
           </a>

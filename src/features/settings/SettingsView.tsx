@@ -46,7 +46,7 @@ export function SettingsView() {
       </div>
       <Button
         variant="outline"
-        className="mt-4 w-full text-xs font-bold text-muted hover:border-[#bdbdbd] hover:text-ink"
+        className="mt-4 w-full text-xs font-bold text-muted"
         type="button"
         onClick={() => signOut()}>
         <SignOut size={17} /> Sign out
