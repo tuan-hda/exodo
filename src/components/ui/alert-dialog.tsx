@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { AlertDialog as AlertDialogPrimitive } from 'radix-ui'
 
+import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 function AlertDialog({ ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Root>) {
@@ -79,10 +80,7 @@ function AlertDialogCancel({ className, ...props }: React.ComponentProps<typeof 
   return (
     <AlertDialogPrimitive.Cancel
       data-slot="alert-dialog-cancel"
-      className={cn(
-        'inline-flex min-h-11 items-center justify-center rounded-[14px] border border-line-strong bg-white px-4 py-3 text-sm font-bold transition hover:bg-soft active:scale-[.98]',
-        className,
-      )}
+      className={cn(buttonVariants({ variant: 'outline' }), 'text-sm font-bold active:scale-[.98]', className)}
       {...props}
     />
   )
@@ -92,10 +90,7 @@ function AlertDialogAction({ className, ...props }: React.ComponentProps<typeof 
   return (
     <AlertDialogPrimitive.Action
       data-slot="alert-dialog-action"
-      className={cn(
-        'inline-flex min-h-11 items-center justify-center rounded-[14px] border border-ink bg-ink px-4 py-3 text-sm font-bold text-white transition hover:bg-white hover:text-ink active:scale-[.98]',
-        className,
-      )}
+      className={cn(buttonVariants({ variant: 'default' }), 'text-sm font-bold active:scale-[.98]', className)}
       {...props}
     />
   )

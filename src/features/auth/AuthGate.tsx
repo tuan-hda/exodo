@@ -9,13 +9,15 @@ export function AuthGate({ children }: { children: ReactNode }) {
   return (
     <>
       <ClerkLoading>
-        <div className="auth-state">Loading your account…</div>
+        <div className="grid min-h-dvh place-items-center bg-white p-6 text-center text-sm text-muted">
+          Loading your account…
+        </div>
       </ClerkLoading>
       <ClerkLoaded>
         {isSignedIn ? (
           children
         ) : (
-          <div className="auth-state">
+          <div className="grid min-h-dvh place-items-center bg-white p-6 text-center text-sm text-muted">
             <SignIn routing="hash" fallbackRedirectUrl="/" />
           </div>
         )}

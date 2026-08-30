@@ -1,12 +1,15 @@
 'use client'
 
 import { FormEvent, useEffect, useState } from 'react'
-import { ArrowDown, ArrowLeft, ArrowUp, Check, CircleNotch, X } from '@phosphor-icons/react'
-import { CategoryPicker, defaultCategory, type Category } from './CategoryPicker'
-import { CalculatorKeypad } from './CalculatorKeypad'
+import { ArrowDown, ArrowUp, Check, X } from '@phosphor-icons/react'
+import { clsx } from 'clsx'
 import { Sheet, SheetContent, SheetTitle } from '../../components/ui/sheet'
 import { Button } from '../../components/ui/button'
-import { evaluateExpression, formatAmountExpression, formatMoney, getCurrentTime, todayKey } from './entry-utils'
+import { defaultCategory, type Category } from './CategoryPicker'
+import { ComposerAmountStep } from './ComposerAmountStep'
+import { ComposerCategoryStep } from './ComposerCategoryStep'
+import { ComposerReviewStep } from './ComposerReviewStep'
+import { evaluateExpression, formatAmountExpression, getCurrentTime, todayKey } from './entry-utils'
 import type { Entry, EntryType } from './types'
 
 type ComposerStep = 1 | 2 | 3
@@ -98,158 +101,105 @@ export function EntryComposer({
       <SheetContent
         side="bottom"
         showCloseButton={false}
-        className={`composer sheet-safe-area ${type}`}
+        className={clsx(
+          'max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-[28px] border border-line-strong bg-white p-[26px] text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)] [margin-inline:auto] [padding-top:max(16px,env(safe-area-inset-top))] [padding-bottom:max(16px,env(safe-area-inset-bottom))] max-[700px]:flex max-[700px]:min-h-0 max-[700px]:max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] max-[700px]:w-full max-[700px]:min-w-0 max-[700px]:overflow-x-hidden max-[700px]:rounded-t-[28px] max-[700px]:rounded-b-none max-[700px]:border-0 max-[700px]:p-5 max-[700px]:[margin-inline:0]',
+          type,
+        )}
         aria-busy={isSaving}>
         <SheetTitle className="sr-only">{entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}</SheetTitle>
-        <div className="sheet-handle" aria-hidden="true" />
-        <div className="composer-heading">
+        <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-line-strong" aria-hidden="true" />
+        <div className="mb-7 flex justify-between max-[700px]:mb-5">
           <h2 id="composer-title">{entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}</h2>
-          <div className="composer-actions">
-            <button
-              className="composer-type-indicator"
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className={clsx(
+                'inline-flex items-center gap-1.5 rounded-xl border border-line-strong bg-soft px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[.06em] text-muted max-[700px]:px-3 max-[700px]:py-2 max-[700px]:text-[11px]',
+                type === 'income' && 'border-[#7fbe91] bg-[#dff3e5] text-[#176b3a]',
+              )}
               type="button"
               disabled={isSaving}
               onClick={toggleType}
               aria-label={`Switch to ${type === 'income' ? 'expense' : 'income'}`}>
               {type === 'income' ? <ArrowDown size={14} weight="bold" /> : <ArrowUp size={14} weight="bold" />}
               {type === 'income' ? 'Income' : 'Expense'}
-            </button>
-            <button className="close-composer" type="button" disabled={isSaving} onClick={onClose} aria-label="Close">
+            </Button>
+            <Button
+              variant="outline"
+              size="icon-lg"
+              className="size-10 rounded-xl p-0 text-ink"
+              type="button"
+              disabled={isSaving}
+              onClick={onClose}
+              aria-label="Close">
               <X size={19} />
-            </button>
+            </Button>
           </div>
         </div>
-        <div className="composer-progress" aria-label="Record steps">
+        <div
+          className="mb-5 grid grid-cols-3 gap-2 border-b border-line pb-4 max-[700px]:mb-2"
+          aria-label="Record steps">
           {stepLabels.map((label, index) => (
-            <span className={step === index + 1 ? 'active' : step > index + 1 ? 'complete' : ''} key={label}>
-              <i>{step > index + 1 ? <Check size={11} weight="bold" /> : index + 1}</i>
+            <span
+              className={clsx(
+                'inline-flex items-center gap-1.5 font-mono text-[10px] text-muted max-[700px]:text-[9px]',
+                step === index + 1 && 'text-ink',
+              )}
+              key={label}>
+              <i
+                className={clsx(
+                  'grid size-5 shrink-0 place-items-center rounded-full border border-line-strong bg-white not-italic',
+                  step > index + 1 && 'border-ink text-ink',
+                  step === index + 1 && 'border-ink bg-ink text-white',
+                )}>
+                {step > index + 1 ? <Check size={11} weight="bold" /> : index + 1}
+              </i>
               {label}
             </span>
           ))}
         </div>
-        <form onSubmit={submit}>
+        <form
+          className="grid gap-3 max-[700px]:flex max-[700px]:min-w-0 max-[700px]:flex-1 max-[700px]:flex-col max-[700px]:gap-4"
+          onSubmit={submit}>
           {step === 1 && (
-            <section className="composer-step" aria-label="Choose category">
-              <CategoryPicker
-                disabled={isSaving}
-                type={type}
-                value={category}
-                onChange={(selectedCategory) => {
-                  setCategory(selectedCategory)
-                  setError('')
-                  setStep(2)
-                }}
-              />
-            </section>
+            <ComposerCategoryStep
+              type={type}
+              category={category}
+              disabled={isSaving}
+              onChange={(selectedCategory) => {
+                setCategory(selectedCategory)
+                setError('')
+                setStep(2)
+              }}
+            />
           )}
           {step === 2 && (
-            <section className="composer-step" aria-label="Enter amount">
-              <label>
-                Amount
-                <input
-                  className="amount-input"
-                  disabled={isSaving}
-                  readOnly={isMobile}
-                  autoFocus
-                  inputMode="decimal"
-                  value={amount}
-                  onChange={(event) => {
-                    setError('')
-                    setAmount(formatAmountExpression(event.target.value))
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                      event.preventDefault()
-                      nextStep()
-                    }
-                  }}
-                  onBlur={() => setAmount(formatAmountExpression(amount))}
-                  placeholder="0 or 1200 + 350"
-                />
-              </label>
-              <CalculatorKeypad
-                amount={amount}
-                disabled={isSaving}
-                onChange={(value) => {
-                  setAmount(value)
-                  setError('')
-                }}
-                onComplete={nextStep}
-              />
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
-              <div className="composer-step-actions">
-                <Button
-                  className="step-back"
-                  disabled={isSaving}
-                  type="button"
-                  variant="outline"
-                  onClick={previousStep}>
-                  <ArrowLeft size={17} /> Back
-                </Button>
-              </div>
-            </section>
+            <ComposerAmountStep
+              amount={amount}
+              disabled={isSaving}
+              error={error}
+              isMobile={isMobile}
+              onAmountChange={setAmount}
+              onClearError={() => setError('')}
+              onNext={nextStep}
+              onBack={previousStep}
+            />
           )}
           {step === 3 && (
-            <section className="composer-step" aria-label="Review record">
-              <div className="review-card">
-                <div className="review-amount">
-                  <span>{type === 'income' ? 'Income' : 'Expense'}</span>
-                  <strong>{formatMoney(evaluateExpression(amount))}</strong>
-                </div>
-                <div className="review-row">
-                  <span>Category</span>
-                  <strong>{category}</strong>
-                </div>
-              </div>
-              <label>
-                Name <span className="optional-label">optional</span>
-                <input
-                  disabled={isSaving}
-                  value={title}
-                  onChange={(event) => setTitle(event.target.value)}
-                  placeholder={type === 'income' ? 'Salary, bonus...' : 'Coffee, groceries...'}
-                />
-              </label>
-              <label>
-                Date and time
-                <input
-                  disabled={isSaving}
-                  type="datetime-local"
-                  value={occurredAt}
-                  onChange={(event) => setOccurredAt(event.target.value)}
-                />
-              </label>
-              {error && (
-                <p className="form-error" role="alert">
-                  {error}
-                </p>
-              )}
-              <div className="composer-step-actions">
-                <Button
-                  className="step-back"
-                  disabled={isSaving}
-                  type="button"
-                  variant="outline"
-                  onClick={previousStep}>
-                  <ArrowLeft size={17} /> Back
-                </Button>
-                <Button className="submit-record" disabled={isSaving} type="submit" variant="default">
-                  {isSaving ? (
-                    <>
-                      <CircleNotch className="loading-spinner" size={17} /> Saving…
-                    </>
-                  ) : (
-                    <>
-                      {entry ? 'Save changes' : 'Save record'} <Check size={17} weight="bold" />
-                    </>
-                  )}
-                </Button>
-              </div>
-            </section>
+            <ComposerReviewStep
+              entry={entry}
+              type={type}
+              amount={amount}
+              title={title}
+              occurredAt={occurredAt}
+              disabled={isSaving}
+              isSaving={isSaving}
+              error={error}
+              category={category}
+              onTitleChange={setTitle}
+              onOccurredAtChange={setOccurredAt}
+              onBack={previousStep}
+            />
           )}
         </form>
       </SheetContent>

@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { clsx } from 'clsx'
 import { ArrowLeft, Trash } from '@phosphor-icons/react'
 import { useUser } from '@clerk/nextjs'
+import { Button } from '../../components/ui/button'
 import { categoryClass, categoryIcon, expenseCategories } from '../entries/CategoryPicker'
 import { formatMoneyInput, formatShort } from '../entries/entry-utils'
 import { useBudgets } from '../budgets/use-budgets'
@@ -20,66 +22,94 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <section className="settings-view budget-settings-view">
-      <button className="settings-back" type="button" onClick={onBack}>
+    <section className="mx-auto max-w-[620px] pb-8">
+      <Button
+        variant="outline"
+        className="mt-8 text-xs font-semibold text-muted hover:border-ink hover:text-ink"
+        type="button"
+        onClick={onBack}>
         <ArrowLeft size={17} /> Settings
-      </button>
-      <div className="settings-page-heading">
-        <p className="eyebrow">recurring controls</p>
-        <h1>Budget settings</h1>
-        <p>These limits apply automatically to every month.</p>
+      </Button>
+      <div className="mt-8">
+        <p className="mb-[15px] font-mono text-[11px] uppercase tracking-[.12em] text-muted">recurring controls</p>
+        <h1 className="text-[clamp(42px,7vw,68px)]">Budget settings</h1>
+        <p className="mt-4 text-sm text-muted">These limits apply automatically to every month.</p>
       </div>
-      <div className="budget-category-picker">
+      <div className="mt-8 grid grid-cols-2 gap-2">
         {expenseCategories.map((item) => (
           <button
             key={item}
             type="button"
-            className={`budget-category-option ${category === item ? 'selected' : ''}`}
+            className={clsx(
+              'inline-flex min-h-11 items-center gap-2 rounded-xl border border-line bg-soft px-3 text-left text-xs text-muted transition hover:border-line-strong hover:text-ink',
+              category === item && 'border-ink bg-ink text-white',
+            )}
             onClick={() => setCategory(item)}>
             <span className={categoryClass(item)}>{categoryIcon(item, 16)}</span>
             {item}
           </button>
         ))}
       </div>
-      <div className="budget-form">
-        <label htmlFor="budget-amount">Monthly limit for {category}</label>
-        <div className="budget-input-row">
+      <div className="mt-5 grid gap-2">
+        <label className="text-[11px] font-bold text-muted" htmlFor="budget-amount">
+          Monthly limit for {category}
+        </label>
+        <div className="flex items-center gap-2">
           <input
             id="budget-amount"
             inputMode="numeric"
             value={amount}
             onChange={(event) => setAmount(formatMoneyInput(event.target.value))}
+            className="h-[50px] min-w-0 flex-1 rounded-[14px] border border-line-strong px-3 py-3 text-base outline-0 focus:border-ink"
             placeholder={currentBudget ? Number(currentBudget.amount).toLocaleString('en-US') : '0'}
           />
-          <button className="submit-record" type="button" onClick={handleSave} disabled={isSaving || !amount.trim()}>
+          <Button
+            variant="outline"
+            className="mt-1 min-h-[36px] text-xs font-bold text-ink hover:-translate-y-0.5 hover:border-[#bdbdbd] active:translate-y-0 disabled:pointer-events-none"
+            type="button"
+            onClick={handleSave}
+            disabled={isSaving || !amount.trim()}>
             {isSaving ? 'Saving…' : 'Save'}
-          </button>
+          </Button>
         </div>
       </div>
-      {isLoading && <p className="settings-muted">Loading budgets…</p>}
+      {isLoading && (
+        <p className="m-0 mt-4 font-mono text-[10px] uppercase tracking-[.06em] text-muted">Loading budgets…</p>
+      )}
       {error && (
-        <p className="form-error" role="alert">
+        <p
+          className="m-0 rounded-[14px] border border-line-strong bg-soft px-3 py-[11px] text-[11px] leading-[1.55] text-danger"
+          role="alert">
           {error}
         </p>
       )}
       {budgets.length > 0 && (
-        <div className="configured-budgets">
-          <p className="settings-muted">Recurring budgets</p>
+        <div className="mt-7 border-t border-line pt-4">
+          <p className="m-0 mt-4 font-mono text-[10px] uppercase tracking-[.06em] text-muted">Recurring budgets</p>
           {budgets.map((budget) => (
-            <div className="configured-budget" key={budget.id}>
-              <span>
-                <span className={`activity-icon ${categoryClass(budget.category)}`}>
+            <div
+              className="flex min-h-[54px] items-center gap-3 border-b border-line font-mono text-xs"
+              key={budget.id}>
+              <span className="flex min-w-0 flex-1 items-center gap-2">
+                <span
+                  className={clsx(
+                    'grid size-7 shrink-0 place-items-center rounded-full border text-current',
+                    categoryClass(budget.category),
+                  )}>
                   {categoryIcon(budget.category, 16)}
                 </span>
                 {budget.category}
               </span>
-              <strong>{formatShort(budget.amount)}</strong>
-              <button
+              <strong className="font-normal text-ink">{formatShort(budget.amount)}</strong>
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                className="rounded-xl p-1 text-muted transition hover:text-danger"
                 type="button"
                 aria-label={`Remove ${budget.category} budget`}
                 onClick={() => removeBudget(budget)}>
                 <Trash size={16} />
-              </button>
+              </Button>
             </div>
           ))}
         </div>

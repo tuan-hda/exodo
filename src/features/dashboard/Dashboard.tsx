@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { clsx } from 'clsx'
 import { useUser } from '@clerk/nextjs'
 import { ArrowClockwise } from '@phosphor-icons/react'
+import { Button } from '../../components/ui/button'
 import { fromKey, toKey } from '../finance/allocation'
 import { SettingsView } from '../settings/SettingsView'
 import { ActivityList } from '../activity/ActivityList'
@@ -98,74 +100,101 @@ function Dashboard() {
   }
 
   return (
-    <div className="app-shell">
+    <div className="min-h-dvh bg-white">
       {(pullDistance > 0 || isRefreshing) && (
         <div
-          className={`pull-refresh-indicator ${isRefreshing ? 'refreshing' : ''}`}
+          className={clsx(
+            'pointer-events-none fixed inset-x-0 top-0 z-[6] mx-auto flex w-fit items-center gap-2 rounded-full bg-ink px-3 py-2 font-mono text-[10px] uppercase tracking-[.06em] text-white opacity-90 shadow-[0_8px_24px_rgb(21_21_21_/_0.16)]',
+            isRefreshing && 'transition-transform duration-200',
+          )}
           style={{ transform: `translateY(${pullDistance}px)` }}
           aria-live="polite">
-          <ArrowClockwise size={17} className={isRefreshing ? 'loading-spinner' : ''} />
+          <ArrowClockwise size={17} className={clsx(isRefreshing && 'animate-spin')} />
           <span>{isRefreshing ? 'Refreshing' : pullDistance >= 56 ? 'Release to refresh' : 'Pull to refresh'}</span>
         </div>
       )}
-      <main id="top" className="page">
-        <header className="app-header">
-          <a className="app-wordmark" href="#top">
+      <main id="top" className="mx-auto w-[min(940px,calc(100%-48px))] max-[700px]:w-[calc(100%-32px)]">
+        <header className="sticky top-0 z-[3] flex min-h-12 items-center justify-between border-b border-line bg-white/95 pt-[max(10px,env(safe-area-inset-top))] backdrop-blur-[16px] max-[700px]:-mx-4 max-[700px]:px-4">
+          <a className="shrink-0 font-mono text-[11px] tracking-[.06em] text-muted no-underline" href="#top">
             exodo / έξοδο
           </a>
-          <span className="app-header-current">{activeTab}</span>
-          <nav className="desktop-tabs" aria-label="Primary navigation">
-            <button
-              className={activeTab === 'today' ? 'active' : ''}
+          <span className="hidden font-mono text-[10px] uppercase tracking-[.08em] text-muted max-[700px]:block">
+            {activeTab}
+          </span>
+          <nav className="flex gap-6 max-[700px]:hidden" aria-label="Primary navigation">
+            <Button
+              variant="ghost"
+              className={clsx(
+                'relative rounded-xl px-0 py-3 text-xs font-semibold text-muted transition hover:text-ink',
+                activeTab === 'today' &&
+                  'text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-ink',
+              )}
               type="button"
               onClick={() => navigateTab('today')}>
               Today
-            </button>
-            <button
-              className={activeTab === 'month' ? 'active' : ''}
+            </Button>
+            <Button
+              variant="ghost"
+              className={clsx(
+                'relative rounded-xl px-0 py-3 text-xs font-semibold text-muted transition hover:text-ink',
+                activeTab === 'month' &&
+                  'text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-ink',
+              )}
               type="button"
               onClick={() => navigateTab('month')}>
               Month
-            </button>
-            <button
-              className={activeTab === 'notifications' ? 'active' : ''}
+            </Button>
+            <Button
+              variant="ghost"
+              className={clsx(
+                'relative rounded-xl px-0 py-3 text-xs font-semibold text-muted transition hover:text-ink',
+                activeTab === 'notifications' &&
+                  'text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-ink',
+              )}
               type="button"
               onClick={() => navigateTab('notifications')}>
               Notifications
-            </button>
-            <button
-              className={activeTab === 'settings' ? 'active' : ''}
+            </Button>
+            <Button
+              variant="ghost"
+              className={clsx(
+                'relative rounded-xl px-0 py-3 text-xs font-semibold text-muted transition hover:text-ink',
+                activeTab === 'settings' &&
+                  'text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-ink',
+              )}
               type="button"
               onClick={() => navigateTab('settings')}>
               Settings
-            </button>
+            </Button>
           </nav>
         </header>
         {persistenceError && (
-          <p className="form-error" role="alert">
+          <p
+            className="m-0 rounded-[14px] border border-line-strong bg-soft px-3 py-[11px] text-[11px] leading-[1.55] text-danger"
+            role="alert">
             {persistenceError}
           </p>
         )}
         {activeTab === 'today' && (
           <>
-            <section className="intro">
+            <section className="grid grid-cols-[1.2fr_.8fr] items-end gap-10 pt-12 pb-14 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both] max-[700px]:grid-cols-1 max-[700px]:gap-7 max-[700px]:pt-8 max-[700px]:pb-[45px]">
               <div>
-                <p className="eyebrow">
+                <p className="mb-[15px] font-mono text-[11px] uppercase tracking-[.12em] text-muted">
                   {currentDay.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                 </p>
-                <h1>
+                <h1 className="mb-0 text-[clamp(46px,7vw,78px)] font-semibold leading-[.98] tracking-[-.09em] max-[430px]:text-[47px]">
                   Spend what today
                   <br />
-                  <em>makes possible.</em>
+                  <em className="not-italic text-ink">makes possible.</em>
                 </h1>
               </div>
-              <p className="intro-copy">
+              <p className="mb-2 max-w-[240px] text-sm leading-[1.7] text-muted max-[700px]:mb-0">
                 Income becomes a daily allowance. Each expense makes the rest of today visible.
               </p>
             </section>
             <SummaryPanels entries={entries} accumulation={accumulation} dayKey={currentDayKey} />
             <BudgetProgress budgets={budgets} entries={entries} monthStart={currentMonthPrefix} />
-            <div className="home-activity">
+            <div className="pt-16">
               <ActivityList
                 entries={entries}
                 todayKey={currentDayKey}
@@ -177,7 +206,7 @@ function Dashboard() {
           </>
         )}
         {activeTab === 'month' && (
-          <section className="tab-view">
+          <section className="pt-6">
             <MonthView
               entries={entries}
               viewMonth={viewMonth}
@@ -190,17 +219,17 @@ function Dashboard() {
           </section>
         )}
         {activeTab === 'notifications' && (
-          <section className="tab-view">
+          <section className="pt-6">
             <NotificationsView />
           </section>
         )}
         {activeTab === 'settings' && (
-          <section className="tab-view">
+          <section className="pt-6">
             <SettingsView />
           </section>
         )}
       </main>
-      <footer className="footer">
+      <footer className="mx-auto mt-[110px] flex w-[min(1180px,calc(100%-48px))] justify-between border-t border-line pt-4 font-mono text-[11px] tracking-[.06em] text-muted max-[700px]:mt-20 max-[700px]:w-[calc(100%-32px)]">
         <span>exodo / έξοδο</span>
         <span>money is a daily practice</span>
       </footer>

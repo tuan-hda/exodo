@@ -38,15 +38,21 @@ export function CalculatorKeypad({
   }
 
   return (
-    <div className="calculator-keypad" aria-label="Amount calculator">
-      <div className="calculator-display">{formatAmountExpression(amount || '0')}</div>
-      <div className="calculator-keys">
+    <div className="hidden max-[700px]:block" aria-label="Amount calculator">
+      <div className="rounded-[14px] border border-line-strong bg-soft px-3 py-3 text-right font-mono text-[20px] text-ink [overflow-wrap:anywhere]">
+        {formatAmountExpression(amount || '0')}
+      </div>
+      <div className="mt-2 grid grid-cols-4 gap-1.5">
         {['1', '2', '3', '÷', '4', '5', '6', '×', '7', '8', '9', '−', '0', '000', '⌫', '+', '='].map((key) => (
           <button
             key={key}
             disabled={disabled}
             type="button"
-            className={`calculator-key ${['÷', '×', '−', '+'].includes(key) ? 'operator' : ''} ${key === '⌫' ? 'utility' : ''} ${key === '=' ? 'equals' : ''}`}
+            className={
+              key === '='
+                ? 'col-span-full inline-flex min-h-[52px] items-center justify-center rounded-xl border border-ink bg-ink font-mono text-base text-white transition active:scale-[.97] disabled:cursor-wait disabled:opacity-50 max-[700px]:min-h-[58px]'
+                : `inline-flex min-h-[52px] items-center justify-center rounded-xl border ${['÷', '×', '−', '+'].includes(key) ? 'border-line-strong' : 'border-line'} ${key === '⌫' ? 'bg-white text-muted' : 'bg-soft text-ink'} font-mono text-base transition hover:border-line-strong active:scale-[.97] disabled:cursor-wait disabled:opacity-50 max-[700px]:min-h-[58px]`
+            }
             aria-label={key === '⌫' ? 'Delete last character' : key}
             onClick={() => {
               if (key === '⌫') backspace()
@@ -57,7 +63,13 @@ export function CalculatorKeypad({
           </button>
         ))}
       </div>
-      {error && <p className="form-error calculator-error">{error}</p>}
+      {error && (
+        <div
+          className="mt-3 rounded-[14px] border border-line-strong bg-soft px-3 py-[11px] text-[11px] leading-[1.55] text-danger"
+          role="alert">
+          {error}
+        </div>
+      )}
     </div>
   )
 }

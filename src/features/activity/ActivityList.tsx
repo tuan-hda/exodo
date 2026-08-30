@@ -7,7 +7,9 @@ import {
   MagnifyingGlass,
   X,
 } from '@phosphor-icons/react'
+import { clsx } from 'clsx'
 import { useState } from 'react'
+import { Button } from '../../components/ui/button'
 import { fromKey } from '../finance/allocation'
 import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
 import { entryDate, formatShort } from '../entries/entry-utils'
@@ -100,100 +102,130 @@ export function ActivityList({
   }
 
   return (
-    <section className="activity-section">
-      <div className="section-heading activity-heading">
+    <section className="pt-[106px] animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_260ms_both] max-[700px]:pt-[75px]">
+      <div className="flex items-end justify-between">
         <div>
-          <p className="eyebrow">recent activity</p>
-          <h2>What moved.</h2>
+          <p className="mb-[15px] font-mono text-[11px] uppercase tracking-[.12em] text-muted">recent activity</p>
+          <h2 className="mb-[17px] text-[clamp(30px,4vw,44px)] font-semibold leading-none tracking-[-.07em]">
+            What moved.
+          </h2>
         </div>
-        <ClockCounterClockwise size={22} />
+        <ClockCounterClockwise className="text-muted" size={22} />
       </div>
       {entries.length > 0 && (
-        <div className="activity-tools">
-          <label className="activity-search">
+        <div className="mt-5 flex items-center justify-between gap-3">
+          <label className="flex min-w-0 flex-1 items-center gap-2 rounded-[14px] border border-line-strong bg-white px-3 text-muted">
             <MagnifyingGlass size={16} />
             <span className="sr-only">Search activity</span>
-            <input value={query} onChange={(event) => updateQuery(event.target.value)} placeholder="Search activity" />
+            <input
+              className="min-w-0 w-full border-0 bg-transparent px-0 py-2.5 text-base text-ink outline-0 placeholder:text-muted"
+              value={query}
+              onChange={(event) => updateQuery(event.target.value)}
+              placeholder="Search activity"
+            />
           </label>
-          <span className="activity-count">
+          <span className="shrink-0 font-mono text-[10px] text-muted">
             {filteredEntries.length} {filteredEntries.length === 1 ? 'record' : 'records'}
           </span>
         </div>
       )}
       {monthKeys.length > 0 && (
-        <nav className="activity-date-nav" aria-label="Activity months">
-          <button
-            className="activity-date-option"
+        <nav
+          className="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-y border-line py-2"
+          aria-label="Activity months">
+          <Button
+            variant="ghost"
+            className="min-w-0 items-center gap-1 rounded-xl px-2 py-2 text-left font-mono text-[10px] text-muted transition hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
             disabled={!previousMonth}
             type="button"
             onClick={() => previousMonth && setSelectedMonth(previousMonth)}
             aria-label={previousMonth ? `Previous month, ${monthChip(previousMonth)}` : 'No previous month'}>
             <CaretLeft size={17} />
             <span>{previousMonth ? monthChip(previousMonth) : '—'}</span>
-          </button>
-          <div className="activity-date-current" aria-current="date">
-            <span>Viewing</span>
-            <strong>{activeMonth ? monthChip(activeMonth) : '—'}</strong>
+          </Button>
+          <div className="grid justify-items-center gap-0.5 px-3 text-center" aria-current="date">
+            <span className="font-mono text-[9px] uppercase tracking-[.1em] text-muted">Viewing</span>
+            <strong className="text-sm font-semibold text-ink">{activeMonth ? monthChip(activeMonth) : '—'}</strong>
           </div>
-          <button
-            className="activity-date-option next"
+          <Button
+            variant="ghost"
+            className="min-w-0 items-center justify-end gap-1 rounded-xl px-2 py-2 text-right font-mono text-[10px] text-muted transition hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
             disabled={!nextMonth}
             type="button"
             onClick={() => nextMonth && setSelectedMonth(nextMonth)}
             aria-label={nextMonth ? `Next month, ${monthChip(nextMonth)}` : 'No next month'}>
             <span>{nextMonth ? monthChip(nextMonth) : '—'}</span>
             <CaretRight size={17} />
-          </button>
+          </Button>
         </nav>
       )}
-      <div className="activity-list">
+      <div className="mt-[9px] border-t border-line-strong">
         {activeGroup ? (
-          <section className="activity-day">
-            <h3>{activeGroup.label}</h3>
-            <div className="activity-month-summary" aria-label={`${activeGroup.label} totals`}>
-              <span>
-                <b>Income</b>
-                <strong className="income">+{formatShort(activeGroup.income)}</strong>
+          <section className="border-b border-line-strong">
+            <h3 className="m-0 border-b border-line px-0 py-3 font-mono text-[10px] font-normal uppercase tracking-[.08em] text-muted">
+              {activeGroup.label}
+            </h3>
+            <div className="flex items-center justify-between gap-3 border-b border-line px-0 py-4">
+              <span className="grid gap-1">
+                <b className="font-mono text-[9px] font-normal uppercase tracking-[.08em] text-muted">Income</b>
+                <strong className="font-mono text-xs font-normal text-[#176b3a]">
+                  +{formatShort(activeGroup.income)}
+                </strong>
               </span>
-              <span>
-                <b>Expense</b>
-                <strong className="expense">-{formatShort(activeGroup.expense)}</strong>
+              <span className="grid justify-items-center gap-1 text-center">
+                <b className="font-mono text-[9px] font-normal uppercase tracking-[.08em] text-muted">Expense</b>
+                <strong className="font-mono text-xs font-normal text-[#a84528]">
+                  -{formatShort(activeGroup.expense)}
+                </strong>
               </span>
-              <span>
-                <b>Leftover</b>
-                <strong className={`leftover ${activeGroup.income - activeGroup.expense < 0 ? 'negative' : ''}`}>
+              <span className="grid justify-items-end gap-1 text-right">
+                <b className="font-mono text-[9px] font-normal uppercase tracking-[.08em] text-muted">Leftover</b>
+                <strong
+                  className={clsx(
+                    'font-mono text-xs font-normal',
+                    activeGroup.income - activeGroup.expense < 0 ? 'text-[#a84528]' : 'text-ink',
+                  )}>
                   {formatShort(activeGroup.income - activeGroup.expense)}
                 </strong>
               </span>
             </div>
             {groupByDate(activeGroup.entries).map((day) => (
-              <section className="activity-date-group" key={day.key}>
-                <h4>{day.label}</h4>
+              <section key={day.key}>
+                <h4 className="m-0 border-b border-line bg-soft px-2 py-3 font-mono text-[10px] font-normal uppercase tracking-[.08em] text-muted">
+                  {day.label}
+                </h4>
                 {day.entries.map((entry) => (
                   <div
-                    className="activity-row"
+                    className="grid min-h-[67px] cursor-pointer grid-cols-[34px_1fr_auto_24px] items-center gap-[13px] border-b border-line transition-colors max-[430px]:grid-cols-[30px_1fr_auto_20px] max-[430px]:gap-[9px]"
                     key={entry.id}
                     onClick={() => onEdit(entry)}
                     role="button"
                     tabIndex={0}
                     onKeyDown={(event) => event.key === 'Enter' && onEdit(entry)}>
-                    <span className={`activity-icon ${categoryClass(entry.category ?? 'Other')}`}>
+                    <span
+                      className={clsx(
+                        'grid size-[29px] place-items-center rounded-full border text-current',
+                        entry.type === 'income' && 'border-ink bg-ink text-white',
+                        categoryClass(entry.category ?? 'Other'),
+                      )}>
                       {categoryIcon(entry.category ?? 'Other', 16)}
                     </span>
-                    <span className="activity-name">
-                      <strong>
+                    <span>
+                      <strong className="block text-[13px] font-medium text-ink">
                         {entry.title || entry.category || (entry.type === 'income' ? 'Income' : 'Expense')}
                       </strong>
-                      <small>
+                      <small className="mt-1 block font-mono text-[10px] text-muted">
                         {entry.category ?? 'Other'} · {entry.occurredAt.slice(11, 16)}
                       </small>
                     </span>
-                    <b className={entry.type === 'income' ? 'income-text' : ''}>
+                    <b className={clsx('font-mono text-xs font-normal', entry.type === 'income' && 'text-ink')}>
                       {entry.type === 'income' ? '+' : '-'}
                       {formatShort(entry.amount)}
                     </b>
-                    <button
-                      className="remove-entry"
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      className="bg-transparent p-1 text-muted transition hover:text-danger"
                       disabled={deletingEntryId === entry.id}
                       onClick={(event) => {
                         event.stopPropagation()
@@ -201,21 +233,25 @@ export function ActivityList({
                       }}
                       aria-label={`Remove ${entry.title || entry.category || entry.type}`}>
                       {deletingEntryId === entry.id ? (
-                        <CircleNotch className="loading-spinner" size={15} />
+                        <CircleNotch className="animate-spin" size={15} />
                       ) : (
                         <X size={15} />
                       )}
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </section>
             ))}
-            <p className="activity-end">End of transactions</p>
+            <p className="m-0 border-t border-line px-2 py-4 text-center font-mono text-[10px] uppercase tracking-[.08em] text-muted">
+              End of transactions
+            </p>
           </section>
         ) : (
-          <div className="empty-activity">
+          <div className="grid justify-items-center gap-3 px-[45px] py-[45px] text-muted">
             <CalendarDots size={22} />
-            <p>{entries.length ? 'No matching records found.' : 'Your first record will show up here.'}</p>
+            <p className="m-0 text-[13px]">
+              {entries.length ? 'No matching records found.' : 'Your first record will show up here.'}
+            </p>
           </div>
         )}
       </div>

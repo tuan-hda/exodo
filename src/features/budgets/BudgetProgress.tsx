@@ -1,8 +1,10 @@
+import { clsx } from 'clsx'
 import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
 import { entryDate, formatShort } from '../entries/entry-utils'
 import type { Entry } from '../entries/types'
 import type { CategoryBudget } from './types'
 import { Progress } from '../../components/ui/progress'
+import { DashboardPanel } from '../dashboard/DashboardPanel'
 
 export function BudgetProgress({
   budgets,
@@ -26,34 +28,46 @@ export function BudgetProgress({
   if (!budgetRows.length) return null
 
   return (
-    <section className="budget-progress" aria-labelledby="budget-progress-title">
-      <div className="budget-progress-heading">
-        <div>
-          <p className="eyebrow">monthly limits</p>
-          <h3 id="budget-progress-title">By category</h3>
-        </div>
-        <span>{budgetRows.length} set</span>
+    <DashboardPanel
+      className="mt-6 min-h-[180px] rounded-[28px] border-line-strong bg-white px-[43px] py-[35px] max-[700px]:p-[26px]"
+      label="monthly limits"
+      aside={`${budgetRows.length} set`}
+      ariaLabel="Monthly limits">
+      <div className="flex items-end justify-between gap-4">
+        <h3
+          id="budget-progress-title"
+          className="m-0 text-[clamp(28px,4vw,40px)] font-semibold leading-none tracking-[-.07em]">
+          By category
+        </h3>
       </div>
-      <div className="budget-progress-list">
+      <div className="mt-5 grid gap-5">
         {budgetRows.map((row) => (
-          <div className="budget-progress-row" key={row.id}>
-            <div className="budget-progress-label">
-              <span>
-                <span className={`activity-icon ${categoryClass(row.category)}`}>{categoryIcon(row.category, 15)}</span>
+          <div className="grid gap-2" key={row.id}>
+            <div className="flex items-center justify-between gap-3 font-mono text-xs">
+              <span className="flex items-center gap-2">
+                <span
+                  className={clsx(
+                    'grid size-7 shrink-0 place-items-center rounded-full border text-current',
+                    categoryClass(row.category),
+                  )}>
+                  {categoryIcon(row.category, 15)}
+                </span>
                 {row.category}
               </span>
-              <strong className={row.percent > 100 ? 'over' : ''}>
-                {formatShort(row.spent)} <small>/ {formatShort(row.amount)}</small>
+              <strong className={clsx('font-normal', row.percent > 100 ? 'text-[#a84528]' : 'text-ink')}>
+                {formatShort(row.spent)} <small className="text-muted">/ {formatShort(row.amount)}</small>
               </strong>
             </div>
             <Progress
               value={Math.min(row.percent, 100)}
-              className={row.percent > 100 ? 'budget-progress-bar over' : 'budget-progress-bar'}
+              className={clsx(row.percent > 100 && '[&_[data-slot=progress-indicator]]:bg-[#a84528]')}
             />
-            {row.percent > 100 && <small className="budget-overage">{formatShort(row.spent - row.amount)} over</small>}
+            {row.percent > 100 && (
+              <small className="text-[10px] text-[#a84528]">{formatShort(row.spent - row.amount)} over</small>
+            )}
           </div>
         ))}
       </div>
-    </section>
+    </DashboardPanel>
   )
 }
