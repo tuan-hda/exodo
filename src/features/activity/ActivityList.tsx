@@ -52,12 +52,14 @@ export function ActivityList({
   deletingEntryId,
   onEdit,
   onRemove,
+  onOpenAnalysis,
 }: {
   entries: Entry[]
   todayKey: string
   deletingEntryId: string | null
   onEdit: (entry: Entry) => void
   onRemove: (id: string) => void
+  onOpenAnalysis: (monthKey: string) => void
 }) {
   const [query, setQuery] = useState('')
   const [entryToDelete, setEntryToDelete] = useState<Entry | null>(null)
@@ -162,10 +164,24 @@ export function ActivityList({
       <div className="mt-[9px] border-t border-line-strong">
         {activeGroup ? (
           <section className="border-b border-line-strong">
-            <h3 className="m-0 border-b border-line px-0 py-3 font-mono text-[10px] font-normal uppercase tracking-[.08em] text-muted">
-              {activeGroup.label}
-            </h3>
-            <div className="flex items-center justify-between gap-3 border-b border-line px-0 py-4">
+            <div className="flex items-center justify-between gap-3 border-b border-line py-3">
+              <h3 className="m-0 font-mono text-[10px] font-normal uppercase tracking-[.08em] text-muted">
+                {activeGroup.label}
+              </h3>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 rounded-lg px-2.5 font-mono text-[9px] uppercase tracking-[.06em]"
+                type="button"
+                onClick={() => onOpenAnalysis(activeGroup.key)}>
+                Analysis
+              </Button>
+            </div>
+            <button
+              type="button"
+              className="flex w-full items-center justify-between gap-3 border-b border-line bg-transparent px-0 py-4 text-left"
+              onClick={() => onOpenAnalysis(activeGroup.key)}
+              aria-label={`Analyze ${activeGroup.label}`}>
               <span className="grid gap-1">
                 <b className="font-mono text-[9px] font-normal uppercase tracking-[.08em] text-muted">Income</b>
                 <strong className="font-mono text-xs font-normal text-[#176b3a]">
@@ -188,7 +204,7 @@ export function ActivityList({
                   {formatShort(activeGroup.income - activeGroup.expense)}
                 </strong>
               </span>
-            </div>
+            </button>
             {groupByDate(activeGroup.entries).map((day) => (
               <section key={day.key}>
                 <h4 className="m-0 border-b border-line bg-soft px-2 py-3 font-mono text-[10px] font-normal uppercase tracking-[.08em] text-muted">

@@ -93,6 +93,43 @@ export function categoryClass(category: Category) {
   }
 }
 
+export function categoryChartColor(category: Category) {
+  switch (category) {
+    case 'Dining':
+      return '#e58a72'
+    case 'Groceries':
+      return '#8dbb8a'
+    case 'Shopping':
+      return '#8e7cc3'
+    case 'Transit':
+    case 'Transport':
+      return '#75a9c6'
+    case 'Entertainment':
+      return '#d9ad58'
+    case 'Bill & Fees':
+    case 'Bills':
+      return '#8096ac'
+    case 'Gifts':
+      return '#d98ba6'
+    case 'Travel':
+      return '#75a9c6'
+    case 'Beverage':
+      return '#b9875d'
+    case 'Food':
+      return '#c9a46c'
+    case 'Home':
+      return '#b69c86'
+    case 'Other':
+      return '#b9bdc3'
+    case 'Salary':
+      return '#176b3a'
+    case 'Income':
+      return '#75a9c6'
+    default:
+      return '#b9bdc3'
+  }
+}
+
 export function CategoryPicker({
   type,
   value,
@@ -124,14 +161,14 @@ export function CategoryPicker({
             disabled={disabled}
             type="button"
             className={clsx(
-              'inline-flex min-h-10 w-full items-center justify-start gap-2 rounded-xl border px-3 py-2 text-left text-[11px] font-medium transition hover:text-ink active:scale-[.98] disabled:cursor-wait disabled:opacity-50',
+              'inline-flex min-h-14 w-full items-center justify-start gap-2.5 rounded-xl border px-4 py-3 text-left text-sm font-medium transition hover:text-ink active:scale-[.98] disabled:cursor-wait disabled:opacity-50',
               value === item ? 'border-ink bg-ink text-white' : categoryClass(item),
             )}
             aria-label={item}
             title={item}
             aria-pressed={value === item}
             onClick={() => onChange(item)}>
-            {categoryIcon(item, 16)}
+            {categoryIcon(item, 18)}
             <span>{item}</span>
           </button>
         ))}

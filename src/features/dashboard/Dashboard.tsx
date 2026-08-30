@@ -19,6 +19,7 @@ import { usePullToRefresh } from '../../hooks/use-pull-to-refresh'
 import type { Entry, EntryType } from '../entries/types'
 import { useBudgets } from '../budgets/use-budgets'
 import { BudgetProgress } from '../budgets/BudgetProgress'
+import { AnalysisView } from '../analysis/AnalysisView'
 
 function Dashboard() {
   const { user } = useUser()
@@ -166,6 +167,17 @@ function Dashboard() {
               onClick={() => navigateTab('settings')}>
               Settings
             </Button>
+            <Button
+              variant="ghost"
+              className={clsx(
+                'relative rounded-xl px-0 py-3 text-xs font-semibold text-muted transition hover:text-ink',
+                activeTab === 'analysis' &&
+                  'text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-ink',
+              )}
+              type="button"
+              onClick={() => navigateTab('analysis')}>
+              Analysis
+            </Button>
           </nav>
         </header>
         {persistenceError && (
@@ -201,6 +213,11 @@ function Dashboard() {
                 deletingEntryId={deletingEntryId}
                 onEdit={(entry) => openComposer(entry.type, entry)}
                 onRemove={removeEntry}
+                onOpenAnalysis={(monthKey) => {
+                  const [year, month] = monthKey.split('-').map(Number)
+                  setViewMonth(new Date(year, month - 1, 1, 12))
+                  navigateTab('analysis')
+                }}
               />
             </div>
           </>
@@ -222,6 +239,14 @@ function Dashboard() {
           <section className="pt-6">
             <NotificationsView />
           </section>
+        )}
+        {activeTab === 'analysis' && (
+          <AnalysisView
+            entries={entries}
+            viewMonth={viewMonth}
+            onMonthChange={moveMonth}
+            onBack={() => navigateTab('today')}
+          />
         )}
         {activeTab === 'settings' && (
           <section className="pt-6">

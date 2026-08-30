@@ -2,7 +2,7 @@ import { Bell, CalendarBlank, Gear, House, Plus } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { Button } from '../../components/ui/button'
 
-export type AppTab = 'today' | 'month' | 'notifications' | 'settings'
+export type AppTab = 'today' | 'month' | 'analysis' | 'notifications' | 'settings'
 
 export function MobileTabBar({
   activeTab,

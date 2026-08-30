@@ -23,7 +23,12 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
 
   return (
     <section className="mx-auto max-w-[620px] pb-8">
-      <Button variant="outline" className="mt-8 text-xs font-semibold text-muted" type="button" onClick={onBack}>
+      <Button
+        variant="outline"
+        size="sm"
+        className="mt-8 text-xs font-semibold text-muted"
+        type="button"
+        onClick={onBack}>
         <ArrowLeft size={17} /> Settings
       </Button>
       <div className="mt-8">
@@ -37,11 +42,11 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
             key={item}
             type="button"
             className={clsx(
-              'inline-flex min-h-11 items-center gap-2 rounded-xl border border-line bg-soft px-3 text-left text-xs text-muted transition hover:text-ink',
+              'inline-flex min-h-14 items-center gap-2.5 rounded-xl border border-line bg-soft px-4 text-left text-sm text-muted transition hover:text-ink',
               category === item && 'border-ink bg-white text-ink',
             )}
             onClick={() => setCategory(item)}>
-            <span className={categoryClass(item)}>{categoryIcon(item, 16)}</span>
+            <span className={categoryClass(item)}>{categoryIcon(item, 18)}</span>
             {item}
           </button>
         ))}
