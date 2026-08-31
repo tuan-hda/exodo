@@ -171,7 +171,7 @@ export function PieChart({
           ))}
       </div>
       <div className="absolute inset-[25%] grid place-items-center rounded-full bg-white text-center">
-        <strong className="font-mono text-sm font-normal tracking-[-.04em]">{formatShort(total)}</strong>
+        <strong className="font-mono text-xl font-semibold tracking-[-.05em]">{formatShort(total)}</strong>
       </div>
     </div>
   )
