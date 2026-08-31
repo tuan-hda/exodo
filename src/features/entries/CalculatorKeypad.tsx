@@ -1,6 +1,7 @@
 'use client'
 
 import { Backspace } from '@phosphor-icons/react'
+import { triggerHaptic } from '@/lib/haptics'
 import { formatAmountExpression } from './entry-utils'
 
 export function CalculatorKeypad({
@@ -21,7 +22,7 @@ export function CalculatorKeypad({
   }
 
   function pressKey(key: string) {
-    navigator.vibrate?.(8)
+    triggerHaptic()
     if (key === '⌫') backspace()
     else append(key === '−' ? '-' : key)
   }
