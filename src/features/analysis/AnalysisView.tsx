@@ -1,74 +1,87 @@
 'use client'
 
-import { ArrowLeft, ChartDonut, CaretLeft, CaretRight, TrendDown, TrendUp } from '@phosphor-icons/react'
+import { useEffect, useState } from 'react'
+import { ArrowLeft, CaretLeft, CaretRight, TrendDown, TrendUp, X } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { Button } from '../../components/ui/button'
 import { Card } from '../../components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
-import { categoryChartColor, categoryClass, categoryIcon } from '../entries/CategoryPicker'
+import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
 import { formatShort } from '../entries/entry-utils'
 import type { Entry } from '../entries/types'
-import { getMonthEntries, groupByCategory } from './analysis-utils'
+import { formatPercentage, getMonthEntries, groupByCategory } from './analysis-utils'
+import { PieChart } from './PieChart'
 
-const MIN_LABEL_PERCENTAGE = 0.08
-
-function PieChart({ slices, total }: { slices: ReturnType<typeof groupByCategory>; total: number }) {
-  let offset = 0
-  const segments = slices.map((slice) => {
-    const start = offset
-    const end = offset + slice.percentage
-    const segment = `${start * 360}deg ${end * 360}deg`
-    offset += slice.percentage
-    return {
-      ...slice,
-      segment,
-      color: categoryChartColor(slice.category),
-      midpoint: (start + slice.percentage / 2) * Math.PI * 2 - Math.PI / 2,
-    }
-  })
+function CategoryDetail({
+  category,
+  type,
+  entries,
+  onClose,
+}: {
+  category: string
+  type: Entry['type']
+  entries: Entry[]
+  onClose: () => void
+}) {
+  const categoryEntries = entries
+    .filter((entry) => entry.type === type && (entry.category || 'Other') === category)
+    .sort((left, right) => right.occurredAt.localeCompare(left.occurredAt))
 
   return (
-    <div className="relative mx-auto size-[210px] max-[430px]:size-[180px]">
-      <div className="relative size-full">
-        <div
-          className="size-full rounded-full"
-          style={{
-            background: segments.length
-              ? `conic-gradient(${segments.map((item) => `${item.color} ${item.segment}`).join(', ')})`
-              : '#eeeeee',
-          }}
-          role="img"
-          aria-label={segments.length ? `Distribution totaling ${formatShort(total)}` : 'No records for this month'}
-        />
-        {segments
-          .filter((segment) => segment.percentage >= MIN_LABEL_PERCENTAGE)
-          .map((segment) => (
-            <span
-              className={clsx(
-                'pointer-events-none absolute grid size-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 bg-white shadow-[0_2px_8px_rgb(21_21_21_/_0.12)] max-[430px]:size-9',
-                categoryClass(segment.category),
-              )}
-              key={segment.category}
-              style={{
-                left: `${50 + Math.cos(segment.midpoint) * 50}%`,
-                top: `${50 + Math.sin(segment.midpoint) * 50}%`,
-              }}>
-              {categoryIcon(segment.category, 19)}
-            </span>
-          ))}
-      </div>
-      <div className="absolute inset-[27%] grid place-items-center rounded-full bg-white text-center">
+    <div className="mt-8 border-t border-line pt-4">
+      <div className="mb-2 flex items-center justify-between gap-3">
         <div>
-          <ChartDonut className="mx-auto mb-1 text-muted" size={17} />
-          <strong className="block font-mono text-sm font-normal tracking-[-.04em]">{formatShort(total)}</strong>
-          <span className="font-mono text-[9px] uppercase tracking-[.08em] text-muted">total</span>
+          <p className="mb-1 font-mono text-[10px] uppercase tracking-[.1em] text-muted">selected category</p>
+          <h3 className="m-0 text-xl font-semibold tracking-[-.05em]">{category}</h3>
         </div>
+        <Button variant="outline" size="icon-sm" type="button" onClick={onClose} aria-label="Close category details">
+          <X size={17} />
+        </Button>
       </div>
+      {categoryEntries.length ? (
+        <div>
+          {categoryEntries.map((entry, index) => (
+            <div
+              className="analysis-detail-item flex min-h-16 items-center gap-3 border-b border-line py-3"
+              style={{ animationDelay: `${index * 45}ms` }}
+              key={entry.id}>
+              <div className="min-w-0 flex-1">
+                <strong className="block truncate text-sm font-medium text-ink">{entry.title || category}</strong>
+                <small className="mt-1 block font-mono text-[10px] text-muted">
+                  {entry.occurredAt.slice(0, 10)} · {entry.occurredAt.slice(11, 16)}
+                </small>
+              </div>
+              <strong
+                className={clsx(
+                  'font-mono text-base font-semibold',
+                  type === 'expense' ? 'text-[#a84528]' : 'text-[#176b3a]',
+                )}>
+                {type === 'expense' ? '-' : '+'}
+                {formatShort(entry.amount)}
+              </strong>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="py-6 text-center text-sm text-muted">No transactions in this category.</p>
+      )}
     </div>
   )
 }
 
-function DistributionCard({ type, entries }: { type: Entry['type']; entries: Entry[] }) {
+function DistributionCard({
+  type,
+  entries,
+  selectedCategory,
+  onSelectCategory,
+  onCloseCategory,
+}: {
+  type: Entry['type']
+  entries: Entry[]
+  selectedCategory: string | null
+  onSelectCategory: (category: string) => void
+  onCloseCategory: () => void
+}) {
   const slices = groupByCategory(entries, type)
   const total = slices.reduce((sum, slice) => sum + slice.amount, 0)
   const isIncome = type === 'income'
@@ -78,10 +91,6 @@ function DistributionCard({ type, entries }: { type: Entry['type']; entries: Ent
       <div className="mb-7 flex items-start justify-between gap-3">
         <div>
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[.12em] text-muted">{type}</p>
-          <strong className={clsx('font-mono text-lg font-normal', isIncome ? 'text-[#176b3a]' : 'text-[#a84528]')}>
-            {isIncome ? '+' : '-'}
-            {formatShort(total)}
-          </strong>
         </div>
         {isIncome ? (
           <TrendUp className="text-[#176b3a]" size={21} />
@@ -89,13 +98,18 @@ function DistributionCard({ type, entries }: { type: Entry['type']; entries: Ent
           <TrendDown className="text-[#a84528]" size={21} />
         )}
       </div>
-      <PieChart slices={slices} total={total} />
-      {slices.length > 0 && (
+      <PieChart slices={slices} total={total} selectedCategory={selectedCategory} onSelect={onSelectCategory} />
+      {selectedCategory ? (
+        <CategoryDetail category={selectedCategory} type={type} entries={entries} onClose={onCloseCategory} />
+      ) : slices.length > 0 ? (
         <div className="mt-8 border-t border-line pt-2">
-          {slices.map((slice) => (
-            <div
-              className="flex min-h-12 items-center gap-3 border-b border-line py-2 last:border-b-0"
-              key={slice.category}>
+          {slices.map((slice, index) => (
+            <button
+              type="button"
+              className="analysis-category-item flex min-h-16 w-full items-center gap-3 border-b border-line bg-transparent py-3 text-left transition-colors hover:bg-soft last:border-b-0"
+              style={{ animationDelay: `${index * 45}ms` }}
+              key={slice.category}
+              onClick={() => onSelectCategory(slice.category)}>
               <span
                 className={clsx(
                   'grid size-8 shrink-0 place-items-center rounded-full border',
@@ -103,12 +117,25 @@ function DistributionCard({ type, entries }: { type: Entry['type']; entries: Ent
                 )}>
                 {categoryIcon(slice.category, 16)}
               </span>
-              <span className="min-w-0 flex-1 truncate text-sm text-muted">{slice.category}</span>
-              <strong className="font-mono text-xs font-normal text-ink">{formatShort(slice.amount)}</strong>
-            </div>
+              <span className="min-w-0 flex-1 truncate text-sm font-medium text-ink">
+                <span className="block truncate">{slice.category}</span>
+                <small className="mt-1 block font-mono text-[10px] font-normal text-muted">
+                  {formatPercentage(slice.percentage)} · {slice.transactionCount}{' '}
+                  {slice.transactionCount === 1 ? 'transaction' : 'transactions'}
+                </small>
+              </span>
+              <strong
+                className={clsx(
+                  'font-mono text-base font-semibold',
+                  type === 'expense' ? 'text-[#a84528]' : 'text-[#176b3a]',
+                )}>
+                {type === 'expense' ? '-' : '+'}
+                {formatShort(slice.amount)}
+              </strong>
+            </button>
           ))}
         </div>
-      )}
+      ) : null}
     </Card>
   )
 }
@@ -124,10 +151,20 @@ export function AnalysisView({
   onMonthChange: (delta: number) => void
   onBack: () => void
 }) {
+  const [activeType, setActiveType] = useState<Entry['type']>('expense')
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const monthEntries = getMonthEntries(entries, viewMonth)
   const monthLabel = viewMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
   const income = monthEntries.filter((entry) => entry.type === 'income').reduce((sum, entry) => sum + entry.amount, 0)
   const expense = monthEntries.filter((entry) => entry.type === 'expense').reduce((sum, entry) => sum + entry.amount, 0)
+
+  useEffect(() => {
+    setSelectedCategory(null)
+  }, [activeType, viewMonth])
+
+  function handleCategorySelect(category: string) {
+    setSelectedCategory((current) => (current === category ? null : category))
+  }
 
   return (
     <section className="pt-[106px] animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_120ms_both] max-[700px]:pt-[75px]">
@@ -179,16 +216,28 @@ export function AnalysisView({
           <b className="font-normal text-ink">{monthEntries.length}</b> records
         </span>
       </div>
-      <Tabs defaultValue="expense">
+      <Tabs value={activeType} onValueChange={(value) => setActiveType(value as Entry['type'])}>
         <TabsList aria-label="Analysis type">
           <TabsTrigger value="expense">Expense</TabsTrigger>
           <TabsTrigger value="income">Income</TabsTrigger>
         </TabsList>
-        <TabsContent value="expense">
-          <DistributionCard type="expense" entries={monthEntries} />
+        <TabsContent className="analysis-tab-content swipe-left" value="expense">
+          <DistributionCard
+            type="expense"
+            entries={monthEntries}
+            selectedCategory={activeType === 'expense' ? selectedCategory : null}
+            onSelectCategory={handleCategorySelect}
+            onCloseCategory={() => setSelectedCategory(null)}
+          />
         </TabsContent>
-        <TabsContent value="income">
-          <DistributionCard type="income" entries={monthEntries} />
+        <TabsContent className="analysis-tab-content swipe-right" value="income">
+          <DistributionCard
+            type="income"
+            entries={monthEntries}
+            selectedCategory={activeType === 'income' ? selectedCategory : null}
+            onSelectCategory={handleCategorySelect}
+            onCloseCategory={() => setSelectedCategory(null)}
+          />
         </TabsContent>
       </Tabs>
     </section>

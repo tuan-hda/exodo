@@ -5,6 +5,7 @@ export type AnalysisSlice = {
   category: string
   amount: number
   percentage: number
+  transactionCount: number
 }
 
 export function monthKey(date: Date) {
@@ -19,16 +20,25 @@ export function getMonthEntries(entries: Entry[], month: Date) {
 export function groupByCategory(entries: Entry[], type: Entry['type']): AnalysisSlice[] {
   const totals = entries
     .filter((entry) => entry.type === type)
-    .reduce<Record<string, number>>((groups, entry) => {
+    .reduce<Record<string, { amount: number; transactionCount: number }>>((groups, entry) => {
       const category = entry.category || 'Other'
-      groups[category] = (groups[category] ?? 0) + entry.amount
+      const current = groups[category] ?? { amount: 0, transactionCount: 0 }
+      groups[category] = {
+        amount: current.amount + entry.amount,
+        transactionCount: current.transactionCount + 1,
+      }
       return groups
     }, {})
-  const total = Object.values(totals).reduce((sum, amount) => sum + amount, 0)
+  const total = Object.values(totals).reduce((sum, group) => sum + group.amount, 0)
 
   return Object.entries(totals)
-    .sort(([, left], [, right]) => right - left)
-    .map(([category, amount]) => ({ category, amount, percentage: total ? amount / total : 0 }))
+    .sort(([, left], [, right]) => right.amount - left.amount)
+    .map(([category, group]) => ({
+      category,
+      amount: group.amount,
+      percentage: total ? group.amount / total : 0,
+      transactionCount: group.transactionCount,
+    }))
 }
 
 export function formatPercentage(value: number) {

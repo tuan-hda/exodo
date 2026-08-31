@@ -221,7 +221,6 @@ export function ActivityList({
                     <span
                       className={clsx(
                         'grid size-[29px] place-items-center rounded-full border text-current',
-                        entry.type === 'income' && 'border-ink bg-ink text-white',
                         categoryClass(entry.category ?? 'Other'),
                       )}>
                       {categoryIcon(entry.category ?? 'Other', 16)}

@@ -13,7 +13,7 @@ import {
   Wallet,
 } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
-import type { Category } from './category'
+import { categoryStyles, type Category } from './category'
 
 export type { Category } from './category'
 
@@ -65,69 +65,14 @@ export function categoryIcon(category: Category, size = 18) {
 }
 
 export function categoryClass(category: Category) {
-  switch (category) {
-    case 'Dining':
-      return 'border-[#efb6a1] bg-[#fff0ea] text-[#a84528]'
-    case 'Groceries':
-      return 'border-[#b9d7b0] bg-[#edf8e9] text-[#397631]'
-    case 'Shopping':
-      return 'border-[#c9b9e8] bg-[#f3effd] text-[#694b9c]'
-    case 'Transit':
-      return 'border-[#a9c9e8] bg-[#edf6ff] text-[#31658e]'
-    case 'Entertainment':
-      return 'border-[#e9c88c] bg-[#fff7e5] text-[#936a18]'
-    case 'Bill & Fees':
-      return 'border-[#c5cbd3] bg-[#f1f3f6] text-[#58616d]'
-    case 'Gifts':
-      return 'border-[#efb5cf] bg-[#fff0f7] text-[#a7436e]'
-    case 'Travel':
-      return 'border-[#a9d8d5] bg-[#ebf9f8] text-[#28716d]'
-    case 'Beverage':
-      return 'border-[#d9bd9e] bg-[#fbf1e6] text-[#8b5a2b]'
-    case 'Salary':
-      return 'border-[#7fbe91] bg-[#dff3e5] text-[#176b3a]'
-    case 'Income':
-      return 'border-[#a8c7e8] bg-[#eaf3ff] text-[#275f96]'
-    default:
-      return 'border-line-strong bg-soft text-muted'
-  }
+  const style = categoryStyles[category]
+  return style
+    ? `${style.borderClass} ${style.backgroundClass} ${style.foregroundClass}`
+    : 'border-line-strong bg-soft text-muted'
 }
 
 export function categoryChartColor(category: Category) {
-  switch (category) {
-    case 'Dining':
-      return '#e58a72'
-    case 'Groceries':
-      return '#8dbb8a'
-    case 'Shopping':
-      return '#8e7cc3'
-    case 'Transit':
-    case 'Transport':
-      return '#75a9c6'
-    case 'Entertainment':
-      return '#d9ad58'
-    case 'Bill & Fees':
-    case 'Bills':
-      return '#8096ac'
-    case 'Gifts':
-      return '#d98ba6'
-    case 'Travel':
-      return '#75a9c6'
-    case 'Beverage':
-      return '#b9875d'
-    case 'Food':
-      return '#c9a46c'
-    case 'Home':
-      return '#b69c86'
-    case 'Other':
-      return '#b9bdc3'
-    case 'Salary':
-      return '#176b3a'
-    case 'Income':
-      return '#75a9c6'
-    default:
-      return '#b9bdc3'
-  }
+  return categoryStyles[category]?.chartColor ?? '#707070'
 }
 
 export function CategoryPicker({
@@ -162,7 +107,7 @@ export function CategoryPicker({
             type="button"
             className={clsx(
               'inline-flex min-h-14 w-full items-center justify-start gap-2.5 rounded-xl border px-4 py-3 text-left text-sm font-medium transition hover:text-ink active:scale-[.98] disabled:cursor-wait disabled:opacity-50',
-              value === item ? 'border-ink bg-ink text-white' : categoryClass(item),
+              categoryClass(item),
             )}
             aria-label={item}
             title={item}
