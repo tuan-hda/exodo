@@ -15,3 +15,4 @@
 - Keep every text input at a minimum of 16px to prevent mobile browser zoom and preserve consistent touch-oriented form behavior.
 - Clerk is the authentication provider. Use `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` for the browser and never expose a Clerk secret key.
 - Run `pnpm test` for allocation tests and `pnpm run build` for the production verification build.
+- Keep implementation and responses as simple as possible; avoid unnecessary text, detail, or extra scope unless explicitly requested.
