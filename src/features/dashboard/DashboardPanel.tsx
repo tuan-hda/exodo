@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { clsx } from 'clsx'
+import { Card } from '../../components/ui/card'
 
 export function DashboardPanel({
   children,
@@ -17,7 +18,7 @@ export function DashboardPanel({
   ariaLabel?: string
 }) {
   return (
-    <section className={clsx('border border-line-strong bg-white', className)} aria-label={ariaLabel}>
+    <Card className={clsx(className)} aria-label={ariaLabel}>
       {(label || aside) && (
         <div className="col-span-full flex w-full items-start justify-between gap-4">
           {label && <span className="font-mono text-[11px] uppercase tracking-[.12em] text-muted">{label}</span>}
@@ -33,6 +34,6 @@ export function DashboardPanel({
         </div>
       )}
       {children}
-    </section>
+    </Card>
   )
 }

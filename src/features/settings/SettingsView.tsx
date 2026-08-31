@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { SignOut, UserCircle, Wallet } from '@phosphor-icons/react'
 import { useClerk, useUser } from '@clerk/nextjs'
 import { Button } from '../../components/ui/button'
+import { Card } from '../../components/ui/card'
 import { BudgetSettingsView } from './BudgetSettingsView'
 import { SettingsMenuItem } from './SettingsMenuItem'
 
@@ -26,7 +27,7 @@ export function SettingsView() {
         <p className="mb-3 font-mono text-[11px] uppercase tracking-[.12em] text-muted">settings</p>
         <h1 className="max-w-full break-words text-balance text-[clamp(34px,5vw,52px)]">{name}</h1>
         <p className="mt-3 text-sm text-muted">{email}</p>
-        <div className="mt-8 w-full rounded-[20px] border border-line bg-soft p-4 text-left">
+        <Card className="mt-8 w-full rounded-[20px] border-line bg-soft p-4 text-left">
           <div className="flex items-center gap-3">
             <UserCircle size={20} />
             <div>
@@ -34,7 +35,7 @@ export function SettingsView() {
               <small className="mt-1 block text-xs text-muted">Private to your account</small>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
       <div className="border-y border-line" aria-label="Settings menu">
         <SettingsMenuItem

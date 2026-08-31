@@ -61,7 +61,7 @@ export function MonthView({
 
   return (
     <section className="pt-[106px] animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_200ms_both] max-[700px]:pt-[75px]">
-      <div className="flex items-end justify-between">
+      <div className="flex items-center justify-between">
         <div>
           <p className="mb-[15px] font-mono text-[11px] uppercase tracking-[.12em] text-muted">the daily view</p>
           <h2 className="mb-[17px] text-[clamp(30px,4vw,44px)] font-semibold leading-none tracking-[-.07em]">

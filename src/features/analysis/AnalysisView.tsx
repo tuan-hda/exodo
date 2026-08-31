@@ -3,6 +3,7 @@
 import { ArrowLeft, ChartDonut, CaretLeft, CaretRight, TrendDown, TrendUp } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { Button } from '../../components/ui/button'
+import { Card } from '../../components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
 import { categoryChartColor, categoryClass, categoryIcon } from '../entries/CategoryPicker'
 import { formatShort } from '../entries/entry-utils'
@@ -73,9 +74,7 @@ function DistributionCard({ type, entries }: { type: Entry['type']; entries: Ent
   const isIncome = type === 'income'
 
   return (
-    <section
-      className="rounded-[28px] border border-line-strong bg-white p-5 max-[700px]:p-4"
-      aria-label={`${type} distribution`}>
+    <Card className="p-5 max-[700px]:p-4" aria-label={`${type} distribution`}>
       <div className="mb-7 flex items-start justify-between gap-3">
         <div>
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[.12em] text-muted">{type}</p>
@@ -110,7 +109,7 @@ function DistributionCard({ type, entries }: { type: Entry['type']; entries: Ent
           ))}
         </div>
       )}
-    </section>
+    </Card>
   )
 }
 
@@ -141,7 +140,7 @@ export function AnalysisView({
         <ArrowLeft size={15} />
         Dashboard
       </Button>
-      <div className="flex items-end justify-between gap-5">
+      <div className="flex items-center justify-between gap-5">
         <div>
           <p className="mb-[15px] font-mono text-[11px] uppercase tracking-[.12em] text-muted">the month analysis</p>
           <h2 className="mb-[17px] text-[clamp(30px,4vw,44px)] font-semibold leading-none tracking-[-.07em]">

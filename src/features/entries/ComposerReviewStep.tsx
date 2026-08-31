@@ -1,5 +1,6 @@
 import { Check, CircleNotch } from '@phosphor-icons/react'
 import { Button } from '../../components/ui/button'
+import { Card } from '../../components/ui/card'
 import { ComposerStepActions } from './ComposerStepActions'
 import { evaluateExpression, formatMoney } from './entry-utils'
 import type { Entry, EntryType } from './types'
@@ -40,7 +41,7 @@ export function ComposerReviewStep({
 }) {
   return (
     <section className="grid content-start gap-4" aria-label="Review record">
-      <div className="grid gap-3 rounded-[18px] border border-line-strong bg-soft p-4">
+      <Card className="grid gap-3 rounded-[18px] bg-soft p-4">
         <div className="flex items-end justify-between border-b border-line-strong pb-3">
           <span className="font-mono text-[10px] uppercase tracking-[.08em] text-muted">
             {type === 'income' ? 'Income' : 'Expense'}
@@ -53,7 +54,7 @@ export function ComposerReviewStep({
           <span className="font-mono text-[10px] uppercase tracking-[.08em] text-muted">Category</span>
           <strong className="text-sm font-medium">{category}</strong>
         </div>
-      </div>
+      </Card>
       <label className="grid min-w-0 gap-1.5 text-[11px] font-bold text-muted max-[700px]:text-xs">
         Name{' '}
         <span className="ml-1 font-mono text-[10px] font-normal uppercase tracking-[.06em] text-muted">optional</span>

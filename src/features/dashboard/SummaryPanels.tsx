@@ -27,7 +27,7 @@ export function SummaryPanels({
       aria-label="Money summary">
       <DashboardPanel
         className={clsx(
-          '!grid min-h-[250px] grid-cols-[1fr_auto] grid-rows-[auto_1fr] items-center justify-between rounded-[28px] border border-line-strong bg-white px-[43px] py-[35px] text-ink transition-colors duration-300 max-[700px]:min-h-[220px] max-[700px]:p-[26px]',
+          '!grid min-h-[250px] grid-cols-[1fr_auto] grid-rows-[auto_1fr] items-center justify-between rounded-[28px] border border-line bg-white px-[43px] py-[35px] text-ink transition-colors duration-300 max-[700px]:min-h-[220px] max-[700px]:p-[26px]',
           availableToday < 0 && 'border-ink',
         )}
         asideClassName="grid justify-items-end gap-[13px]"
@@ -51,7 +51,7 @@ export function SummaryPanels({
         </div>
       </DashboardPanel>
       <DashboardPanel
-        className="!grid min-h-[180px] grid-cols-[1fr_auto] grid-rows-[auto_1fr] items-center justify-between rounded-[28px] border border-line-strong bg-white px-[43px] py-[35px] text-ink transition-colors duration-300 max-[700px]:min-h-[190px] max-[700px]:p-[26px]"
+        className="!grid min-h-[180px] grid-cols-[1fr_auto] grid-rows-[auto_1fr] items-center justify-between rounded-[28px] border border-line bg-white px-[43px] py-[35px] text-ink transition-colors duration-300 max-[700px]:min-h-[190px] max-[700px]:p-[26px]"
         asideClassName="grid justify-items-end gap-3"
         label="accumulated"
         aside={<span>all time</span>}
