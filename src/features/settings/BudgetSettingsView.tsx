@@ -8,6 +8,7 @@ import { Button } from '../../components/ui/button'
 import { categoryClass, categoryIcon, expenseCategories } from '../entries/CategoryPicker'
 import { formatMoneyInput, formatShort } from '../entries/entry-utils'
 import { useBudgets } from '../budgets/use-budgets'
+import { Input } from '@/components/ui/input'
 
 export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
   const { user } = useUser()
@@ -56,12 +57,12 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
           Monthly limit for {category}
         </label>
         <div className="grid gap-2">
-          <input
+          <Input
             id="budget-amount"
             inputMode="numeric"
             value={amount}
             onChange={(event) => setAmount(formatMoneyInput(event.target.value))}
-            className="h-11 min-w-0 w-full rounded-[14px] border border-line-strong px-3 py-2 text-base outline-0 focus:border-ink"
+            className="min-w-0 w-full rounded-[14px] border border-line-strong px-3 py-2 text-base outline-0 focus:border-ink"
             placeholder={currentBudget ? Number(currentBudget.amount).toLocaleString('en-US') : '0'}
           />
           <Button
