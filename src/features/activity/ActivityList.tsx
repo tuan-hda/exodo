@@ -24,6 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../../components/ui/alert-dialog'
+import { Input } from '@/components/ui/input'
 
 type ActivityDay = { key: string; label: string; entries: Entry[] }
 type ActivityMonth = { key: string; label: string; entries: Entry[]; income: number; expense: number }
@@ -119,8 +120,8 @@ export function ActivityList({
           <label className="flex min-w-0 flex-1 items-center gap-2 rounded-[14px] border border-line-strong bg-white px-3 text-muted">
             <MagnifyingGlass size={16} />
             <span className="sr-only">Search activity</span>
-            <input
-              className="h-10 min-w-0 w-full border-0 bg-transparent px-0 text-base text-ink outline-0 placeholder:text-muted"
+            <Input
+              className="border-0 bg-transparent px-0 text-base text-ink outline-0 placeholder:text-muted"
               value={query}
               onChange={(event) => updateQuery(event.target.value)}
               placeholder="Search activity"
