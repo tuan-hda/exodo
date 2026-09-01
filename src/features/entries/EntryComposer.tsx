@@ -5,6 +5,7 @@ import { ArrowDown, ArrowUp, Check, X } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { Sheet, SheetContent, SheetTitle } from '../../components/ui/sheet'
 import { Button } from '../../components/ui/button'
+import { FadeContent } from '../../components/ui/fade-content'
 import { defaultCategory, type Category } from './CategoryPicker'
 import { ComposerAmountStep } from './ComposerAmountStep'
 import { ComposerCategoryStep } from './ComposerCategoryStep'
@@ -162,44 +163,50 @@ export function EntryComposer({
           className="grid gap-3 max-[700px]:flex max-[700px]:min-w-0 max-[700px]:flex-1 max-[700px]:flex-col max-[700px]:gap-4"
           onSubmit={submit}>
           {step === 1 && (
-            <ComposerCategoryStep
-              type={type}
-              category={category}
-              disabled={isSaving}
-              onChange={(selectedCategory) => {
-                setCategory(selectedCategory)
-                setError('')
-                setStep(2)
-              }}
-            />
+            <FadeContent>
+              <ComposerCategoryStep
+                type={type}
+                category={category}
+                disabled={isSaving}
+                onChange={(selectedCategory) => {
+                  setCategory(selectedCategory)
+                  setError('')
+                  setStep(2)
+                }}
+              />
+            </FadeContent>
           )}
           {step === 2 && (
-            <ComposerAmountStep
-              amount={amount}
-              disabled={isSaving}
-              error={error}
-              isMobile={isMobile}
-              onAmountChange={setAmount}
-              onClearError={() => setError('')}
-              onNext={nextStep}
-              onBack={previousStep}
-            />
+            <FadeContent>
+              <ComposerAmountStep
+                amount={amount}
+                disabled={isSaving}
+                error={error}
+                isMobile={isMobile}
+                onAmountChange={setAmount}
+                onClearError={() => setError('')}
+                onNext={nextStep}
+                onBack={previousStep}
+              />
+            </FadeContent>
           )}
           {step === 3 && (
-            <ComposerReviewStep
-              entry={entry}
-              type={type}
-              amount={amount}
-              title={title}
-              occurredAt={occurredAt}
-              disabled={isSaving}
-              isSaving={isSaving}
-              error={error}
-              category={category}
-              onTitleChange={setTitle}
-              onOccurredAtChange={setOccurredAt}
-              onBack={previousStep}
-            />
+            <FadeContent>
+              <ComposerReviewStep
+                entry={entry}
+                type={type}
+                amount={amount}
+                title={title}
+                occurredAt={occurredAt}
+                disabled={isSaving}
+                isSaving={isSaving}
+                error={error}
+                category={category}
+                onTitleChange={setTitle}
+                onOccurredAtChange={setOccurredAt}
+                onBack={previousStep}
+              />
+            </FadeContent>
           )}
         </form>
       </SheetContent>

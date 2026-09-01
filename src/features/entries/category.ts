@@ -105,3 +105,7 @@ export const categoryStyles: Record<string, CategoryStyle> = {
     chartColor: '#1769a8',
   },
 }
+
+export function categoryBorderStyle(category: Category) {
+  return { borderColor: `${categoryStyles[category]?.chartColor ?? '#707070'}1A` }
+}

@@ -13,7 +13,7 @@ import {
   Wallet,
 } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
-import { categoryStyles, type Category } from './category'
+import { categoryBorderStyle, categoryStyles, type Category } from './category'
 
 export type { Category } from './category'
 
@@ -109,6 +109,7 @@ export function CategoryPicker({
               'inline-flex min-h-14 w-full items-center justify-start gap-2.5 rounded-xl border px-4 py-3 text-left text-sm font-medium transition hover:text-ink active:scale-[.98] disabled:cursor-wait disabled:opacity-50',
               categoryClass(item),
             )}
+            style={categoryBorderStyle(item)}
             aria-label={item}
             title={item}
             aria-pressed={value === item}

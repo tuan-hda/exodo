@@ -104,7 +104,7 @@ export function ActivityList({
   }
 
   return (
-    <section className="pt-[106px] animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_260ms_both] max-[700px]:pt-[75px]">
+    <section className="animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_260ms_both]">
       <div className="flex items-end justify-between">
         <div>
           <p className="mb-[15px] font-mono text-[11px] uppercase tracking-[.12em] text-muted">recent activity</p>
@@ -137,7 +137,7 @@ export function ActivityList({
           aria-label="Activity months">
           <Button
             variant="ghost"
-            className="min-w-0 items-center gap-1 rounded-xl px-2 py-2 text-left font-mono text-[10px] text-muted transition hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
+            className="min-w-0 items-center justify-start gap-1 rounded-xl px-2 py-2 text-left font-mono text-[10px] text-muted transition hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
             disabled={!previousMonth}
             type="button"
             onClick={() => previousMonth && setSelectedMonth(previousMonth)}

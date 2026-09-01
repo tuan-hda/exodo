@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { clsx } from 'clsx'
 import { categoryChartColor, categoryClass, categoryIcon } from '../entries/CategoryPicker'
 import { formatShort } from '../entries/entry-utils'
+import { CountUp } from '../../components/ui/count-up'
 import type { AnalysisSlice } from './analysis-utils'
 
 const MIN_LABEL_PERCENTAGE = 0.08
@@ -171,7 +172,9 @@ export function PieChart({
           ))}
       </div>
       <div className="absolute inset-[25%] grid place-items-center rounded-full bg-white text-center">
-        <strong className="font-mono text-lg font-semibold tracking-[-.05em]">{formatShort(total)}</strong>
+        <strong className="font-mono text-lg font-semibold tracking-[-.05em]">
+          <CountUp value={total} formatValue={formatShort} />
+        </strong>
       </div>
     </div>
   )

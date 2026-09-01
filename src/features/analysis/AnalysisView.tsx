@@ -5,6 +5,7 @@ import { ArrowLeft, CaretLeft, CaretRight, TrendDown, TrendUp, X } from '@phosph
 import { clsx } from 'clsx'
 import { Button } from '../../components/ui/button'
 import { Card } from '../../components/ui/card'
+import { AnimatedList } from '../../components/ui/animated-list'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
 import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
 import { formatShort } from '../entries/entry-utils'
@@ -39,12 +40,9 @@ function CategoryDetail({
         </Button>
       </div>
       {categoryEntries.length ? (
-        <div>
-          {categoryEntries.map((entry, index) => (
-            <div
-              className="analysis-detail-item flex min-h-16 items-center gap-3 border-b border-line py-3"
-              style={{ animationDelay: `${index * 45}ms` }}
-              key={entry.id}>
+        <AnimatedList items={categoryEntries} getKey={(entry) => entry.id}>
+          {(entry) => (
+            <div className="analysis-detail-item flex min-h-16 items-center gap-3 border-b border-line py-3">
               <div className="min-w-0 flex-1">
                 <strong className="block truncate text-sm font-medium text-ink">{entry.title || category}</strong>
                 <small className="mt-1 block font-mono text-[10px] text-muted">
@@ -60,8 +58,8 @@ function CategoryDetail({
                 {formatShort(entry.amount)}
               </strong>
             </div>
-          ))}
-        </div>
+          )}
+        </AnimatedList>
       ) : (
         <p className="py-6 text-center text-sm text-muted">No transactions in this category.</p>
       )}
@@ -87,28 +85,29 @@ function DistributionCard({
   const isIncome = type === 'income'
 
   return (
-    <Card className="p-5 max-[700px]:p-4" aria-label={`${type} distribution`}>
-      <div className="mb-7 flex items-start justify-between gap-3">
-        <div>
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-[.12em] text-muted">{type}</p>
+    <div aria-label={`${type} distribution`}>
+      <Card className="p-5 max-[700px]:p-4">
+        <div className="mb-7 flex items-start justify-between gap-3">
+          <div>
+            <p className="mb-2 font-mono text-[10px] uppercase tracking-[.12em] text-muted">{type}</p>
+          </div>
+          {isIncome ? (
+            <TrendUp className="text-[#176b3a]" size={21} />
+          ) : (
+            <TrendDown className="text-[#a84528]" size={21} />
+          )}
         </div>
-        {isIncome ? (
-          <TrendUp className="text-[#176b3a]" size={21} />
-        ) : (
-          <TrendDown className="text-[#a84528]" size={21} />
-        )}
-      </div>
-      <PieChart slices={slices} total={total} selectedCategory={selectedCategory} onSelect={onSelectCategory} />
+        <PieChart slices={slices} total={total} selectedCategory={selectedCategory} onSelect={onSelectCategory} />
+        <div className="h-10" />
+      </Card>
       {selectedCategory ? (
         <CategoryDetail category={selectedCategory} type={type} entries={entries} onClose={onCloseCategory} />
       ) : slices.length > 0 ? (
-        <div className="mt-8 border-t border-line pt-2">
-          {slices.map((slice, index) => (
+        <AnimatedList className="mt-8 border-t border-line pt-2" items={slices} getKey={(slice) => slice.category}>
+          {(slice) => (
             <button
               type="button"
               className="analysis-category-item flex min-h-16 w-full items-center gap-3 border-b border-line bg-transparent py-3 text-left transition-colors hover:bg-soft last:border-b-0"
-              style={{ animationDelay: `${index * 45}ms` }}
-              key={slice.category}
               onClick={() => onSelectCategory(slice.category)}>
               <span
                 className={clsx(
@@ -133,10 +132,10 @@ function DistributionCard({
                 {formatShort(slice.amount)}
               </strong>
             </button>
-          ))}
-        </div>
+          )}
+        </AnimatedList>
       ) : null}
-    </Card>
+    </div>
   )
 }
 
