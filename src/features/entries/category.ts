@@ -9,10 +9,10 @@ export type CategoryStyle = {
 
 export const categoryStyles: Record<string, CategoryStyle> = {
   Dining: {
-    borderClass: 'border-[#d94f2b]',
-    backgroundClass: 'bg-[#fff0eb]',
-    foregroundClass: 'text-[#d94f2b]',
-    chartColor: '#d94f2b',
+    borderClass: 'border-ink',
+    backgroundClass: 'bg-soft',
+    foregroundClass: 'text-ink',
+    chartColor: '#151515',
   },
   Groceries: {
     borderClass: 'border-[#2f7d32]',
