@@ -38,7 +38,7 @@ export function SummaryPanels({
           aside={<span>{availableToday < 0 ? 'over pace' : 'on pace'}</span>}
           ariaLabel="Today's available amount">
           <div className="col-start-1 row-start-2 today-copy">
-            <strong className="block text-[clamp(52px,9vw,94px)] font-semibold leading-[.9] tracking-[-.09em]">
+            <strong className="block text-[clamp(34px,4vw,54px)] font-semibold leading-[.9] tracking-[-.09em]">
               <CountUp value={availableToday} formatValue={formatMoney} />
             </strong>
             <span className="mt-5 block font-mono text-[11px]">
