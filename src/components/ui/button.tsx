@@ -52,6 +52,7 @@ function Button({
     asChild?: boolean
   }) {
   const Comp = asChild ? Slot.Root : 'button'
+  const hapticInputRef = React.useRef<HTMLInputElement>(null)
 
   return (
     <Comp
@@ -60,15 +61,26 @@ function Button({
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
       onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') triggerHaptic()
+        if (event.key === 'Enter' || event.key === ' ') triggerHaptic(hapticInputRef.current)
         onKeyDown?.(event)
       }}
       onPointerDown={(event) => {
-        triggerHaptic()
+        triggerHaptic(hapticInputRef.current)
         onPointerDown?.(event)
       }}
-      {...props}
-    />
+      {...props}>
+      {props.children}
+      <input
+        ref={(input) => {
+          hapticInputRef.current = input
+          input?.setAttribute('switch', '')
+        }}
+        type="checkbox"
+        tabIndex={-1}
+        aria-hidden="true"
+        className="pointer-events-none absolute size-px opacity-0"
+      />
+    </Comp>
   )
 }
 
