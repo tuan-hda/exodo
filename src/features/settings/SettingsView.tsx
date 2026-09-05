@@ -1,22 +1,25 @@
 'use client'
 
 import { useState } from 'react'
-import { SignOut, UserCircle, Wallet } from '@phosphor-icons/react'
+import { PiggyBank, SignOut, UserCircle, Wallet } from '@phosphor-icons/react'
 import { useClerk, useUser } from '@clerk/nextjs'
 import { Button } from '../../components/ui/button'
 import { Card } from '../../components/ui/card'
 import { BudgetSettingsView } from './BudgetSettingsView'
 import { SettingsMenuItem } from './SettingsMenuItem'
+import type { Entry } from '../entries/types'
+import { SavingsView } from '../savings/SavingsView'
 
-export function SettingsView() {
+export function SettingsView({ userId, entries }: { userId?: string; entries: Entry[] }) {
   const { user } = useUser()
   const { signOut } = useClerk()
-  const [page, setPage] = useState<'menu' | 'budgets'>('menu')
+  const [page, setPage] = useState<'menu' | 'budgets' | 'savings'>('menu')
   const email = user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses[0]?.emailAddress ?? ''
   const initials = (user?.firstName?.[0] ?? user?.lastName?.[0] ?? email[0] ?? 'E').toUpperCase()
   const name = user?.fullName ?? user?.firstName ?? 'Your account'
 
   if (page === 'budgets') return <BudgetSettingsView onBack={() => setPage('menu')} />
+  if (page === 'savings') return <SavingsView userId={userId} entries={entries} onBack={() => setPage('menu')} />
 
   return (
     <section className="mx-auto max-w-[620px] pb-8">
@@ -43,6 +46,12 @@ export function SettingsView() {
           title="Budget settings"
           description="Set a recurring limit for each expense category"
           onClick={() => setPage('budgets')}
+        />
+        <SettingsMenuItem
+          icon={<PiggyBank size={20} />}
+          title="Savings goals"
+          description="Track money you are saving for a target"
+          onClick={() => setPage('savings')}
         />
       </div>
       <Button

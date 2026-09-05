@@ -9,7 +9,6 @@ import { fromKey, toKey } from '../finance/allocation'
 import { SettingsView } from '../settings/SettingsView'
 import { ActivityList } from '../activity/ActivityList'
 import { EntryComposer } from '../entries/EntryComposer'
-import { MonthView } from '../month/MonthView'
 import { MobileTabBar, type AppTab } from '../navigation/MobileTabBar'
 import { NotificationsView } from '../notifications/NotificationsView'
 import { SummaryPanels } from './SummaryPanels'
@@ -18,8 +17,8 @@ import { useDayBoundary } from './use-day-boundary'
 import { usePullToRefresh } from '../../hooks/use-pull-to-refresh'
 import type { Entry, EntryType } from '../entries/types'
 import { useBudgets } from '../budgets/use-budgets'
-import { BudgetProgress } from '../budgets/BudgetProgress'
 import { AnalysisView } from '../analysis/AnalysisView'
+import { OverviewView } from '../overview/OverviewView'
 
 function Dashboard() {
   const { user } = useUser()
@@ -35,7 +34,6 @@ function Dashboard() {
   const [selectedDay, setSelectedDay] = useState(currentDayKey)
   const [activeTab, setActiveTab] = useState<AppTab>('today')
   const { budgets } = useBudgets(user?.id)
-  const currentMonthPrefix = `${currentDay.getFullYear()}-${String(currentDay.getMonth() + 1).padStart(2, '0')}-`
 
   useEffect(() => {
     setSelectedDay(currentDayKey)
@@ -138,12 +136,12 @@ function Dashboard() {
               variant="ghost"
               className={clsx(
                 'relative rounded-xl px-0 py-3 text-xs font-semibold text-muted transition hover:text-ink',
-                activeTab === 'month' &&
+                activeTab === 'overview' &&
                   'text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-ink',
               )}
               type="button"
-              onClick={() => navigateTab('month')}>
-              Month
+              onClick={() => navigateTab('overview')}>
+              Overview
             </Button>
             <Button
               variant="ghost"
@@ -204,8 +202,7 @@ function Dashboard() {
                 Income becomes a daily allowance. Each expense makes the rest of today visible.
               </p>
             </section>
-            <SummaryPanels entries={entries} accumulation={accumulation} dayKey={currentDayKey} />
-            <BudgetProgress budgets={budgets} entries={entries} monthStart={currentMonthPrefix} />
+            <SummaryPanels entries={entries} dayKey={currentDayKey} budgets={budgets} userId={user?.id} />
             <div className="pt-16">
               <ActivityList
                 entries={entries}
@@ -222,19 +219,7 @@ function Dashboard() {
             </div>
           </>
         )}
-        {activeTab === 'month' && (
-          <section className="pt-6">
-            <MonthView
-              entries={entries}
-              viewMonth={viewMonth}
-              selectedDay={selectedDay}
-              todayKey={currentDayKey}
-              onMonthChange={moveMonth}
-              onSelectDay={setSelectedDay}
-              budgets={budgets}
-            />
-          </section>
-        )}
+        {activeTab === 'overview' && <OverviewView accumulation={accumulation} />}
         {activeTab === 'notifications' && (
           <section className="pt-6">
             <NotificationsView />
@@ -250,7 +235,7 @@ function Dashboard() {
         )}
         {activeTab === 'settings' && (
           <section className="pt-6">
-            <SettingsView />
+            <SettingsView userId={user?.id} entries={entries} />
           </section>
         )}
       </main>

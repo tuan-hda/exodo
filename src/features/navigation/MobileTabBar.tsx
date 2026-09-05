@@ -1,8 +1,8 @@
-import { Bell, CalendarBlank, Gear, House, Plus } from '@phosphor-icons/react'
+import { Bell, ChartLineUp, Gear, House, Plus } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { Button } from '../../components/ui/button'
 
-export type AppTab = 'today' | 'month' | 'analysis' | 'notifications' | 'settings'
+export type AppTab = 'today' | 'overview' | 'analysis' | 'notifications' | 'settings'
 
 export function MobileTabBar({
   activeTab,
@@ -33,12 +33,12 @@ export function MobileTabBar({
         variant="ghost"
         className={clsx(
           'flex h-12 min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-xl bg-transparent p-0 text-muted no-underline',
-          activeTab === 'month' && 'text-ink',
+          activeTab === 'overview' && 'text-ink',
         )}
         type="button"
-        onClick={() => onChange('month')}>
-        <CalendarBlank size={20} weight={activeTab === 'month' ? 'fill' : 'regular'} />
-        <span className="font-mono text-[9px] uppercase tracking-[.04em]">Month</span>
+        onClick={() => onChange('overview')}>
+        <ChartLineUp size={20} weight={activeTab === 'overview' ? 'fill' : 'regular'} />
+        <span className="font-mono text-[9px] uppercase tracking-[.04em]">Overview</span>
       </Button>
       <Button
         className="relative z-10 grid size-12 place-items-center self-center justify-self-center rounded-full border-0 bg-ink p-0 text-white shadow-[0_8px_24px_rgb(21_21_21_/_0.2)]"

@@ -29,7 +29,7 @@ export function BudgetProgress({
 
   return (
     <DashboardPanel
-      className="mt-6 min-h-[180px] rounded-[28px] border-line bg-white px-[43px] py-[35px] max-[700px]:p-[26px]"
+      className="min-h-[180px] rounded-[28px] border-line bg-white px-[43px] py-[35px] max-[700px]:p-[26px]"
       label="monthly limits"
       aside={`${budgetRows.length} set`}
       ariaLabel="Monthly limits">

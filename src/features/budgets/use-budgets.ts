@@ -5,6 +5,29 @@ import { useSupabase } from '../../hooks/use-supabase'
 import type { Category } from '../entries/category'
 import type { CategoryBudget, StoredCategoryBudget } from './types'
 
+const budgetCacheTtl = 24 * 60 * 60 * 1000
+
+function budgetCacheKey(userId: string) {
+  return `exodo.budgets.${userId}`
+}
+
+function readBudgetCache(userId: string) {
+  try {
+    const cached = JSON.parse(localStorage.getItem(budgetCacheKey(userId)) ?? 'null') as {
+      budgets?: CategoryBudget[]
+      cachedAt?: number
+    } | null
+    if (!cached?.budgets || !cached.cachedAt || Date.now() - cached.cachedAt > budgetCacheTtl) return null
+    return cached.budgets
+  } catch {
+    return null
+  }
+}
+
+function writeBudgetCache(userId: string, budgets: CategoryBudget[]) {
+  localStorage.setItem(budgetCacheKey(userId), JSON.stringify({ budgets, cachedAt: Date.now() }))
+}
+
 function normalizeBudget(budget: StoredCategoryBudget): CategoryBudget {
   return {
     id: budget.id,
@@ -37,7 +60,9 @@ export function useBudgets(userId: string | undefined) {
     setIsLoading(true)
     setError('')
     try {
-      setBudgets(await fetchBudgets())
+      const nextBudgets = await fetchBudgets()
+      setBudgets(nextBudgets)
+      writeBudgetCache(userId, nextBudgets)
       return true
     } catch (fetchError) {
       console.error('Failed to load category budgets from Supabase', fetchError)
@@ -49,6 +74,10 @@ export function useBudgets(userId: string | undefined) {
   }, [fetchBudgets, userId])
 
   useEffect(() => {
+    if (userId) {
+      const cachedBudgets = readBudgetCache(userId)
+      if (cachedBudgets) setBudgets(cachedBudgets)
+    }
     refreshBudgets()
   }, [refreshBudgets])
 
@@ -74,6 +103,12 @@ export function useBudgets(userId: string | undefined) {
             a.category.localeCompare(b.category),
           ),
         )
+        writeBudgetCache(
+          userId,
+          [...budgets.filter((budget) => budget.category !== category), nextBudget].sort((a, b) =>
+            a.category.localeCompare(b.category),
+          ),
+        )
         return true
       } catch (saveError) {
         console.error('Failed to save category budget to Supabase', saveError)
@@ -83,7 +118,7 @@ export function useBudgets(userId: string | undefined) {
         setIsSaving(false)
       }
     },
-    [getSupabase, userId],
+    [budgets, getSupabase, userId],
   )
 
   const removeBudget = useCallback(
@@ -99,6 +134,10 @@ export function useBudgets(userId: string | undefined) {
           .eq('user_id', userId)
         if (removeError) throw removeError
         setBudgets((current) => current.filter((item) => item.id !== budget.id))
+        writeBudgetCache(
+          userId,
+          budgets.filter((item) => item.id !== budget.id),
+        )
         return true
       } catch (removeError) {
         console.error('Failed to remove category budget from Supabase', removeError)
@@ -106,7 +145,7 @@ export function useBudgets(userId: string | undefined) {
         return false
       }
     },
-    [getSupabase, userId],
+    [budgets, getSupabase, userId],
   )
 
   return { budgets, isLoading, isSaving, error, saveBudget, removeBudget, refreshBudgets }

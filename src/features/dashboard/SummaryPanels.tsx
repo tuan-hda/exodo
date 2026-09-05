@@ -1,4 +1,4 @@
-import { ArrowDown, Check } from '@phosphor-icons/react'
+import { Check } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { dailyIncome } from '../finance/allocation'
 import { entryDate, formatMoney } from '../entries/entry-utils'
@@ -6,15 +6,20 @@ import type { Entry } from '../entries/types'
 import { CountUp } from '../../components/ui/count-up'
 import { FadeContent } from '../../components/ui/fade-content'
 import { DashboardPanel } from './DashboardPanel'
+import { BudgetProgress } from '../budgets/BudgetProgress'
+import type { CategoryBudget } from '../budgets/types'
+import { SavingsGoalsPanel } from '../savings/SavingsGoalsPanel'
 
 export function SummaryPanels({
   entries,
-  accumulation,
   dayKey,
+  budgets,
+  userId,
 }: {
   entries: Entry[]
-  accumulation: number | null
   dayKey: string
+  budgets: CategoryBudget[]
+  userId?: string
 }) {
   const allocationEntries = entries.map((entry) => ({ type: entry.type, amount: entry.amount, date: entryDate(entry) }))
   const todayIncome = dailyIncome(allocationEntries, dayKey)
@@ -54,24 +59,8 @@ export function SummaryPanels({
           </div>
         </DashboardPanel>
       </FadeContent>
-      <FadeContent delay={0.08}>
-        <DashboardPanel
-          className="!grid min-h-[180px] grid-cols-[1fr_auto] grid-rows-[auto_1fr] items-center justify-between rounded-[28px] border border-line bg-white px-[43px] py-[35px] text-ink transition-colors duration-300 max-[700px]:min-h-[190px] max-[700px]:p-[26px]"
-          asideClassName="grid justify-items-end gap-3"
-          label="accumulated"
-          aside={<span>all time</span>}
-          ariaLabel="All-time accumulation">
-          <div className="col-start-1 row-start-2 accumulation-copy">
-            <strong className="block text-[clamp(34px,4vw,54px)] font-semibold leading-[.95] tracking-[-.08em]">
-              {accumulation === null ? '—' : <CountUp value={accumulation} formatValue={formatMoney} />}
-            </strong>
-            <span className="mt-5 block font-mono text-[11px]">all income minus all expenses</span>
-          </div>
-          <div className="col-start-2 row-start-2 self-center justify-self-end text-muted">
-            <ArrowDown size={23} weight="bold" />
-          </div>
-        </DashboardPanel>
-      </FadeContent>
+      <BudgetProgress budgets={budgets} entries={entries} monthStart={`${dayKey.slice(0, 7)}-`} />
+      <SavingsGoalsPanel userId={userId} entries={entries} />
     </section>
   )
 }
