@@ -31,7 +31,22 @@
     @apply scroll-smooth;
   }
   body {
-    @apply m-0 min-w-[320px] overflow-x-hidden bg-white font-sans text-ink antialiased;
+    @apply m-0 min-w-[320px] overflow-x-hidden font-sans text-ink antialiased;
+    background-color: #fcfdff;
+    background-image:
+      radial-gradient(
+        ellipse 72% 58% at 54% 46%,
+        rgb(206 229 255 / 0.34) 0%,
+        rgb(224 239 255 / 0.18) 34%,
+        transparent 72%
+      ),
+      radial-gradient(ellipse 42% 34% at 92% 4%, rgb(235 228 255 / 0.16) 0%, transparent 72%),
+      radial-gradient(ellipse 38% 32% at 2% 96%, rgb(255 235 235 / 0.12) 0%, transparent 72%);
+    background-attachment: fixed;
+    background-size: cover;
+  }
+  body.plain-background {
+    background: #ffffff;
   }
   button,
   input,

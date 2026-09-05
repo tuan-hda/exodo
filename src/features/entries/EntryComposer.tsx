@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useEffect, useState } from 'react'
-import { ArrowDown, ArrowUp, Check, X } from '@phosphor-icons/react'
+import { ArrowDown, ArrowUp, Check, Trash, X } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { Sheet, SheetContent, SheetTitle } from '../../components/ui/sheet'
 import { Button } from '../../components/ui/button'
@@ -12,6 +12,16 @@ import { ComposerCategoryStep } from './ComposerCategoryStep'
 import { ComposerReviewStep } from './ComposerReviewStep'
 import { evaluateExpression, formatAmountExpression, getCurrentTime, todayKey } from './entry-utils'
 import type { Entry, EntryType } from './types'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../../components/ui/alert-dialog'
 
 type ComposerStep = 1 | 2 | 3
 
@@ -23,6 +33,7 @@ export function EntryComposer({
   onClose,
   onSave,
   onTypeChange,
+  onDelete,
 }: {
   entry?: Entry
   type: EntryType
@@ -31,6 +42,7 @@ export function EntryComposer({
   onClose: () => void
   onSave: (entry: Entry) => Promise<boolean>
   onTypeChange: (type: EntryType) => void
+  onDelete?: () => Promise<void>
 }) {
   const [step, setStep] = useState<ComposerStep>(1)
   const [amount, setAmount] = useState(entry ? formatAmountExpression(String(entry.amount)) : '')
@@ -39,6 +51,7 @@ export function EntryComposer({
   const [category, setCategory] = useState<Category>(entry?.category ?? defaultCategory(type))
   const [error, setError] = useState('')
   const [isMobile, setIsMobile] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 700px)')
@@ -91,6 +104,13 @@ export function EntryComposer({
     onTypeChange(nextType)
   }
 
+  async function handleDelete() {
+    if (!onDelete) return
+    await onDelete()
+    setDeleteOpen(false)
+    onClose()
+  }
+
   const stepLabels = ['Category', 'Amount', 'Review']
 
   return (
@@ -112,6 +132,18 @@ export function EntryComposer({
         <div className="mb-7 flex justify-between max-[700px]:mb-5">
           <h2 id="composer-title">{entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}</h2>
           <div className="flex items-center gap-2">
+            {entry && onDelete && (
+              <Button
+                variant="outline"
+                size="icon-lg"
+                className="text-danger"
+                type="button"
+                disabled={isSaving}
+                onClick={() => setDeleteOpen(true)}
+                aria-label="Delete transaction">
+                <Trash size={18} />
+              </Button>
+            )}
             <Button
               variant="outline"
               className={clsx(
@@ -209,6 +241,18 @@ export function EntryComposer({
             </FadeContent>
           )}
         </form>
+        <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this transaction?</AlertDialogTitle>
+              <AlertDialogDescription>This transaction will be permanently removed.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => void handleDelete()}>Delete</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </SheetContent>
     </Sheet>
   )

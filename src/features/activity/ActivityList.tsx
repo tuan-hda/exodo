@@ -1,12 +1,4 @@
-import {
-  CalendarDots,
-  CaretLeft,
-  CaretRight,
-  CircleNotch,
-  ClockCounterClockwise,
-  MagnifyingGlass,
-  X,
-} from '@phosphor-icons/react'
+import { CalendarDots, CaretLeft, CaretRight, ClockCounterClockwise, MagnifyingGlass } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { useState } from 'react'
 import { Button } from '../../components/ui/button'
@@ -14,16 +6,6 @@ import { fromKey } from '../finance/allocation'
 import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
 import { entryDate, formatShort } from '../entries/entry-utils'
 import type { Entry } from '../entries/types'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '../../components/ui/alert-dialog'
 import { Input } from '@/components/ui/input'
 
 type ActivityDay = { key: string; label: string; entries: Entry[] }
@@ -50,20 +32,15 @@ function groupByDate(entries: Entry[]) {
 export function ActivityList({
   entries,
   todayKey,
-  deletingEntryId,
   onEdit,
-  onRemove,
   onOpenAnalysis,
 }: {
   entries: Entry[]
   todayKey: string
-  deletingEntryId: string | null
   onEdit: (entry: Entry) => void
-  onRemove: (id: string) => void
   onOpenAnalysis: (monthKey: string) => void
 }) {
   const [query, setQuery] = useState('')
-  const [entryToDelete, setEntryToDelete] = useState<Entry | null>(null)
   const [selectedMonth, setSelectedMonth] = useState(todayKey.slice(0, 7))
   const normalizedQuery = query.trim().toLocaleLowerCase()
   const sortedEntries = [...entries].sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
@@ -172,7 +149,7 @@ export function ActivityList({
               <Button
                 variant="outline"
                 size="sm"
-                className="h-7 rounded-lg px-2.5 font-mono text-[9px] uppercase tracking-[.06em]"
+                className="font-mono"
                 type="button"
                 onClick={() => onOpenAnalysis(activeGroup.key)}>
                 Analysis
@@ -208,12 +185,12 @@ export function ActivityList({
             </button>
             {groupByDate(activeGroup.entries).map((day) => (
               <section key={day.key}>
-                <h4 className="m-0 border-b border-line bg-soft px-2 py-3 font-mono text-[10px] font-normal uppercase tracking-[.08em] text-muted">
+                <h4 className="m-0 border-b border-line px-2 py-3 font-mono text-[10px] font-normal uppercase tracking-[.08em] text-muted">
                   {day.label}
                 </h4>
                 {day.entries.map((entry) => (
                   <div
-                    className="grid min-h-[67px] cursor-pointer grid-cols-[34px_1fr_auto_24px] items-center gap-[13px] border-b border-line transition-colors max-[430px]:grid-cols-[30px_1fr_auto_20px] max-[430px]:gap-[9px]"
+                    className="grid min-h-[67px] cursor-pointer grid-cols-[34px_1fr_auto] items-center gap-[13px] border-b border-line transition-colors max-[430px]:grid-cols-[30px_1fr_auto] max-[430px]:gap-[9px]"
                     key={entry.id}
                     onClick={() => onEdit(entry)}
                     role="button"
@@ -234,26 +211,14 @@ export function ActivityList({
                         {entry.category ?? 'Other'} · {entry.occurredAt.slice(11, 16)}
                       </small>
                     </span>
-                    <b className={clsx('font-mono text-xs font-normal', entry.type === 'income' && 'text-ink')}>
+                    <b
+                      className={clsx(
+                        'font-mono text-base font-semibold',
+                        entry.type === 'expense' ? 'text-[#a84528]' : 'text-[#176b3a]',
+                      )}>
                       {entry.type === 'income' ? '+' : '-'}
                       {formatShort(entry.amount)}
                     </b>
-                    <Button
-                      variant="ghost"
-                      size="icon-xs"
-                      className="bg-transparent p-1 text-muted transition hover:text-danger"
-                      disabled={deletingEntryId === entry.id}
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        setEntryToDelete(entry)
-                      }}
-                      aria-label={`Remove ${entry.title || entry.category || entry.type}`}>
-                      {deletingEntryId === entry.id ? (
-                        <CircleNotch className="animate-spin" size={15} />
-                      ) : (
-                        <X size={15} />
-                      )}
-                    </Button>
                   </div>
                 ))}
               </section>
@@ -271,28 +236,6 @@ export function ActivityList({
           </div>
         )}
       </div>
-      <AlertDialog open={Boolean(entryToDelete)} onOpenChange={(open) => !open && setEntryToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete this transaction?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {entryToDelete
-                ? `This will permanently remove ${entryToDelete.title || entryToDelete.category || entryToDelete.type}.`
-                : 'This transaction will be permanently removed.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (entryToDelete) onRemove(entryToDelete.id)
-                setEntryToDelete(null)
-              }}>
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </section>
   )
 }

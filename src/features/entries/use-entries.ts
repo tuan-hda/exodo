@@ -19,7 +19,6 @@ export function useEntries(userId?: string) {
   const [accumulation, setAccumulation] = useState<number | null>(null)
   const [persistenceError, setPersistenceError] = useState('')
   const [isSaving, setIsSaving] = useState(false)
-  const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null)
 
   const fetchEntries = useCallback(async () => {
     const supabase = await getSupabase()
@@ -124,7 +123,6 @@ export function useEntries(userId?: string) {
     async (id: string) => {
       if (!userId) return
       setPersistenceError('')
-      setDeletingEntryId(id)
       try {
         const supabase = await getSupabase()
         const { error } = await supabase.from('entries').delete().eq('id', id).eq('user_id', userId)
@@ -139,8 +137,6 @@ export function useEntries(userId?: string) {
       } catch (error) {
         console.error('Failed to delete entry from Supabase', error)
         setPersistenceError('Could not delete this record. Please try again.')
-      } finally {
-        setDeletingEntryId(null)
       }
     },
     [entries, getSupabase, userId],
@@ -164,5 +160,5 @@ export function useEntries(userId?: string) {
     }
   }, [fetchEntries, userId])
 
-  return { entries, accumulation, persistenceError, isSaving, deletingEntryId, saveEntry, removeEntry, refreshEntries }
+  return { entries, accumulation, persistenceError, isSaving, saveEntry, removeEntry, refreshEntries }
 }

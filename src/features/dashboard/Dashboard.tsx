@@ -19,11 +19,14 @@ import type { Entry, EntryType } from '../entries/types'
 import { useBudgets } from '../budgets/use-budgets'
 import { AnalysisView } from '../analysis/AnalysisView'
 import { OverviewView } from '../overview/OverviewView'
+import { useBackgroundPreference } from '../settings/use-background-preference'
 
 function Dashboard() {
   const { user } = useUser()
-  const { entries, accumulation, persistenceError, isSaving, deletingEntryId, saveEntry, removeEntry, refreshEntries } =
-    useEntries(user?.id)
+  const { enabled: gradientBackgroundEnabled } = useBackgroundPreference()
+  const { entries, accumulation, persistenceError, isSaving, saveEntry, removeEntry, refreshEntries } = useEntries(
+    user?.id,
+  )
   const { pullDistance, isRefreshing } = usePullToRefresh(refreshEntries)
   const currentDayKey = useDayBoundary()
   const currentDay = fromKey(currentDayKey)
@@ -99,7 +102,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-dvh bg-white">
+    <div className={clsx('min-h-dvh', !gradientBackgroundEnabled && 'bg-white')}>
       {(pullDistance > 0 || isRefreshing) && (
         <div
           className={clsx(
@@ -113,7 +116,7 @@ function Dashboard() {
         </div>
       )}
       <main id="top" className="mx-auto w-[min(940px,calc(100%-48px))] max-[700px]:w-[calc(100%-32px)]">
-        <header className="sticky top-0 z-[3] flex min-h-12 items-center justify-between border-b border-line bg-white/95 pt-[max(10px,env(safe-area-inset-top))] backdrop-blur-[16px] max-[700px]:-mx-4 max-[700px]:px-4">
+        <header className="sticky top-0 z-[3] flex min-h-12 items-center justify-between border-b border-line bg-white/70 pt-[max(10px,env(safe-area-inset-top))] backdrop-blur-[24px] max-[700px]:-mx-4 max-[700px]:px-4">
           <a className="shrink-0 font-mono text-[11px] tracking-[.06em] text-muted no-underline" href="#top">
             exodo / έξοδο
           </a>
@@ -207,9 +210,7 @@ function Dashboard() {
               <ActivityList
                 entries={entries}
                 todayKey={currentDayKey}
-                deletingEntryId={deletingEntryId}
                 onEdit={(entry) => openComposer(entry.type, entry)}
-                onRemove={removeEntry}
                 onOpenAnalysis={(monthKey) => {
                   const [year, month] = monthKey.split('-').map(Number)
                   setViewMonth(new Date(year, month - 1, 1, 12))
@@ -256,6 +257,13 @@ function Dashboard() {
             setEditingEntry(undefined)
           }}
           onTypeChange={setComposerType}
+          onDelete={
+            editingEntry
+              ? async () => {
+                  await removeEntry(editingEntry.id)
+                }
+              : undefined
+          }
           onSave={handleSave}
         />
       )}

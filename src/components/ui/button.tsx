@@ -28,8 +28,8 @@ const buttonVariants = cva(
         lg: 'rounded-xl h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2',
         icon: 'size-8 rounded-lg',
         'icon-xs': "rounded-lg size-6 [&_svg:not([class*='size-'])]:size-3",
-        'icon-sm': 'rounded-lg size-7',
-        'icon-lg': 'rounded-lg size-9',
+        'icon-sm': 'rounded-xl size-7',
+        'icon-lg': 'rounded-xl size-10',
       },
     },
     defaultVariants: {
@@ -50,7 +50,7 @@ function Button({
 }: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
-}) {
+  }) {
   const Comp = asChild ? Slot.Root : 'button'
 
   return (

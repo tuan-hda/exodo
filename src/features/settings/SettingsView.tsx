@@ -9,17 +9,20 @@ import { BudgetSettingsView } from './BudgetSettingsView'
 import { SettingsMenuItem } from './SettingsMenuItem'
 import type { Entry } from '../entries/types'
 import { SavingsView } from '../savings/SavingsView'
+import { CustomizationView } from './CustomizationView'
+import { PaintBrush } from '@phosphor-icons/react'
 
 export function SettingsView({ userId, entries }: { userId?: string; entries: Entry[] }) {
   const { user } = useUser()
   const { signOut } = useClerk()
-  const [page, setPage] = useState<'menu' | 'budgets' | 'savings'>('menu')
+  const [page, setPage] = useState<'menu' | 'budgets' | 'savings' | 'customization'>('menu')
   const email = user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses[0]?.emailAddress ?? ''
   const initials = (user?.firstName?.[0] ?? user?.lastName?.[0] ?? email[0] ?? 'E').toUpperCase()
   const name = user?.fullName ?? user?.firstName ?? 'Your account'
 
   if (page === 'budgets') return <BudgetSettingsView onBack={() => setPage('menu')} />
   if (page === 'savings') return <SavingsView userId={userId} entries={entries} onBack={() => setPage('menu')} />
+  if (page === 'customization') return <CustomizationView onBack={() => setPage('menu')} />
 
   return (
     <section className="mx-auto max-w-[620px] pb-8">
@@ -52,6 +55,12 @@ export function SettingsView({ userId, entries }: { userId?: string; entries: En
           title="Savings goals"
           description="Track money you are saving for a target"
           onClick={() => setPage('savings')}
+        />
+        <SettingsMenuItem
+          icon={<PaintBrush size={20} />}
+          title="Customization"
+          description="Choose how Exodo looks"
+          onClick={() => setPage('customization')}
         />
       </div>
       <Button
