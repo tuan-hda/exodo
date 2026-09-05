@@ -10,6 +10,7 @@
 - Use Tailwind CSS v4 through `postcss.config.mjs`; keep visual changes in the existing black-and-white theme.
 - Prefer Tailwind utility classes for component styling whenever possible and appropriate; avoid `!important` for visual overrides.
 - Follow the established design language: reuse shared UI primitives, centralize button shape, border, shadow, hover, and focus behavior, and avoid screen-specific button overrides unless they are intentional exceptions.
+- Do not override button styles or class names at the screen/component level; follow the shared button design tokens and component styles. Prefer a shared variant and custom color when needed.
 - Keep regular buttons as rounded rectangles; reserve full rounding for circular controls and semantically appropriate pills.
 - Design and implement mobile-first: validate narrow viewports first, use `100dvh`/safe-area insets for full-height and fixed UI, and prevent horizontal overflow before adding desktop enhancements.
 - Keep every text input at a minimum of 16px to prevent mobile browser zoom and preserve consistent touch-oriented form behavior.
