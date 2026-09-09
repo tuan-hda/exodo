@@ -65,7 +65,7 @@ export function SavingsGoalCard({
           {recentDeposits.map((deposit) => (
             <div className="flex justify-between py-1 text-xs" key={deposit.id}>
               <span>{deposit.source === 'automatic' ? 'Monthly remainder' : 'Manual deposit'}</span>
-              <strong>+{formatMoney(deposit.amount)}</strong>
+              <strong className="ui-number font-normal text-ink">+{formatMoney(deposit.amount)}</strong>
             </div>
           ))}
         </div>

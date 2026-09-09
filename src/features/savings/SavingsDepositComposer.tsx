@@ -47,7 +47,7 @@ export function SavingsDepositComposer({
         <SheetTitle className="sr-only">Add contribution to {goal.name}</SheetTitle>
         <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-line-strong" aria-hidden="true" />
         <div className="mb-7 flex justify-between max-md:mb-5">
-          <h2>Add contribution</h2>
+          <h2 className="ui-dialog-title m-0">Add contribution</h2>
           <Button
             variant="outline"
             size="icon-lg"

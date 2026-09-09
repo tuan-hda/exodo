@@ -126,6 +126,10 @@
     @apply text-[clamp(28px,4vw,42px)] font-semibold leading-[.95] tracking-[-.07em];
   }
 
+  .ui-dialog-title {
+    @apply text-xl font-semibold leading-none tracking-[-.05em];
+  }
+
   .ui-page-description {
     @apply max-w-[36ch] text-sm leading-[1.65] text-muted;
   }

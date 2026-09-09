@@ -117,7 +117,9 @@ export function EntryComposer({
         <SheetTitle className="sr-only">{entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}</SheetTitle>
         <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-line-strong" aria-hidden="true" />
         <div className="mb-7 flex justify-between max-md:mb-5">
-          <h2 id="composer-title">{entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}</h2>
+          <h2 id="composer-title" className="ui-dialog-title m-0">
+            {entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}
+          </h2>
           <div className="flex items-center gap-2">
             {entry && onDelete && (
               <Button
