@@ -3,6 +3,7 @@ import { categoryClass, categoryIcon } from '@/features/entries/CategoryPicker'
 import { entryDate, formatMoney } from '@/features/entries/entry-utils'
 import type { Entry } from '@/features/entries/types'
 import type { CategoryBudget } from './types'
+import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DashboardPanel } from '@/features/dashboard/DashboardPanel'
@@ -37,7 +38,25 @@ export function BudgetProgress({
     }
   })
 
-  if (!budgetRows.length && !isLoading) return null
+  if (!budgetRows.length && !isLoading) {
+    return (
+      <DashboardPanel
+        className="grid gap-5 p-7 md:p-9"
+        label="monthly limits"
+        aside="not set"
+        ariaLabel="Monthly limits are not configured">
+        <div className="grid gap-2">
+          <h3 className="ui-section-title m-0">Set your pace.</h3>
+          <p className="m-0 max-w-[42ch] text-sm leading-[1.6] text-muted">
+            Add a category limit and Exodo will show what remains available for each day of the month.
+          </p>
+        </div>
+        <Button asChild variant="outline-muted" size="sm" className="justify-self-start">
+          <a href="/?tab=settings">Set a category limit</a>
+        </Button>
+      </DashboardPanel>
+    )
+  }
 
   if (!budgetRows.length) {
     return (
