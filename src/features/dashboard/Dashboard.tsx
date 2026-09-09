@@ -230,13 +230,7 @@ function Dashboard() {
             setEditingEntry(undefined)
           }}
           onTypeChange={setComposerType}
-          onDelete={
-            editingEntry
-              ? async () => {
-                  await removeEntry(editingEntry.id)
-                }
-              : undefined
-          }
+          onDelete={editingEntry ? () => removeEntry(editingEntry.id) : undefined}
           onSave={handleSave}
         />
       )}

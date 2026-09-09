@@ -46,7 +46,7 @@ export function EntryComposer({
   onClose: () => void
   onSave: (entry: Entry) => Promise<boolean>
   onTypeChange: (type: EntryType) => void
-  onDelete?: () => Promise<void>
+  onDelete?: () => Promise<boolean>
 }) {
   const [step, setStep] = useState<ComposerStep>(1)
   const [amount, setAmount] = useState(entry ? formatAmountExpression(String(entry.amount)) : '')
@@ -55,7 +55,9 @@ export function EntryComposer({
   const [category, setCategory] = useState<Category>(entry?.category ?? defaultCategory(type))
   const [error, setError] = useState('')
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const isMobile = useMediaQuery(mediaQueries.mobile)
+  const isBusy = isSaving || isDeleting
 
   function validateAmount() {
     try {
@@ -101,10 +103,16 @@ export function EntryComposer({
   }
 
   async function handleDelete() {
-    if (!onDelete) return
-    await onDelete()
-    setDeleteOpen(false)
-    onClose()
+    if (!onDelete || isDeleting) return
+    setIsDeleting(true)
+    try {
+      if (await onDelete()) {
+        setDeleteOpen(false)
+        onClose()
+      }
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   const stepLabels = ['Category', 'Amount', 'Review']
@@ -113,16 +121,16 @@ export function EntryComposer({
     <Sheet
       open
       onOpenChange={(open) => {
-        if (!open && !isSaving) onClose()
+        if (!open && !isBusy) onClose()
       }}>
-      <SheetContent side="bottom" variant="composer" showCloseButton={false} aria-busy={isSaving}>
+      <SheetContent side="bottom" variant="composer" showCloseButton={false} aria-busy={isBusy}>
         <ComposerHeader title={entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}>
           {entry && onDelete && (
             <Button
               variant="outline-danger"
               size="icon-lg"
               type="button"
-              disabled={isSaving}
+              disabled={isBusy}
               onClick={() => setDeleteOpen(true)}
               aria-label="Delete transaction">
               <Trash size={18} />
@@ -133,19 +141,13 @@ export function EntryComposer({
             size="sm"
             className={clsx('ui-label tracking-[.06em] max-md:text-[11px]', type === 'income' && 'text-success')}
             type="button"
-            disabled={isSaving}
+            disabled={isBusy}
             onClick={toggleType}
             aria-label={`Switch to ${type === 'income' ? 'expense' : 'income'}`}>
             {type === 'income' ? <ArrowDown size={14} weight="bold" /> : <ArrowUp size={14} weight="bold" />}
             {type === 'income' ? 'Income' : 'Expense'}
           </Button>
-          <Button
-            variant="outline"
-            size="icon-lg"
-            type="button"
-            disabled={isSaving}
-            onClick={onClose}
-            aria-label="Close">
+          <Button variant="outline" size="icon-lg" type="button" disabled={isBusy} onClick={onClose} aria-label="Close">
             <X size={19} />
           </Button>
         </ComposerHeader>
@@ -177,7 +179,7 @@ export function EntryComposer({
               <ComposerCategoryStep
                 type={type}
                 category={category}
-                disabled={isSaving}
+                disabled={isBusy}
                 onChange={(selectedCategory) => {
                   setCategory(selectedCategory)
                   setError('')
@@ -190,7 +192,7 @@ export function EntryComposer({
             <FadeContent>
               <ComposerAmountStep
                 amount={amount}
-                disabled={isSaving}
+                disabled={isBusy}
                 error={error}
                 isMobile={isMobile}
                 onAmountChange={setAmount}
@@ -208,7 +210,7 @@ export function EntryComposer({
                 amount={amount}
                 title={title}
                 occurredAt={occurredAt}
-                disabled={isSaving}
+                disabled={isBusy}
                 isSaving={isSaving}
                 error={error}
                 category={category}
@@ -219,15 +221,21 @@ export function EntryComposer({
             </FadeContent>
           )}
         </form>
-        <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialog
+          open={deleteOpen}
+          onOpenChange={(open) => {
+            if (!isBusy) setDeleteOpen(open)
+          }}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Delete this transaction?</AlertDialogTitle>
               <AlertDialogDescription>This transaction will be permanently removed.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => void handleDelete()}>Delete</AlertDialogAction>
+              <AlertDialogCancel disabled={isBusy}>Cancel</AlertDialogCancel>
+              <AlertDialogAction disabled={isBusy} onClick={() => void handleDelete()}>
+                {isDeleting ? 'Deleting…' : 'Delete transaction'}
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

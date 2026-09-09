@@ -125,7 +125,7 @@ export function useEntries(userId?: string) {
 
   const removeEntry = useCallback(
     async (id: string) => {
-      if (!userId) return
+      if (!userId) return false
       setPersistenceError('')
       try {
         const supabase = await getSupabase()
@@ -137,9 +137,11 @@ export function useEntries(userId?: string) {
         setEntries(nextEntries)
         setAccumulation(nextAccumulation)
         writeEntriesCache(userId, nextEntries)
+        return true
       } catch (error) {
         console.error('Failed to delete entry from Supabase', error)
         setPersistenceError('Could not delete this record. Please try again.')
+        return false
       }
     },
     [getSupabase, userId],
