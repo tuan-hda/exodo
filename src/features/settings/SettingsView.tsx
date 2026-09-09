@@ -12,10 +12,19 @@ import type { Entry } from '@/features/entries/types'
 import { SavingsView } from '@/features/savings/SavingsView'
 import { CustomizationView } from './CustomizationView'
 
+type SettingsPage = 'menu' | 'budgets' | 'savings' | 'customization'
+
+function getInitialSettingsPage(): SettingsPage {
+  if (typeof window === 'undefined') return 'menu'
+  const section = new URLSearchParams(window.location.search).get('section')
+  if (section === 'budgets' || section === 'savings' || section === 'customization') return section
+  return 'menu'
+}
+
 export function SettingsView({ userId, entries }: { userId?: string; entries: Entry[] }) {
   const { user } = useUser()
   const { signOut } = useClerk()
-  const [page, setPage] = useState<'menu' | 'budgets' | 'savings' | 'customization'>('menu')
+  const [page, setPage] = useState<SettingsPage>(getInitialSettingsPage)
   const email = user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses[0]?.emailAddress ?? ''
   const initials = (user?.firstName?.[0] ?? user?.lastName?.[0] ?? email[0] ?? 'E').toUpperCase()
   const name = user?.fullName ?? user?.firstName ?? 'Your account'

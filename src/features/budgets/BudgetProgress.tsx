@@ -53,7 +53,7 @@ export function BudgetProgress({
           </p>
         </div>
         <Button asChild variant="outline-muted" size="sm" className="justify-self-start">
-          <a href="/?tab=settings">Set a category limit</a>
+          <a href="/?tab=settings&section=budgets">Set a category limit</a>
         </Button>
       </DashboardPanel>
     )
