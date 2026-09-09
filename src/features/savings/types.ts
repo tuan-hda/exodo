@@ -1,10 +1,12 @@
+import type { SavingsIconName } from './savings-icons'
+
 export type SavingsGoal = {
   id: string
   name: string
   targetAmount: number
   savedAmount: number
   targetDate: string | null
-  icon: string
+  icon: SavingsIconName
   priority: number
   status: 'active' | 'paused' | 'completed'
 }

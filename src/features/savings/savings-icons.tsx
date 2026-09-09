@@ -22,6 +22,10 @@ export const savingsIconOptions: readonly SavingsIconOption[] = [
   { name: 'wallet', label: 'Wallet', render: (size) => <Wallet size={size} weight="regular" /> },
 ]
 
+export function normalizeSavingsIcon(name: string | null | undefined): SavingsIconName {
+  return savingsIconOptions.some((option) => option.name === name) ? (name as SavingsIconName) : defaultSavingsIcon
+}
+
 export function SavingsIcon({ name, size = 22 }: { name?: string; size?: number }) {
   const option = savingsIconOptions.find((item) => item.name === name)
   return option?.render(size) ?? <Target size={size} weight="regular" />
