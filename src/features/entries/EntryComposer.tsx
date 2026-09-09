@@ -113,14 +113,7 @@ export function EntryComposer({
       onOpenChange={(open) => {
         if (!open && !isSaving) onClose()
       }}>
-      <SheetContent
-        side="bottom"
-        showCloseButton={false}
-        className={clsx(
-          'max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-panel border border-line-strong bg-surface p-6 text-ink shadow-sheet [margin-inline:auto] [padding-top:max(16px,env(safe-area-inset-top))] [padding-bottom:max(16px,env(safe-area-inset-bottom))] max-md:flex max-md:min-h-0 max-md:max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] max-md:w-full max-md:min-w-0 max-md:overflow-x-hidden max-md:rounded-t-panel max-md:rounded-b-none max-md:border-0 max-md:p-5 max-md:[margin-inline:0]',
-          type,
-        )}
-        aria-busy={isSaving}>
+      <SheetContent side="bottom" variant="composer" showCloseButton={false} aria-busy={isSaving}>
         <SheetTitle className="sr-only">{entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}</SheetTitle>
         <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-line-strong" aria-hidden="true" />
         <div className="mb-7 flex justify-between max-md:mb-5">
