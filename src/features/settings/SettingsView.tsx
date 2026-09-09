@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PaintBrush, PiggyBank, SignOut, UserCircle, Wallet } from '@phosphor-icons/react'
 import { useClerk, useUser } from '@clerk/nextjs'
 import { PageHeader } from '@/components/PageHeader'
@@ -28,6 +28,12 @@ export function SettingsView({ userId, entries }: { userId?: string; entries: En
   const email = user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses[0]?.emailAddress ?? ''
   const initials = (user?.firstName?.[0] ?? user?.lastName?.[0] ?? email[0] ?? 'E').toUpperCase()
   const name = user?.fullName ?? user?.firstName ?? 'Your account'
+
+  useEffect(() => {
+    const syncPage = () => setPage(getInitialSettingsPage())
+    window.addEventListener('popstate', syncPage)
+    return () => window.removeEventListener('popstate', syncPage)
+  }, [])
 
   function changePage(nextPage: SettingsPage) {
     setPage(nextPage)

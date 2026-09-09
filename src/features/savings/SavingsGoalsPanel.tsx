@@ -12,7 +12,7 @@ import { useSavings } from './use-savings'
 
 export function SavingsGoalsLoading() {
   return (
-    <div className="grid gap-4" aria-label="Loading savings goals">
+    <div className="grid gap-4" role="status" aria-label="Loading savings goals">
       {Array.from({ length: 2 }, (_, index) => (
         <Card tone="flat" className="grid gap-5 p-6 md:p-7" key={index}>
           <div className="flex items-center gap-3">

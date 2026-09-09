@@ -229,7 +229,7 @@ export function ActivityList({
             <p className="ui-label m-0 border-t border-line px-2 py-4 text-center">End of transactions</p>
           </section>
         ) : isLoading ? (
-          <div className="mt-4 grid gap-3" aria-label="Loading activity">
+          <div className="mt-4 grid gap-3" role="status" aria-label="Loading activity">
             {Array.from({ length: 4 }, (_, index) => (
               <div className="flex min-h-[67px] items-center gap-3 border-b border-line" key={index}>
                 <Skeleton className="size-8 rounded-full" />

@@ -98,7 +98,7 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
         </div>
       </div>
       {isLoading && budgets.length === 0 && (
-        <div className="grid gap-3" aria-label="Loading budgets">
+        <div className="grid gap-3" role="status" aria-label="Loading budgets">
           {Array.from({ length: 2 }, (_, index) => (
             <div className="flex min-h-14 items-center gap-3 border-b border-line" key={index}>
               <Skeleton className="size-8 rounded-full" />

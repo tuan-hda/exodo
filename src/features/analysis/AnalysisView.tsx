@@ -89,7 +89,7 @@ function DistributionCard({
   const isIncome = type === 'income'
 
   return (
-    <div aria-label={`${type} distribution`}>
+    <section aria-label={`${type} distribution`}>
       <Card className="p-5 max-md:p-4">
         {isLoading ? (
           <div className="grid min-h-[360px] content-center gap-5 p-8">
@@ -165,7 +165,7 @@ function DistributionCard({
           )}
         </AnimatedList>
       ) : null}
-    </div>
+    </section>
   )
 }
 
