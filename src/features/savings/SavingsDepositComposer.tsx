@@ -64,8 +64,8 @@ export function SavingsDepositComposer({
           <span className="ui-icon-tile-inverse size-10 rounded-input text-lg" aria-hidden="true">
             <SavingsIcon name={goal.icon} size={20} />
           </span>
-          <div>
-            <p className="text-sm font-semibold">{goal.name}</p>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold">{goal.name}</p>
             <p className="text-xs text-muted">Target {formatMoney(goal.targetAmount)}</p>
           </div>
         </div>

@@ -110,7 +110,7 @@ export function BudgetProgress({
         {budgetRows.map((row) => (
           <div className="grid gap-2.5" key={row.id}>
             <div className="flex items-center justify-between gap-3 font-mono text-xs">
-              <span className="flex items-center gap-2">
+              <span className="flex min-w-0 items-center gap-2">
                 <span
                   className={clsx(
                     'grid size-9 shrink-0 place-items-center rounded-input border text-current',
@@ -118,7 +118,7 @@ export function BudgetProgress({
                   )}>
                   {categoryIcon(row.category, 15)}
                 </span>
-                {row.category}
+                <span className="truncate">{row.category}</span>
               </span>
               <div className="grid justify-items-end gap-0.5 text-right">
                 <strong className={clsx('ui-number font-normal', row.percent > 100 ? 'text-danger' : 'text-ink')}>

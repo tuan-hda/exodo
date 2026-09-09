@@ -206,8 +206,8 @@ export function ActivityList({
                       )}>
                       {categoryIcon(entry.category ?? 'Other', 16)}
                     </span>
-                    <span>
-                      <strong className="block text-[13px] font-medium text-ink">
+                    <span className="min-w-0">
+                      <strong className="block truncate text-[13px] font-medium text-ink">
                         {entry.title || entry.category || (entry.type === 'income' ? 'Income' : 'Expense')}
                       </strong>
                       <small className="ui-meta mt-1 block">

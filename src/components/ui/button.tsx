@@ -35,10 +35,10 @@ const buttonVariants = cva(
         'icon-lg': 'size-11 rounded-control',
         option: 'min-h-14 w-full justify-start gap-2.5 rounded-control px-4 py-3 text-left text-sm font-medium',
         keypad: 'min-h-[52px] w-full rounded-input font-mono text-base max-md:min-h-[58px]',
-        list: 'grid min-h-[67px] w-full grid-cols-[34px_1fr_auto] items-center gap-[13px] rounded-none border-0 border-b border-line px-2 py-3 text-left max-xs:grid-cols-[30px_1fr_auto] max-xs:gap-[9px]',
+        list: 'grid min-h-[67px] w-full min-w-0 grid-cols-[34px_1fr_auto] items-center gap-[13px] rounded-none border-0 border-b border-line px-2 py-3 text-left max-xs:grid-cols-[30px_1fr_auto] max-xs:gap-[9px]',
         summary:
-          'grid min-h-[76px] w-full grid-cols-3 items-center gap-3 rounded-none border-0 border-b border-line px-2 py-4 text-left',
-        row: 'flex min-h-16 w-full items-center gap-3 rounded-none border-0 border-b border-line px-0 py-3 text-left',
+          'grid min-h-[76px] w-full min-w-0 grid-cols-3 items-center gap-3 rounded-none border-0 border-b border-line px-2 py-4 text-left',
+        row: 'flex min-h-16 w-full min-w-0 items-center gap-3 rounded-none border-0 border-b border-line px-0 py-3 text-left',
         nav: 'min-h-10 rounded-input px-3 py-2',
         'nav-item': 'h-12 min-h-12 min-w-0 rounded-input px-2 py-2',
         fab: 'size-12 rounded-full',
