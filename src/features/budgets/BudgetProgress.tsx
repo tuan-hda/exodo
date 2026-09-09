@@ -37,6 +37,7 @@ export function BudgetProgress({
       percent: budget.amount ? (spent / budget.amount) * 100 : 0,
     }
   })
+  const dailyPace = budgetRows.reduce((sum, row) => sum + row.dailyAllowance, 0)
 
   if (!budgetRows.length && !isLoading) {
     return (
@@ -94,7 +95,18 @@ export function BudgetProgress({
           By category
         </h3>
       </div>
-      <div className="mt-7 grid gap-6">
+      <div className="mt-7 flex items-end justify-between gap-4 border-y border-line py-4">
+        <div className="grid gap-1">
+          <span className="ui-label">Daily pace</span>
+          <strong className="ui-number text-xl font-semibold tracking-[-.04em]">
+            {formatMoney(Math.floor(dailyPace))} <small className="ui-meta font-normal">/ day</small>
+          </strong>
+        </div>
+        <span className="ui-meta max-w-[16ch] text-right">
+          {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} including today
+        </span>
+      </div>
+      <div className="mt-6 grid gap-6">
         {budgetRows.map((row) => (
           <div className="grid gap-2.5" key={row.id}>
             <div className="flex items-center justify-between gap-3 font-mono text-xs">
