@@ -2,18 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupabase } from '@/hooks/use-supabase'
-import { readStorageCache, writeStorageCache } from '@/lib/storage'
+import { readStorageCache, storageCacheTtl, writeStorageCache } from '@/lib/storage'
 import type { Category } from '@/features/finance/category'
 import type { CategoryBudget, StoredCategoryBudget } from './types'
-
-const budgetCacheTtl = 24 * 60 * 60 * 1000
 
 function budgetCacheKey(userId: string) {
   return `exodo.budgets.${userId}`
 }
 
 function readBudgetCache(userId: string) {
-  const cached = readStorageCache<{ budgets?: CategoryBudget[] }>(budgetCacheKey(userId), budgetCacheTtl)
+  const cached = readStorageCache<{ budgets?: CategoryBudget[] }>(budgetCacheKey(userId), storageCacheTtl)
   if (!Array.isArray(cached?.budgets)) return null
   return cached.budgets
 }

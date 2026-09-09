@@ -1,3 +1,5 @@
+export const storageCacheTtl = 24 * 60 * 60 * 1000
+
 export function readStorageValue(key: string) {
   if (typeof window === 'undefined') return null
 

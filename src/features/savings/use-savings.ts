@@ -2,13 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupabase } from '@/hooks/use-supabase'
-import { readStorageCache, writeStorageCache } from '@/lib/storage'
+import { readStorageCache, storageCacheTtl, writeStorageCache } from '@/lib/storage'
 import type { Entry } from '@/features/entries/types'
 import { allocateRemainder, calculateMonthlyRemainder, monthKey } from './savings-utils'
 import { normalizeSavingsIcon } from './savings-icons'
 import type { SavingsDeposit, SavingsGoal, StoredSavingsDeposit, StoredSavingsGoal } from './types'
-
-const savingsCacheTtl = 24 * 60 * 60 * 1000
 
 function savingsCacheKey(userId: string) {
   return `exodo.savings.${userId}`
@@ -18,7 +16,7 @@ function readSavingsCache(userId: string) {
   const cached = readStorageCache<{
     goals?: SavingsGoal[]
     deposits?: SavingsDeposit[]
-  }>(savingsCacheKey(userId), savingsCacheTtl)
+  }>(savingsCacheKey(userId), storageCacheTtl)
   if (!Array.isArray(cached?.goals) || !Array.isArray(cached.deposits)) return null
   return {
     goals: cached.goals.map((goal) => ({ ...goal, icon: normalizeSavingsIcon(goal.icon) })),

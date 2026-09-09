@@ -1,8 +1,6 @@
 import type { Entry, StoredEntry } from './types'
 import type { Category } from '@/features/finance/category'
-import { readStorageCache, writeStorageCache } from '@/lib/storage'
-
-const entriesCacheTtl = 24 * 60 * 60 * 1000
+import { readStorageCache, storageCacheTtl, writeStorageCache } from '@/lib/storage'
 
 export function normalizeStoredEntry(entry: StoredEntry): Entry {
   return {
@@ -23,7 +21,7 @@ function entriesCacheKey(userId: string) {
 }
 
 export function readEntriesCache(userId: string) {
-  const cached = readStorageCache<{ entries?: Entry[] }>(entriesCacheKey(userId), entriesCacheTtl)
+  const cached = readStorageCache<{ entries?: Entry[] }>(entriesCacheKey(userId), storageCacheTtl)
   if (!Array.isArray(cached?.entries)) return null
   return cached.entries
 }
