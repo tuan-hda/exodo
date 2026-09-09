@@ -60,7 +60,7 @@ export function ComposerAmountStep({
       />
       {error && <StateMessage tone="danger">{error}</StateMessage>}
       <ComposerStepActions disabled={disabled} onBack={onBack}>
-        <Button className="flex-1 gap-2 text-sm font-semibold" disabled={disabled} type="button" onClick={onNext}>
+        <Button className="flex-1 gap-2" disabled={disabled} type="button" onClick={onNext}>
           Continue <ArrowRight size={17} />
         </Button>
       </ComposerStepActions>

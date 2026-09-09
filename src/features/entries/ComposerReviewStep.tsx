@@ -68,7 +68,7 @@ export function ComposerReviewStep({
       </label>
       {error && <StateMessage tone="danger">{error}</StateMessage>}
       <ComposerStepActions disabled={disabled} onBack={onBack}>
-        <Button className="flex-1 gap-2 text-sm font-semibold" disabled={disabled} type="submit" variant="default">
+        <Button className="flex-1 gap-2" disabled={disabled} type="submit" variant="default">
           {isSaving ? (
             <>
               <CircleNotch className="animate-spin" size={17} /> Saving…

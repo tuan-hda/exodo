@@ -1,10 +1,11 @@
 import { SignIn } from '@clerk/nextjs'
 import { clerkAppearance } from '@/features/auth/clerk-appearance'
+import { AuthShell } from '@/features/auth/AuthShell'
 
 export default function SignInPage() {
   return (
-    <main className="grid min-h-dvh place-items-center bg-page p-6 text-center text-sm text-muted">
+    <AuthShell>
       <SignIn appearance={clerkAppearance} fallbackRedirectUrl="/" />
-    </main>
+    </AuthShell>
   )
 }

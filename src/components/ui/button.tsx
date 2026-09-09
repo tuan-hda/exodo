@@ -25,10 +25,10 @@ const buttonVariants = cva(
       },
       size: {
         default:
-          'min-h-11 gap-1.5 rounded-control px-3.5 py-2.5 has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5',
+          'min-h-11 gap-1.5 rounded-control px-3.5 py-2.5 text-sm has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5',
         xs: "h-8 gap-1 rounded-chip px-2.5 text-[11px] has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3.5",
         sm: "h-9 gap-1 rounded-input px-3 text-xs has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: 'h-12 gap-1.5 rounded-control px-4 has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3',
+        lg: 'h-12 gap-1.5 rounded-control px-4 text-sm has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3',
         icon: 'size-10 rounded-input',
         'icon-xs': "size-8 rounded-chip [&_svg:not([class*='size-'])]:size-3.5",
         'icon-sm': 'size-9 rounded-input',
@@ -42,6 +42,7 @@ const buttonVariants = cva(
         nav: 'min-h-10 rounded-input px-3 py-2',
         'nav-item': 'h-12 min-h-12 min-w-0 rounded-input px-2 py-2',
         fab: 'size-12 rounded-full',
+        menu: 'grid h-auto min-h-0 w-full min-w-0 grid-cols-[42px_minmax(0,1fr)_24px] items-center gap-3 rounded-none px-0 py-4 text-left',
       },
     },
     defaultVariants: {

@@ -92,11 +92,7 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
             className="w-full"
             placeholder={currentBudget ? Number(currentBudget.amount).toLocaleString('en-US') : '0'}
           />
-          <Button
-            className="w-full text-xs font-semibold disabled:pointer-events-none"
-            type="button"
-            onClick={handleSave}
-            disabled={isSaving || !amount.trim()}>
+          <Button className="w-full" type="button" onClick={handleSave} disabled={isSaving || !amount.trim()}>
             {isSaving ? 'Saving…' : 'Save'}
           </Button>
         </div>

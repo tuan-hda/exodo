@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react'
 import { Check, X } from '@phosphor-icons/react'
+import { ComposerFooter } from '@/components/ComposerFooter'
 import { StateMessage } from '@/components/StateMessage'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -103,11 +104,11 @@ export function SavingsDepositComposer({
             />
           </label>
           {error && <StateMessage tone="danger">{error}</StateMessage>}
-          <div className="relative z-10 mt-2 flex items-start border-t border-line bg-surface pt-3 max-md:sticky max-md:bottom-0 max-md:-mx-5 max-md:mt-auto max-md:px-5 max-md:pt-4">
-            <Button className="w-full gap-2 text-sm font-semibold" disabled={isSaving} type="submit">
+          <ComposerFooter>
+            <Button className="w-full gap-2" disabled={isSaving} type="submit">
               {isSaving ? 'Saving…' : 'Save'} <Check size={17} />
             </Button>
-          </div>
+          </ComposerFooter>
         </form>
       </SheetContent>
     </Sheet>
