@@ -25,7 +25,7 @@ export function OverviewView({
       />
       <div className="grid gap-4">
         <AccumulatedPanel accumulation={accumulation} isLoading={isLoading} />
-        <div className="grid grid-cols-3 gap-3 max-sm:grid-cols-2 max-xs:grid-cols-1">
+        <div className="grid grid-cols-2 gap-3 max-xs:grid-cols-1">
           <MetricCard
             label="income"
             value={formatMoney(income)}
@@ -44,6 +44,7 @@ export function OverviewView({
             label="records"
             value={entries.length.toLocaleString('en-US')}
             detail="all time"
+            className="col-span-2 max-xs:col-span-1"
             isLoading={isLoading}
           />
         </div>
