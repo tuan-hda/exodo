@@ -3,7 +3,7 @@
 import { Backspace } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { Button } from '@/components/ui/button'
-import { formatAmountExpression } from './entry-utils'
+import { formatAmountExpression } from '@/lib/amount'
 
 export function CalculatorKeypad({
   amount,

@@ -2,9 +2,9 @@ import { ArrowRight } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { StateMessage } from '@/components/StateMessage'
-import { CalculatorKeypad } from './CalculatorKeypad'
 import { ComposerStepActions } from './ComposerStepActions'
-import { formatAmountExpression } from './entry-utils'
+import { CalculatorKeypad } from '@/components/CalculatorKeypad'
+import { formatAmountExpression } from '@/lib/amount'
 
 export function ComposerAmountStep({
   amount,

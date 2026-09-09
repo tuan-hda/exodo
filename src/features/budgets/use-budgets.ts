@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupabase } from '@/hooks/use-supabase'
 import { readStorageCache, writeStorageCache } from '@/lib/storage'
-import type { Category } from '@/features/entries/category'
+import type { Category } from '@/features/finance/category'
 import type { CategoryBudget, StoredCategoryBudget } from './types'
 
 const budgetCacheTtl = 24 * 60 * 60 * 1000

@@ -15,7 +15,7 @@ export function SettingsMenuItem({
 }) {
   return (
     <Button variant="ghost" size="menu" type="button" onClick={onClick}>
-      <span className="grid size-9 place-items-center rounded-full bg-soft text-ink">{icon}</span>
+      <span className="ui-icon-tile size-9 rounded-full">{icon}</span>
       <span className="min-w-0">
         <strong className="block text-sm font-semibold">{title}</strong>
         <small className="mt-1 block whitespace-normal text-xs leading-[1.45] text-muted">{description}</small>

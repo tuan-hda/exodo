@@ -1,4 +1,4 @@
-import type { Category } from '@/features/entries/category'
+import type { Category } from '@/features/finance/category'
 
 export type CategoryBudget = {
   id: string

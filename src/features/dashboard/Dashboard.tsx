@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { clsx } from 'clsx'
+import { useReducedMotion } from 'motion/react'
 import { useUser } from '@clerk/nextjs'
 import { ArrowClockwise } from '@phosphor-icons/react'
 import { fromKey } from '@/lib/date'
@@ -26,6 +27,7 @@ import { formatLongDate } from '@/lib/date-format'
 
 function Dashboard() {
   const { user } = useUser()
+  const prefersReducedMotion = useReducedMotion()
   const { enabled: gradientBackgroundEnabled } = useBackgroundPreference()
   const {
     entries,
@@ -108,7 +110,7 @@ function Dashboard() {
     else url.searchParams.set('tab', tab)
     if (tab !== 'settings') url.searchParams.delete('section')
     window.history.pushState(null, '', `${url.pathname}${url.search}${url.hash}`)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
   }
 
   async function handleSave(entry: Entry) {

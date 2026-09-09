@@ -5,8 +5,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { clsx } from 'clsx'
 import { useReducedMotion } from 'motion/react'
 import { Button } from '@/components/ui/button'
-import { categoryChartColor, categoryClass, categoryIcon } from '@/features/entries/CategoryPicker'
+import { categoryChartColor, categoryClass, categoryIcon } from '@/features/finance/category'
 import { formatMoney } from '@/lib/money'
+import { motionDurations } from '@/lib/motion'
 import { CountUp } from '@/components/ui/count-up'
 import type { AnalysisSlice } from './analysis-utils'
 
@@ -59,7 +60,7 @@ export function PieChart({
     if (animationFrame.current) cancelAnimationFrame(animationFrame.current)
 
     const animate = (time: number) => {
-      const progress = Math.min((time - startTime) / 600, 1)
+      const progress = Math.min((time - startTime) / (motionDurations.pieSelection * 1000), 1)
       const easedProgress = 1 - Math.pow(1 - progress, 3)
       setOuterRadius(startRadius + (targetRadius - startRadius) * easedProgress)
       if (progress < 1) {

@@ -4,6 +4,7 @@ export const motionDurations = {
   countUp: 0.85,
   fadeContent: 0.5,
   listItem: 0.42,
+  pieSelection: 0.6,
 } as const
 
 export const motionStagger = {

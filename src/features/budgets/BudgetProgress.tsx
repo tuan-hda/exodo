@@ -1,5 +1,5 @@
 import { clsx } from 'clsx'
-import { categoryClass, categoryIcon } from '@/features/entries/CategoryPicker'
+import { categoryClass, categoryIcon } from '@/features/finance/category'
 import { entryDate } from '@/lib/date'
 import type { Entry } from '@/features/entries/types'
 import type { CategoryBudget } from './types'

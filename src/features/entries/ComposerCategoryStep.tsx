@@ -1,4 +1,5 @@
-import { CategoryPicker, type Category } from './CategoryPicker'
+import { CategoryPicker } from './CategoryPicker'
+import type { Category } from '@/features/finance/category'
 import type { EntryType } from './types'
 
 export function ComposerCategoryStep({

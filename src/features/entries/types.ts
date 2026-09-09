@@ -1,4 +1,4 @@
-import type { Category } from './category'
+import type { Category } from '@/features/finance/category'
 
 export type EntryType = 'income' | 'expense'
 

@@ -15,8 +15,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { categoryClass, categoryIcon, expenseCategories } from '@/features/entries/CategoryPicker'
-import { formatMoneyInput } from '@/features/entries/entry-utils'
+import { categoryClass, categoryIcon, expenseCategories } from '@/features/finance/category'
 import type { CategoryBudget } from '@/features/budgets/types'
 import { useBudgets } from '@/features/budgets/use-budgets'
 import { PageHeader } from '@/components/PageHeader'
@@ -24,6 +23,7 @@ import { StateMessage } from '@/components/StateMessage'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatMoney } from '@/lib/money'
+import { formatMoneyInput } from '@/lib/amount'
 
 export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
   const { user } = useUser()
