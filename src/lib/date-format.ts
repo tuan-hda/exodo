@@ -1,3 +1,5 @@
+import { fromKey } from './date'
+
 const longDateFormatter = new Intl.DateTimeFormat('en-US', {
   weekday: 'long',
   month: 'long',
@@ -7,7 +9,7 @@ const monthLabelFormatter = new Intl.DateTimeFormat('en-US', { month: 'long', ye
 const monthChipFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' })
 
 function toDate(value: Date | string) {
-  return typeof value === 'string' ? new Date(`${value.slice(0, 10)}T12:00:00`) : value
+  return typeof value === 'string' ? fromKey(value) : value
 }
 
 export function formatLongDate(value: Date | string) {

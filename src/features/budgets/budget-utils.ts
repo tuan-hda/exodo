@@ -1,5 +1,4 @@
-import { monthDays } from '@/features/entries/entry-utils'
-import { fromKey } from '@/features/finance/allocation'
+import { fromKey, monthDays } from '@/lib/date'
 
 export function remainingDaysInMonth(dayKey: string) {
   const day = fromKey(dayKey)

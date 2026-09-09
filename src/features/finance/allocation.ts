@@ -1,11 +1,9 @@
+import { fromKey } from '@/lib/date'
+
 export type IncomeLike = {
   type: 'income'
   amount: number
   date: string
-}
-
-export function fromKey(value: string) {
-  return new Date(`${value}T12:00:00`)
 }
 
 export function allocateIncome(income: IncomeLike, dayKey: string) {

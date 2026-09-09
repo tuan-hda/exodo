@@ -1,7 +1,7 @@
 import { Check } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { dailyIncome } from '@/features/finance/allocation'
-import { entryDate } from '@/features/entries/entry-utils'
+import { entryDate } from '@/lib/date'
 import type { Entry } from '@/features/entries/types'
 import { CountUp } from '@/components/ui/count-up'
 import { FadeContent } from '@/components/ui/fade-content'

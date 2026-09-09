@@ -1,4 +1,4 @@
-import { entryDate } from '@/features/entries/entry-utils'
+import { entryDate } from '@/lib/date'
 import type { Entry } from '@/features/entries/types'
 
 export type AnalysisSlice = {

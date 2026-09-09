@@ -4,16 +4,6 @@ import { readStorageCache, writeStorageCache } from '@/lib/storage'
 
 const entriesCacheTtl = 24 * 60 * 60 * 1000
 
-export function getDayKey(date = new Date()) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-}
-
-export function getCurrentTime(date = new Date()) {
-  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
-}
-
-export const todayKey = getDayKey()
-
 export function formatAmountExpression(value: string) {
   return value.replace(/\d[\d,]*(?:\.\d*)?/g, (token) => {
     const [integer, fraction] = token.split('.')
@@ -25,14 +15,6 @@ export function formatAmountExpression(value: string) {
 export function formatMoneyInput(value: string) {
   const digits = value.replace(/\D/g, '')
   return digits ? Number(digits).toLocaleString('en-US') : ''
-}
-
-export function monthDays(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
-}
-
-export function entryDate(entry: Entry) {
-  return entry.occurredAt.slice(0, 10)
 }
 
 export function normalizeStoredEntry(entry: StoredEntry): Entry {
