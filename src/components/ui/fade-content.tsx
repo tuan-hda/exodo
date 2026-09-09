@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'motion/react'
 import { useRef, type ReactNode } from 'react'
+import { motionDurations, motionEase } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
 function FadeContent({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
@@ -14,7 +15,7 @@ function FadeContent({ children, className, delay = 0 }: { children: ReactNode; 
       className={cn(className)}
       initial={{ opacity: 0, y: 8 }}
       animate={inView ? { opacity: 1, y: 0 } : undefined}
-      transition={{ duration: 0.5, delay, ease: [0.05, 0.78, 0.18, 1] }}>
+      transition={{ duration: motionDurations.fadeContent, delay, ease: motionEase }}>
       {children}
     </motion.div>
   )

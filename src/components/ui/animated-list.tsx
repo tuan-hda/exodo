@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'motion/react'
 import { useRef, type Key, type ReactNode } from 'react'
+import { motionDurations, motionEase, motionStagger } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
 function AnimatedListItem({ children, index }: { children: ReactNode; index: number }) {
@@ -13,7 +14,11 @@ function AnimatedListItem({ children, index }: { children: ReactNode; index: num
       ref={ref}
       initial={{ opacity: 0, scale: 0.97, y: 7 }}
       animate={inView ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.97, y: 7 }}
-      transition={{ duration: 0.42, delay: index * 0.045, ease: [0.05, 0.78, 0.18, 1] }}>
+      transition={{
+        duration: motionDurations.listItem,
+        delay: index * motionStagger.listItem,
+        ease: motionEase,
+      }}>
       {children}
     </motion.div>
   )

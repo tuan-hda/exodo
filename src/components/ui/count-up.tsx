@@ -2,12 +2,13 @@
 
 import { animate, useMotionValue, useMotionValueEvent, useReducedMotion } from 'motion/react'
 import { useEffect, useState } from 'react'
+import { motionDurations, motionEase } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
 function CountUp({
   value,
   formatValue = (currentValue) => Math.round(currentValue).toLocaleString('en-US'),
-  duration = 0.85,
+  duration = motionDurations.countUp,
   className,
 }: {
   value: number
@@ -31,7 +32,7 @@ function CountUp({
 
     const controls = animate(motionValue, value, {
       duration,
-      ease: [0.05, 0.78, 0.18, 1],
+      ease: motionEase,
     })
 
     return () => controls.stop()
