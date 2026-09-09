@@ -174,11 +174,12 @@
 
   .ui-control-motion {
     transition-duration: var(--motion-control-duration);
-    transition-timing-function: ease-out;
+    transition-timing-function: var(--motion-ease);
   }
 
   .ui-progress-motion {
     transition-duration: var(--motion-progress-duration);
+    transition-timing-function: var(--motion-ease);
   }
 
   .ui-icon-tile {
