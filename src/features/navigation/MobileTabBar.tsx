@@ -13,7 +13,7 @@ function MobileNavigationItem({
   activeTab: AppTab
   onChange: (tab: AppTab) => void
 }) {
-  const { id, label, Icon } = item
+  const { id, mobileLabel, Icon } = item
   const isActive = activeTab === id
 
   return (
@@ -25,7 +25,7 @@ function MobileNavigationItem({
       type="button"
       onClick={() => onChange(id)}>
       <Icon size={20} weight={isActive ? 'fill' : 'regular'} />
-      <span className="ui-nav-label">{label}</span>
+      <span className="ui-nav-label">{mobileLabel}</span>
     </Button>
   )
 }

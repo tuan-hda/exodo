@@ -20,5 +20,6 @@ describe('app navigation', () => {
     expect(mobileItemIds).toEqual(itemIds)
     expect(itemIds.every((id) => isAppTab(id))).toBe(true)
     expect(appTabLabels.analysis).toBe('Analysis')
+    expect(navigationItems.find((item) => item.id === 'notifications')?.mobileLabel).toBe('Inbox')
   })
 })

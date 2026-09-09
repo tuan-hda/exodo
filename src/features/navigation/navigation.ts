@@ -1,9 +1,19 @@
 import { Bell, ChartLineUp, Gear, House } from '@phosphor-icons/react'
 
-const todayNavigationItem = { id: 'today', label: 'Today', Icon: House } as const
-const overviewNavigationItem = { id: 'overview', label: 'Overview', Icon: ChartLineUp } as const
-const notificationsNavigationItem = { id: 'notifications', label: 'Notifications', Icon: Bell } as const
-const settingsNavigationItem = { id: 'settings', label: 'Settings', Icon: Gear } as const
+const todayNavigationItem = { id: 'today', label: 'Today', mobileLabel: 'Today', Icon: House } as const
+const overviewNavigationItem = {
+  id: 'overview',
+  label: 'Overview',
+  mobileLabel: 'Overview',
+  Icon: ChartLineUp,
+} as const
+const notificationsNavigationItem = {
+  id: 'notifications',
+  label: 'Notifications',
+  mobileLabel: 'Inbox',
+  Icon: Bell,
+} as const
+const settingsNavigationItem = { id: 'settings', label: 'Settings', mobileLabel: 'Settings', Icon: Gear } as const
 
 export type AppTab = 'today' | 'overview' | 'analysis' | 'notifications' | 'settings'
 
