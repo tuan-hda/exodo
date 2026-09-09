@@ -119,8 +119,7 @@ export function PieChart({
             const isSelected = segment.category === visualSelectedCategory
             const segmentOuterRadius = isSelected ? outerRadius : 48
             const shapeProps = {
-              className:
-                'pie-slice cursor-pointer outline-none transition-[transform] duration-[600ms] ease-[cubic-bezier(.05,.78,.18,1)] focus-visible:stroke-ink focus-visible:stroke-[1.5]',
+              className: 'pie-chart-slice',
               fill: segment.color,
               onClick: () => onSelect(segment.category),
               onKeyDown: (event: KeyboardEvent<SVGElement>) => {
@@ -163,7 +162,7 @@ export function PieChart({
                 aria-label={`Select ${segment.category}`}
                 onClick={() => onSelect(segment.category)}
                 className={clsx(
-                  'grid size-14 place-items-center rounded-full border-[3px] shadow-badge transition-transform duration-[600ms] ease-[cubic-bezier(.05,.78,.18,1)] max-xs:size-11',
+                  'pie-chart-badge grid size-14 place-items-center rounded-full border-[3px] shadow-badge max-xs:size-11',
                   segment.category === selectedCategory && segment.percentage < MIN_LABEL_PERCENTAGE
                     ? 'pie-badge-zoom-small'
                     : segment.category === visualSelectedCategory && !selectedCategory
