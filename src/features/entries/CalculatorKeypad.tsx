@@ -29,7 +29,7 @@ export function CalculatorKeypad({
 
   return (
     <div className="hidden max-md:block" role="group" aria-label="Amount calculator">
-      <div className="rounded-control border border-line-strong bg-soft px-3 py-3 text-right font-mono text-[20px] text-ink [overflow-wrap:anywhere]">
+      <div className="ui-expression rounded-control border border-line-strong bg-soft px-3 py-3 text-right">
         {formatAmountExpression(amount || '0')}
       </div>
       <div className="mt-2 grid grid-cols-4 gap-1.5">

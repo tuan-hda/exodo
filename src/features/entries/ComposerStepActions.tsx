@@ -18,10 +18,10 @@ export function ComposerStepActions({
   return (
     <ComposerFooter className={clsx(fullWidthBack ? 'justify-start' : 'justify-between')}>
       <Button
-        className={clsx('flex-1 gap-2 text-sm font-semibold text-muted', fullWidthBack && 'w-full')}
+        className={clsx('flex-1 gap-2', fullWidthBack && 'w-full')}
         disabled={disabled}
         type="button"
-        variant="outline"
+        variant="outline-muted"
         onClick={onBack}>
         <ArrowLeft size={17} /> Back
       </Button>

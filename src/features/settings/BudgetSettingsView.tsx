@@ -126,9 +126,8 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
               </span>
               <strong className="ui-number font-normal text-ink">{formatMoney(budget.amount)}</strong>
               <Button
-                variant="ghost"
+                variant="destructive-ghost"
                 size="icon-xs"
-                className="text-muted hover:text-danger"
                 type="button"
                 aria-label={`Remove ${budget.category} budget`}
                 onClick={() => setBudgetToRemove(budget)}>

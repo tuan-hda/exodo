@@ -54,7 +54,6 @@ export function SavingsDepositComposer({
           <Button
             variant="outline"
             size="icon-lg"
-            className="text-ink"
             type="button"
             disabled={isSaving}
             onClick={onClose}

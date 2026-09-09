@@ -15,6 +15,8 @@ const buttonVariants = cva(
         secondary: 'border-transparent bg-soft text-ink hover:bg-line',
         ghost: 'border-transparent text-muted hover:bg-soft hover:text-ink',
         destructive: 'border-danger/20 bg-danger-soft text-danger hover:border-danger/35 hover:bg-danger/15',
+        'outline-danger': 'border-danger/30 bg-surface text-danger hover:border-danger/50 hover:bg-danger-soft',
+        'destructive-ghost': 'border-transparent bg-transparent text-danger hover:bg-danger-soft hover:text-danger',
         link: 'border-transparent text-ink underline-offset-4 hover:underline',
         'outline-muted': 'border-line-strong bg-surface text-muted hover:border-ink hover:bg-soft hover:text-ink',
         option:
@@ -22,12 +24,15 @@ const buttonVariants = cva(
         keypad: 'border-line bg-soft text-ink hover:border-line-strong hover:bg-line',
         list: 'bg-transparent text-ink hover:bg-soft',
         nav: 'border-transparent text-muted hover:bg-soft hover:text-ink data-[active=true]:bg-ink data-[active=true]:text-white data-[active=true]:shadow-button',
+        'subtle-nav':
+          'border-transparent bg-transparent text-muted hover:bg-soft hover:text-ink disabled:cursor-not-allowed disabled:opacity-35',
       },
       size: {
         default:
           'min-h-11 gap-1.5 rounded-control px-3.5 py-2.5 text-sm has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5',
         xs: "h-8 gap-1 rounded-chip px-2.5 text-[11px] has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3.5",
         sm: "h-9 gap-1 rounded-input px-3 text-xs has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5 [&_svg:not([class*='size-'])]:size-3.5",
+        meta: 'h-9 gap-1 rounded-input px-3 font-mono text-[10px] leading-[1.5]',
         lg: 'h-12 gap-1.5 rounded-control px-4 text-sm has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3',
         icon: 'size-10 rounded-input',
         'icon-xs': "size-8 rounded-chip [&_svg:not([class*='size-'])]:size-3.5",

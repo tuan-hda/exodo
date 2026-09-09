@@ -123,9 +123,8 @@ export function EntryComposer({
           <div className="flex items-center gap-2">
             {entry && onDelete && (
               <Button
-                variant="outline"
+                variant="outline-danger"
                 size="icon-lg"
-                className="text-danger"
                 type="button"
                 disabled={isSaving}
                 onClick={() => setDeleteOpen(true)}
@@ -147,7 +146,6 @@ export function EntryComposer({
             <Button
               variant="outline"
               size="icon-lg"
-              className="text-ink"
               type="button"
               disabled={isSaving}
               onClick={onClose}

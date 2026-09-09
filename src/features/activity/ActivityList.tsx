@@ -125,9 +125,9 @@ export function ActivityList({
           className="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-y border-line py-2"
           aria-label="Activity months">
           <Button
-            variant="ghost"
-            size="sm"
-            className="ui-meta min-w-0 justify-start gap-1 px-2 text-left hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
+            variant="subtle-nav"
+            size="meta"
+            className="justify-start text-left"
             disabled={!previousMonth}
             type="button"
             onClick={() => previousMonth && setSelectedMonth(previousMonth)}
@@ -140,9 +140,9 @@ export function ActivityList({
             <strong className="text-sm font-semibold text-ink">{activeMonth ? monthChip(activeMonth) : '—'}</strong>
           </div>
           <Button
-            variant="ghost"
-            size="sm"
-            className="ui-meta min-w-0 justify-end gap-1 px-2 text-right hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
+            variant="subtle-nav"
+            size="meta"
+            className="justify-end text-right"
             disabled={!nextMonth}
             type="button"
             onClick={() => nextMonth && setSelectedMonth(nextMonth)}
