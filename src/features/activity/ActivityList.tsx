@@ -5,10 +5,11 @@ import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { categoryClass, categoryIcon } from '@/features/entries/CategoryPicker'
-import { entryDate, formatMoney } from '@/features/entries/entry-utils'
+import { entryDate } from '@/features/entries/entry-utils'
 import type { Entry } from '@/features/entries/types'
 import { Input } from '@/components/ui/input'
 import { formatLongDate, formatMonthChip, formatMonthLabel } from '@/lib/date-format'
+import { formatMoney } from '@/lib/money'
 
 type ActivityDay = { key: string; label: string; entries: Entry[] }
 type ActivityMonth = { key: string; label: string; entries: Entry[]; income: number; expense: number }

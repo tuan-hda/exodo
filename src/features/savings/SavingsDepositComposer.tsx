@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { CalculatorKeypad } from '@/features/entries/CalculatorKeypad'
-import { evaluateExpression, formatAmountExpression, formatMoney } from '@/features/entries/entry-utils'
+import { evaluateExpression, formatAmountExpression } from '@/features/entries/entry-utils'
 import { SavingsIcon } from './savings-icons'
 import type { SavingsGoal } from './types'
 import { useMediaQuery } from '@/hooks/use-media-query'
 import { mediaQueries } from '@/lib/breakpoints'
+import { formatMoney } from '@/lib/money'
 
 export function SavingsDepositComposer({
   goal,

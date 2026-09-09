@@ -2,7 +2,6 @@ import type { Entry, StoredEntry } from './types'
 import type { Category } from './category'
 import { readStorageJson, writeStorageJson } from '@/lib/storage'
 
-const whole = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
 const entriesCacheTtl = 24 * 60 * 60 * 1000
 
 export function getDayKey(date = new Date()) {
@@ -14,10 +13,6 @@ export function getCurrentTime(date = new Date()) {
 }
 
 export const todayKey = getDayKey()
-
-export function formatMoney(value: number) {
-  return `${whole.format(Math.round(value))} ₫`
-}
 
 export function formatAmountExpression(value: string) {
   return value.replace(/\d[\d,]*(?:\.\d*)?/g, (token) => {

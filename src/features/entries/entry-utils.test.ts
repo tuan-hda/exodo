@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { evaluateExpression, formatAmountExpression, formatMoney } from './entry-utils'
+import { evaluateExpression, formatAmountExpression } from './entry-utils'
+import { formatMoney } from '@/lib/money'
 
 describe('entry formatting and calculations', () => {
   it('uses the shared Vietnamese currency format', () => {

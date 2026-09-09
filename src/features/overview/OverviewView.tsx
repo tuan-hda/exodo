@@ -1,7 +1,7 @@
 import { MetricCard } from '@/components/MetricCard'
 import { AccumulatedPanel } from '@/features/dashboard/AccumulatedPanel'
 import { PageHeader } from '@/components/PageHeader'
-import { formatMoney } from '@/features/entries/entry-utils'
+import { formatMoney } from '@/lib/money'
 import type { Entry } from '@/features/entries/types'
 
 export function OverviewView({

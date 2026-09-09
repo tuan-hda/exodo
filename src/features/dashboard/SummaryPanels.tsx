@@ -1,7 +1,7 @@
 import { Check } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { dailyIncome } from '@/features/finance/allocation'
-import { entryDate, formatMoney } from '@/features/entries/entry-utils'
+import { entryDate } from '@/features/entries/entry-utils'
 import type { Entry } from '@/features/entries/types'
 import { CountUp } from '@/components/ui/count-up'
 import { FadeContent } from '@/components/ui/fade-content'
@@ -9,6 +9,7 @@ import { DashboardValuePanel } from './DashboardValuePanel'
 import { BudgetProgress } from '@/features/budgets/BudgetProgress'
 import type { CategoryBudget } from '@/features/budgets/types'
 import { SavingsGoalsPanel } from '@/features/savings/SavingsGoalsPanel'
+import { formatMoney } from '@/lib/money'
 
 export function SummaryPanels({
   entries,

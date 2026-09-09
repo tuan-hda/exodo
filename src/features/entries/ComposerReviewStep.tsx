@@ -4,8 +4,9 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { StateMessage } from '@/components/StateMessage'
 import { ComposerStepActions } from './ComposerStepActions'
-import { evaluateExpression, formatMoney } from './entry-utils'
+import { evaluateExpression } from './entry-utils'
 import type { Entry, EntryType } from './types'
+import { formatMoney } from '@/lib/money'
 
 export function ComposerReviewStep({
   entry,

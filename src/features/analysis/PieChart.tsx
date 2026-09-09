@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { clsx } from 'clsx'
 import { Button } from '@/components/ui/button'
 import { categoryChartColor, categoryClass, categoryIcon } from '@/features/entries/CategoryPicker'
-import { formatMoney } from '@/features/entries/entry-utils'
+import { formatMoney } from '@/lib/money'
 import { CountUp } from '@/components/ui/count-up'
 import type { AnalysisSlice } from './analysis-utils'
 
