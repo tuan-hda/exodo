@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react'
 import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { fromKey } from '../finance/allocation'
-import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
-import { entryDate, formatMoney } from '../entries/entry-utils'
-import type { Entry } from '../entries/types'
+import { fromKey } from '@/features/finance/allocation'
+import { categoryClass, categoryIcon } from '@/features/entries/CategoryPicker'
+import { entryDate, formatMoney } from '@/features/entries/entry-utils'
+import type { Entry } from '@/features/entries/types'
 import { Input } from '@/components/ui/input'
 
 type ActivityDay = { key: string; label: string; entries: Entry[] }
@@ -165,9 +165,10 @@ export function ActivityList({
                 Analysis
               </Button>
             </div>
-            <button
+            <Button
+              variant="list"
+              size="summary"
               type="button"
-              className="flex min-h-[76px] w-full items-center justify-between gap-3 border-b border-line bg-transparent px-2 py-4 text-left transition-colors hover:bg-soft focus-visible:bg-soft"
               onClick={() => onOpenAnalysis(activeGroup.key)}
               aria-label={`Analyze ${activeGroup.label}`}>
               <span className="grid gap-1">
@@ -192,7 +193,7 @@ export function ActivityList({
                   {formatMoney(activeGroup.income - activeGroup.expense)}
                 </strong>
               </span>
-            </button>
+            </Button>
             {groupByDate(activeGroup.entries).map((day) => (
               <section key={day.key}>
                 <h4 className="m-0 border-b border-line px-2 py-3 font-mono text-[10px] font-normal uppercase tracking-[.08em] text-muted">

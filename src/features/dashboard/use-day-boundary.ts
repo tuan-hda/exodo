@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getDayKey } from '../entries/entry-utils'
+import { getDayKey } from '@/features/entries/entry-utils'
 
 export function useDayBoundary() {
   const [dayKey, setDayKey] = useState(() => getDayKey())

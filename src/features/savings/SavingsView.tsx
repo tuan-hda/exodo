@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, type CSSProperties, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Plus, X } from '@phosphor-icons/react'
-import EmojiPicker, { Theme } from 'emoji-picker-react'
 import { EmptyState } from '@/components/EmptyState'
 import { PageHeader } from '@/components/PageHeader'
 import { StateMessage } from '@/components/StateMessage'
@@ -11,29 +10,13 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { Entry } from '../entries/types'
-import { formatMoney } from '../entries/entry-utils'
+import type { Entry } from '@/features/entries/types'
+import { formatMoney } from '@/features/entries/entry-utils'
 import { SavingsDepositComposer } from './SavingsDepositComposer'
 import { SavingsGoalCard } from './SavingsGoalCard'
 import { SavingsGoalsLoading } from './SavingsGoalsPanel'
+import { SavingsIcon, defaultSavingsIcon, savingsIconOptions, type SavingsIconName } from './savings-icons'
 import { useSavings } from './use-savings'
-
-const emojiPickerStyle = {
-  '--epr-bg-color': 'var(--color-surface)',
-  '--epr-picker-border-color': 'var(--color-line)',
-  '--epr-picker-border-radius': '14px',
-  '--epr-text-color': 'var(--color-muted)',
-  '--epr-highlight-color': 'var(--color-ink)',
-  '--epr-category-icon-active-color': 'var(--color-ink)',
-  '--epr-hover-bg-color': 'var(--color-soft)',
-  '--epr-hover-bg-color-reduced-opacity': 'var(--color-soft)',
-  '--epr-focus-bg-color': 'var(--color-line)',
-  '--epr-search-input-bg-color': 'var(--color-page)',
-  '--epr-search-input-bg-color-active': 'var(--color-surface)',
-  '--epr-search-border-color': 'var(--color-line)',
-  '--epr-search-border-color-active': 'var(--color-ink)',
-  '--epr-category-label-bg-color': 'var(--color-surface)',
-} as CSSProperties
 
 export function SavingsView({ userId, entries, onBack }: { userId?: string; entries: Entry[]; onBack?: () => void }) {
   const { goals, deposits, isLoading, isSaving, error, saveGoal, addDeposit } = useSavings(userId, entries)
@@ -41,8 +24,8 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
   const [name, setName] = useState('')
   const [target, setTarget] = useState('')
   const [date, setDate] = useState('')
-  const [icon, setIcon] = useState('✈️')
-  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false)
+  const [icon, setIcon] = useState<SavingsIconName>(defaultSavingsIcon)
+  const [iconPickerOpen, setIconPickerOpen] = useState(false)
   const [depositGoal, setDepositGoal] = useState<string | null>(null)
   const selectedGoal = goals.find((goal) => goal.id === depositGoal)
 
@@ -63,8 +46,8 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
       setName('')
       setTarget('')
       setDate('')
-      setIcon('✈️')
-      setEmojiPickerOpen(false)
+      setIcon(defaultSavingsIcon)
+      setIconPickerOpen(false)
       setShowForm(false)
     }
   }
@@ -106,8 +89,8 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
       {showForm && (
         <Card className="p-5">
           <form className="grid gap-4" onSubmit={submitGoal}>
-            <div>
-              <label className="mb-2 block text-xs font-semibold" htmlFor="goal-name">
+            <div className="ui-field">
+              <label className="ui-field-label" htmlFor="goal-name">
                 Goal name
               </label>
               <Input
@@ -118,52 +101,55 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
                 required
               />
             </div>
-            <div>
-              <div>
-                <label className="mb-2 block text-xs font-semibold" htmlFor="goal-target">
-                  Target amount
-                </label>
-                <Input
-                  id="goal-target"
-                  inputMode="decimal"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={target}
-                  onChange={(event) => setTarget(event.target.value)}
-                  placeholder="3000"
-                  required
-                />
-              </div>
+            <div className="ui-field">
+              <label className="ui-field-label" htmlFor="goal-target">
+                Target amount
+              </label>
+              <Input
+                id="goal-target"
+                inputMode="decimal"
+                type="number"
+                min="0.01"
+                step="0.01"
+                value={target}
+                onChange={(event) => setTarget(event.target.value)}
+                placeholder="3000"
+                required
+              />
             </div>
-            <div>
-              <label className="mb-2 block text-xs font-semibold" htmlFor="goal-date">
-                Target date <span className="font-normal text-muted">(optional)</span>
+            <div className="ui-field">
+              <label className="ui-field-label" htmlFor="goal-date">
+                Target date <span className="ui-field-hint">optional</span>
               </label>
               <Input id="goal-date" type="date" value={date} onChange={(event) => setDate(event.target.value)} />
             </div>
-            <div>
-              <p className="mb-2 text-xs font-semibold">Choose an emoji</p>
-              <Popover open={emojiPickerOpen} onOpenChange={setEmojiPickerOpen}>
+            <div className="ui-field">
+              <p className="ui-field-label">Choose an icon</p>
+              <Popover open={iconPickerOpen} onOpenChange={setIconPickerOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="size-14 p-0 text-2xl" type="button" aria-label="Choose an emoji">
-                    {icon}
+                  <Button variant="outline" size="icon-lg" type="button" aria-label="Choose a goal icon">
+                    <SavingsIcon name={icon} size={24} />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[min(352px,calc(100vw-32px))] p-0" align="start">
-                  <EmojiPicker
-                    onEmojiClick={(emojiData) => {
-                      setIcon(emojiData.emoji)
-                      setEmojiPickerOpen(false)
-                    }}
-                    className="exodo-emoji-picker"
-                    theme={Theme.LIGHT}
-                    style={emojiPickerStyle}
-                    width="100%"
-                    height={350}
-                    skinTonesDisabled
-                    previewConfig={{ showPreview: false }}
-                  />
+                <PopoverContent className="w-[min(288px,calc(100vw-32px))] p-3" align="start">
+                  <div className="grid grid-cols-4 gap-2" role="group" aria-label="Goal icons">
+                    {savingsIconOptions.map((option) => (
+                      <Button
+                        key={option.name}
+                        variant="option"
+                        size="icon-lg"
+                        type="button"
+                        data-selected={icon === option.name}
+                        aria-label={option.label}
+                        aria-pressed={icon === option.name}
+                        onClick={() => {
+                          setIcon(option.name)
+                          setIconPickerOpen(false)
+                        }}>
+                        <SavingsIcon name={option.name} size={21} />
+                      </Button>
+                    ))}
+                  </div>
                 </PopoverContent>
               </Popover>
             </div>

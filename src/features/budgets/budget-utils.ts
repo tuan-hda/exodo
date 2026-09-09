@@ -1,5 +1,5 @@
-import { monthDays } from '../entries/entry-utils'
-import { fromKey } from '../finance/allocation'
+import { monthDays } from '@/features/entries/entry-utils'
+import { fromKey } from '@/features/finance/allocation'
 
 export function remainingDaysInMonth(dayKey: string) {
   const day = fromKey(dayKey)

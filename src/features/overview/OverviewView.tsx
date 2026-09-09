@@ -1,4 +1,4 @@
-import { AccumulatedPanel } from '../dashboard/AccumulatedPanel'
+import { AccumulatedPanel } from '@/features/dashboard/AccumulatedPanel'
 import { PageHeader } from '@/components/PageHeader'
 
 export function OverviewView({

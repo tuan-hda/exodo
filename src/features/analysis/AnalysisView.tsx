@@ -9,9 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
-import { formatMoney } from '../entries/entry-utils'
-import type { Entry } from '../entries/types'
+import { categoryClass, categoryIcon } from '@/features/entries/CategoryPicker'
+import { formatMoney } from '@/features/entries/entry-utils'
+import type { Entry } from '@/features/entries/types'
 import { formatPercentage, getMonthEntries, groupByCategory } from './analysis-utils'
 import { PieChart } from './PieChart'
 
@@ -138,10 +138,7 @@ function DistributionCard({
       ) : slices.length > 0 ? (
         <AnimatedList className="mt-8 border-t border-line pt-2" items={slices} getKey={(slice) => slice.category}>
           {(slice) => (
-            <button
-              type="button"
-              className="analysis-category-item flex min-h-16 w-full items-center gap-3 border-b border-line bg-transparent py-3 text-left transition-colors hover:bg-soft last:border-b-0"
-              onClick={() => onSelectCategory(slice.category)}>
+            <Button variant="list" size="row" type="button" onClick={() => onSelectCategory(slice.category)}>
               <span
                 className={clsx(
                   'grid size-8 shrink-0 place-items-center rounded-full border',
@@ -164,7 +161,7 @@ function DistributionCard({
                 {type === 'expense' ? '-' : '+'}
                 {formatMoney(slice.amount)}
               </strong>
-            </button>
+            </Button>
           )}
         </AnimatedList>
       ) : null}

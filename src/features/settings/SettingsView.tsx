@@ -8,8 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { BudgetSettingsView } from './BudgetSettingsView'
 import { SettingsMenuItem } from './SettingsMenuItem'
-import type { Entry } from '../entries/types'
-import { SavingsView } from '../savings/SavingsView'
+import type { Entry } from '@/features/entries/types'
+import { SavingsView } from '@/features/savings/SavingsView'
 import { CustomizationView } from './CustomizationView'
 
 export function SettingsView({ userId, entries }: { userId?: string; entries: Entry[] }) {

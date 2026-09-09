@@ -13,6 +13,7 @@ import { ComposerReviewStep } from './ComposerReviewStep'
 import { evaluateExpression, formatAmountExpression, getCurrentTime, todayKey } from './entry-utils'
 import type { Entry, EntryType } from './types'
 import { useMediaQuery } from '@/hooks/use-media-query'
+import { mediaQueries } from '@/lib/breakpoints'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,7 +53,7 @@ export function EntryComposer({
   const [category, setCategory] = useState<Category>(entry?.category ?? defaultCategory(type))
   const [error, setError] = useState('')
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const isMobile = useMediaQuery('(max-width: 700px)')
+  const isMobile = useMediaQuery(mediaQueries.mobile)
 
   function validateAmount() {
     try {

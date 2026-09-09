@@ -6,10 +6,12 @@ import { clsx } from 'clsx'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
-import { CalculatorKeypad } from '../entries/CalculatorKeypad'
-import { evaluateExpression, formatAmountExpression, formatMoney } from '../entries/entry-utils'
+import { CalculatorKeypad } from '@/features/entries/CalculatorKeypad'
+import { evaluateExpression, formatAmountExpression, formatMoney } from '@/features/entries/entry-utils'
+import { SavingsIcon } from './savings-icons'
 import type { SavingsGoal } from './types'
 import { useMediaQuery } from '@/hooks/use-media-query'
+import { mediaQueries } from '@/lib/breakpoints'
 
 export function SavingsDepositComposer({
   goal,
@@ -25,7 +27,7 @@ export function SavingsDepositComposer({
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
   const [error, setError] = useState('')
-  const isMobile = useMediaQuery('(max-width: 700px)')
+  const isMobile = useMediaQuery(mediaQueries.mobile)
   async function submit(event: FormEvent) {
     event.preventDefault()
     try {
@@ -66,7 +68,7 @@ export function SavingsDepositComposer({
         </div>
         <div className="mb-5 flex items-center gap-3 border-b border-line pb-4">
           <span className="grid size-10 place-items-center rounded-input bg-ink text-lg text-white" aria-hidden="true">
-            {goal.icon || '✈️'}
+            <SavingsIcon name={goal.icon} size={20} />
           </span>
           <div>
             <p className="text-sm font-semibold">{goal.name}</p>
@@ -74,7 +76,7 @@ export function SavingsDepositComposer({
           </div>
         </div>
         <form className="grid gap-4 max-md:flex max-md:min-w-0 max-md:flex-1 max-md:flex-col" onSubmit={submit}>
-          <label className="grid min-w-0 gap-1.5 text-[11px] font-bold text-muted max-md:text-xs">
+          <label className="ui-field">
             Amount
             <Input
               autoFocus={!isMobile}
@@ -97,7 +99,7 @@ export function SavingsDepositComposer({
               setAmount(value)
             }}
           />
-          <label className="grid min-w-0 gap-1.5 text-[11px] font-bold text-muted max-md:text-xs">
+          <label className="ui-field">
             Note{' '}
             <Input
               value={note}

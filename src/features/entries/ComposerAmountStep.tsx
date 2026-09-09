@@ -27,7 +27,7 @@ export function ComposerAmountStep({
 }) {
   return (
     <section className="grid content-start gap-4" aria-label="Enter amount">
-      <label className="grid min-w-0 gap-1.5 text-[11px] font-bold text-muted max-md:text-xs">
+      <label className="ui-field">
         Amount
         <Input
           className="max-md:hidden"

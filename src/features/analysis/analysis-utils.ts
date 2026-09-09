@@ -1,5 +1,5 @@
-import { entryDate } from '../entries/entry-utils'
-import type { Entry } from '../entries/types'
+import { entryDate } from '@/features/entries/entry-utils'
+import type { Entry } from '@/features/entries/types'
 
 export type AnalysisSlice = {
   category: string

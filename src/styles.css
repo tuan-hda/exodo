@@ -118,6 +118,18 @@
     @apply max-w-[36ch] text-sm leading-[1.65] text-muted;
   }
 
+  .ui-field {
+    @apply grid min-w-0 gap-1.5 text-xs font-medium text-muted;
+  }
+
+  .ui-field-label {
+    @apply text-xs font-medium text-muted;
+  }
+
+  .ui-field-hint {
+    @apply ml-1 font-mono text-[10px] font-normal uppercase tracking-[.06em] text-muted;
+  }
+
   .ui-number {
     @apply font-mono tabular-nums;
   }

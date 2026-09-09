@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupabase } from '@/hooks/use-supabase'
 import { readStorageJson, writeStorageJson } from '@/lib/storage'
-import type { Entry } from '../entries/types'
+import type { Entry } from '@/features/entries/types'
 import { allocateRemainder, calculateMonthlyRemainder, monthKey } from './savings-utils'
+import { defaultSavingsIcon } from './savings-icons'
 import type { SavingsDeposit, SavingsGoal, StoredSavingsDeposit, StoredSavingsGoal } from './types'
 
 const savingsCacheTtl = 24 * 60 * 60 * 1000
@@ -46,7 +47,7 @@ function normalizeGoal(goal: StoredSavingsGoal): SavingsGoal {
     targetAmount: Number(goal.target_amount),
     savedAmount: Number(goal.saved_amount),
     targetDate: goal.target_date,
-    icon: goal.icon,
+    icon: goal.icon || defaultSavingsIcon,
     priority: goal.priority,
     status: normalizeGoalStatus(goal.status),
   }

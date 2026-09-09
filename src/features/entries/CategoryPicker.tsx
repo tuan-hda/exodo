@@ -90,11 +90,11 @@ export function CategoryPicker({
   const options = type === 'expense' ? expenseCategories : incomeCategories
   return (
     <div className="grid gap-2 max-md:gap-3">
-      <div className="flex items-center justify-between text-[11px] font-bold text-muted max-md:text-sm">
+      <div className="flex items-center justify-between ui-field-label max-md:text-sm">
         <span>Category</span>
         <span
           className={clsx(
-            'inline-flex items-center gap-1 rounded-lg bg-soft px-2 py-1 font-mono text-[10px] font-normal text-ink max-md:px-3 max-md:py-2 max-md:text-xs',
+            'inline-flex items-center gap-1 rounded-chip bg-soft px-2 py-1 font-mono text-[10px] font-normal text-ink max-md:px-3 max-md:py-2 max-md:text-xs',
             categoryClass(value),
           )}>
           {categoryIcon(value, 14)} {value}

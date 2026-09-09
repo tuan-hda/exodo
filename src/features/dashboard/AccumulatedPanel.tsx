@@ -1,7 +1,7 @@
 import { ChartLineUp } from '@phosphor-icons/react'
 import { CountUp } from '@/components/ui/count-up'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatMoney } from '../entries/entry-utils'
+import { formatMoney } from '@/features/entries/entry-utils'
 import { DashboardPanel } from './DashboardPanel'
 
 export function AccumulatedPanel({

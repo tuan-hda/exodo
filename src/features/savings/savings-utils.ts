@@ -1,4 +1,4 @@
-import type { Entry } from '../entries/types'
+import type { Entry } from '@/features/entries/types'
 import type { SavingsGoal } from './types'
 export function monthKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`

@@ -50,9 +50,8 @@ export function ComposerReviewStep({
           <strong className="text-sm font-medium">{category}</strong>
         </div>
       </Card>
-      <label className="grid min-w-0 gap-1.5 text-[11px] font-bold text-muted max-md:text-xs">
-        Name{' '}
-        <span className="ml-1 font-mono text-[10px] font-normal uppercase tracking-[.06em] text-muted">optional</span>
+      <label className="ui-field">
+        Name <span className="ui-field-hint">optional</span>
         <Input
           disabled={disabled}
           value={title}
@@ -60,7 +59,7 @@ export function ComposerReviewStep({
           placeholder={type === 'income' ? 'Salary, bonus...' : 'Coffee, groceries...'}
         />
       </label>
-      <label className="grid min-w-0 gap-1.5 text-[11px] font-bold text-muted max-md:text-xs">
+      <label className="ui-field">
         Date and time
         <Input
           disabled={disabled}

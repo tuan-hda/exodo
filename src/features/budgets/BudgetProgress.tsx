@@ -1,11 +1,11 @@
 import { clsx } from 'clsx'
-import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
-import { entryDate, formatMoney } from '../entries/entry-utils'
-import type { Entry } from '../entries/types'
+import { categoryClass, categoryIcon } from '@/features/entries/CategoryPicker'
+import { entryDate, formatMoney } from '@/features/entries/entry-utils'
+import type { Entry } from '@/features/entries/types'
 import type { CategoryBudget } from './types'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
-import { DashboardPanel } from '../dashboard/DashboardPanel'
+import { DashboardPanel } from '@/features/dashboard/DashboardPanel'
 import { dailyBudgetAllowance, remainingDaysInMonth } from './budget-utils'
 
 export function BudgetProgress({

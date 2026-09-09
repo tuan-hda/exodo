@@ -5,9 +5,9 @@ import { clsx } from 'clsx'
 import { Trash } from '@phosphor-icons/react'
 import { useUser } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
-import { categoryClass, categoryIcon, expenseCategories } from '../entries/CategoryPicker'
-import { formatMoney, formatMoneyInput } from '../entries/entry-utils'
-import { useBudgets } from '../budgets/use-budgets'
+import { categoryClass, categoryIcon, expenseCategories } from '@/features/entries/CategoryPicker'
+import { formatMoney, formatMoneyInput } from '@/features/entries/entry-utils'
+import { useBudgets } from '@/features/budgets/use-budgets'
 import { PageHeader } from '@/components/PageHeader'
 import { StateMessage } from '@/components/StateMessage'
 import { Input } from '@/components/ui/input'
@@ -51,7 +51,7 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
         ))}
       </div>
       <div className="grid gap-2">
-        <label className="text-[11px] font-bold text-muted" htmlFor="budget-amount">
+        <label className="ui-field-label" htmlFor="budget-amount">
           Monthly limit for {category}
         </label>
         <div className="grid gap-2">

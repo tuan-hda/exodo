@@ -2,7 +2,8 @@ import { Plus } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { formatMoney } from '../entries/entry-utils'
+import { formatMoney } from '@/features/entries/entry-utils'
+import { SavingsIcon } from './savings-icons'
 import type { SavingsDeposit, SavingsGoal } from './types'
 
 export function SavingsGoalCard({
@@ -24,7 +25,7 @@ export function SavingsGoalCard({
           <span
             className="grid size-11 place-items-center rounded-control bg-ink text-xl text-white"
             aria-hidden="true">
-            {goal.icon || '✈️'}
+            <SavingsIcon name={goal.icon} size={21} />
           </span>
           <div>
             <h2 className="text-lg font-semibold">{goal.name}</h2>

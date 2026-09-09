@@ -1,8 +1,8 @@
 import { auth } from '@clerk/nextjs/server'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { isGmailOwner } from '../../../../features/gmail/access'
-import { createGmailAuthorizationUrl, gmailOAuthStateCookie } from '../../../../features/gmail/gmail-service'
+import { isGmailOwner } from '@/features/gmail/access'
+import { createGmailAuthorizationUrl, gmailOAuthStateCookie } from '@/features/gmail/gmail-service'
 
 export async function GET() {
   const { userId } = await auth()

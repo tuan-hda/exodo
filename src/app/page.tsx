@@ -1,5 +1,5 @@
-import Dashboard from '../features/dashboard/Dashboard'
-import { AuthGate } from '../features/auth/AuthGate'
+import Dashboard from '@/features/dashboard/Dashboard'
+import { AuthGate } from '@/features/auth/AuthGate'
 
 export default function Page() {
   return (

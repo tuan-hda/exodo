@@ -23,9 +23,6 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
-      emoji-picker-react:
-        specifier: ^4.20.1
-        version: 4.20.1(react@19.2.8)
       motion:
         specifier: ^13.1.1
         version: 13.1.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1932,15 +1929,6 @@ packages:
   electron-to-chromium@1.5.412:
     resolution: {integrity: sha512-z4rMe3esBzlzovKHj4gxJnsCGZRK5l4baUvm+gCGJBPE+gsyUMKsuU9tnEUtI1dOebXz1ytAPGjvXhmQ7rIPwA==}
 
-  emoji-picker-react@4.20.1:
-    resolution: {integrity: sha512-vsgsdNOf0zFahv7+Pj5u3WNz9ennqUAkSZw1ZvUEAh8Kfel292AjmKbCLI7t9Hq2DN3lFGVMb1G7Iqa2Jl4HWg==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      react: '>=16'
-
-  emoji-regex@10.6.0:
-    resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
-
   encodeurl@2.0.0:
     resolution: {integrity: sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==}
     engines: {node: '>= 0.8'}
@@ -2064,10 +2052,6 @@ packages:
   find-up@3.0.0:
     resolution: {integrity: sha512-1yD6RmLI1XBfxugvORwlck6f75tYL+iR0jqwsOrOxMZyGYqUuDhJ0l4AXdO1iX/FTs9cBAMEk1gWSEx1kSbylg==}
     engines: {node: '>=6'}
-
-  flairup@1.1.1:
-    resolution: {integrity: sha512-NRdjAYpQLEOmvLebVCfL2D88M6CZOz3LCK06arH1HKSHbrJgEDbqzgJjur2yuRtbb1YAtElacR57tf5GBAHaqg==}
-    engines: {node: ^20.19.0 || >=22.12.0}
 
   forwarded@0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
@@ -5020,13 +5004,6 @@ snapshots:
 
   electron-to-chromium@1.5.412: {}
 
-  emoji-picker-react@4.20.1(react@19.2.8):
-    dependencies:
-      flairup: 1.1.1
-      react: 19.2.8
-
-  emoji-regex@10.6.0: {}
-
   encodeurl@2.0.0: {}
 
   enhanced-resolve@5.24.5:
@@ -5187,8 +5164,6 @@ snapshots:
   find-up@3.0.0:
     dependencies:
       locate-path: 3.0.0
-
-  flairup@1.1.1: {}
 
   forwarded@0.2.0: {}
 

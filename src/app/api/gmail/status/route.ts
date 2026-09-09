@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { isGmailOwner } from '../../../../features/gmail/access'
-import { getGmailConnection } from '../../../../features/gmail/gmail-service'
+import { isGmailOwner } from '@/features/gmail/access'
+import { getGmailConnection } from '@/features/gmail/gmail-service'
 
 const noStoreHeaders = { 'Cache-Control': 'private, no-store' }
 
