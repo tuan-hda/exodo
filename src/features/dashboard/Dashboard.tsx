@@ -212,7 +212,7 @@ function Dashboard() {
           )}
           {activeTab === 'overview' && (
             <section className="pt-16 max-md:pt-10">
-              <OverviewView accumulation={accumulation} isLoading={entriesLoading} />
+              <OverviewView accumulation={accumulation} entries={entries} isLoading={entriesLoading} />
             </section>
           )}
           {activeTab === 'notifications' && (

@@ -3,13 +3,13 @@
 import { useState, type FormEvent } from 'react'
 import { Plus, X } from '@phosphor-icons/react'
 import { EmptyState } from '@/components/EmptyState'
+import { MetricCard } from '@/components/MetricCard'
 import { PageHeader } from '@/components/PageHeader'
 import { StateMessage } from '@/components/StateMessage'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Skeleton } from '@/components/ui/skeleton'
 import type { Entry } from '@/features/entries/types'
 import { formatMoney } from '@/features/entries/entry-utils'
 import { SavingsDepositComposer } from './SavingsDepositComposer'
@@ -69,22 +69,18 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
       />
       {error && <StateMessage tone="danger">{error}</StateMessage>}
       <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
-        <Card tone="soft" className="p-5">
-          <p className="ui-eyebrow m-0">Saved</p>
-          {isLoading ? (
-            <Skeleton className="mt-2 h-7 w-32" />
-          ) : (
-            <strong className="ui-number mt-2 block text-2xl font-semibold">{formatMoney(summary.saved)}</strong>
-          )}
-        </Card>
-        <Card tone="soft" className="p-5">
-          <p className="ui-eyebrow m-0">Target</p>
-          {isLoading ? (
-            <Skeleton className="mt-2 h-7 w-32" />
-          ) : (
-            <strong className="ui-number mt-2 block text-2xl font-semibold">{formatMoney(summary.target)}</strong>
-          )}
-        </Card>
+        <MetricCard
+          label="saved"
+          value={formatMoney(summary.saved)}
+          detail="across active goals"
+          isLoading={isLoading}
+        />
+        <MetricCard
+          label="target"
+          value={formatMoney(summary.target)}
+          detail="across active goals"
+          isLoading={isLoading}
+        />
       </div>
       {showForm && (
         <Card className="p-5">
