@@ -9,7 +9,8 @@ import { fromKey } from '@/features/finance/allocation'
 import { SettingsView } from '@/features/settings/SettingsView'
 import { ActivityList } from '@/features/activity/ActivityList'
 import { EntryComposer } from '@/features/entries/EntryComposer'
-import { MobileTabBar, type AppTab } from '@/features/navigation/MobileTabBar'
+import { MobileTabBar } from '@/features/navigation/MobileTabBar'
+import { isAppTab, navigationItems, type AppTab } from '@/features/navigation/navigation'
 import { NotificationsView } from '@/features/notifications/NotificationsView'
 import { SummaryPanels } from './SummaryPanels'
 import { useEntries } from '@/features/entries/use-entries'
@@ -21,23 +22,6 @@ import { AnalysisView } from '@/features/analysis/AnalysisView'
 import { OverviewView } from '@/features/overview/OverviewView'
 import { useBackgroundPreference } from '@/features/settings/use-background-preference'
 import { StateMessage } from '@/components/StateMessage'
-
-const primaryTabs: Array<{ id: AppTab; label: string }> = [
-  { id: 'today', label: 'Today' },
-  { id: 'overview', label: 'Overview' },
-  { id: 'notifications', label: 'Notifications' },
-  { id: 'settings', label: 'Settings' },
-]
-
-function isAppTab(value: string | null): value is AppTab {
-  return (
-    value === 'today' ||
-    value === 'overview' ||
-    value === 'analysis' ||
-    value === 'notifications' ||
-    value === 'settings'
-  )
-}
 
 function Dashboard() {
   const { user } = useUser()
@@ -162,7 +146,7 @@ function Dashboard() {
           </span>
           <div className="flex items-center gap-2 max-md:hidden">
             <nav className="flex items-center gap-1" aria-label="Primary navigation">
-              {primaryTabs.map((tab) => (
+              {navigationItems.map((tab) => (
                 <Button
                   key={tab.id}
                   variant="nav"
