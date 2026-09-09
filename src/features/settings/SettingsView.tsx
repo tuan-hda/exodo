@@ -1,16 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { PiggyBank, SignOut, UserCircle, Wallet } from '@phosphor-icons/react'
+import { PaintBrush, PiggyBank, SignOut, UserCircle, Wallet } from '@phosphor-icons/react'
 import { useClerk, useUser } from '@clerk/nextjs'
 import { Button } from '../../components/ui/button'
 import { Card } from '../../components/ui/card'
+import { PageHeader } from '../../components/PageHeader'
 import { BudgetSettingsView } from './BudgetSettingsView'
 import { SettingsMenuItem } from './SettingsMenuItem'
 import type { Entry } from '../entries/types'
 import { SavingsView } from '../savings/SavingsView'
 import { CustomizationView } from './CustomizationView'
-import { PaintBrush } from '@phosphor-icons/react'
 
 export function SettingsView({ userId, entries }: { userId?: string; entries: Entry[] }) {
   const { user } = useUser()
@@ -25,17 +25,17 @@ export function SettingsView({ userId, entries }: { userId?: string; entries: En
   if (page === 'customization') return <CustomizationView onBack={() => setPage('menu')} />
 
   return (
-    <section className="mx-auto max-w-[620px] pb-8">
-      <div className="mx-auto flex flex-col items-center py-8 text-center">
-        <div className="mb-5 grid size-20 place-items-center rounded-full bg-ink text-2xl font-bold tracking-[-.06em] text-white">
+    <section className="mx-auto grid max-w-[620px] gap-8 pb-8 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both]">
+      <div className="grid justify-items-center gap-4 py-4 text-center">
+        <div className="grid size-16 place-items-center rounded-full bg-ink text-xl font-semibold tracking-[-.06em] text-white">
           {initials}
         </div>
-        <p className="mb-3 font-mono text-[11px] uppercase tracking-[.12em] text-muted">settings</p>
-        <h1 className="max-w-full break-words text-balance text-[clamp(34px,5vw,52px)]">{name}</h1>
-        <p className="mt-3 text-sm text-muted">{email}</p>
-        <Card className="mt-8 w-full rounded-[20px] border-line bg-soft p-4 text-left">
+        <PageHeader eyebrow="settings" title={name} description={email} className="justify-items-center gap-0" />
+        <Card tone="soft" className="w-full p-4 text-left">
           <div className="flex items-center gap-3">
-            <UserCircle size={20} />
+            <span className="ui-icon-tile size-9 rounded-full bg-surface">
+              <UserCircle size={19} />
+            </span>
             <div>
               <strong className="block text-sm font-semibold">Personal workspace</strong>
               <small className="mt-1 block text-xs text-muted">Private to your account</small>
@@ -43,7 +43,7 @@ export function SettingsView({ userId, entries }: { userId?: string; entries: En
           </div>
         </Card>
       </div>
-      <div className="border-y border-line" aria-label="Settings menu">
+      <nav className="ui-divider-list border-y border-line" aria-label="Settings menu">
         <SettingsMenuItem
           icon={<Wallet size={20} />}
           title="Budget settings"
@@ -62,10 +62,10 @@ export function SettingsView({ userId, entries }: { userId?: string; entries: En
           description="Choose how Exodo looks"
           onClick={() => setPage('customization')}
         />
-      </div>
+      </nav>
       <Button
         variant="outline"
-        className="mt-4 w-full text-xs font-bold text-muted"
+        className="w-full text-xs font-semibold text-muted"
         type="button"
         onClick={() => signOut()}>
         <SignOut size={17} /> Sign out

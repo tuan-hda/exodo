@@ -5,7 +5,7 @@ import { clsx } from 'clsx'
 import { useUser } from '@clerk/nextjs'
 import { ArrowClockwise } from '@phosphor-icons/react'
 import { Button } from '../../components/ui/button'
-import { fromKey, toKey } from '../finance/allocation'
+import { fromKey } from '../finance/allocation'
 import { SettingsView } from '../settings/SettingsView'
 import { ActivityList } from '../activity/ActivityList'
 import { EntryComposer } from '../entries/EntryComposer'
@@ -20,6 +20,15 @@ import { useBudgets } from '../budgets/use-budgets'
 import { AnalysisView } from '../analysis/AnalysisView'
 import { OverviewView } from '../overview/OverviewView'
 import { useBackgroundPreference } from '../settings/use-background-preference'
+import { StateMessage } from '../../components/StateMessage'
+
+const primaryTabs: Array<{ id: AppTab; label: string }> = [
+  { id: 'today', label: 'Today' },
+  { id: 'overview', label: 'Overview' },
+  { id: 'notifications', label: 'Notifications' },
+  { id: 'settings', label: 'Settings' },
+  { id: 'analysis', label: 'Analysis' },
+]
 
 function Dashboard() {
   const { user } = useUser()
@@ -34,12 +43,10 @@ function Dashboard() {
   const [composerType, setComposerType] = useState<EntryType>('expense')
   const [editingEntry, setEditingEntry] = useState<Entry | undefined>()
   const [viewMonth, setViewMonth] = useState(new Date(currentDay.getFullYear(), currentDay.getMonth(), 1, 12))
-  const [selectedDay, setSelectedDay] = useState(currentDayKey)
   const [activeTab, setActiveTab] = useState<AppTab>('today')
   const { budgets } = useBudgets(user?.id)
 
   useEffect(() => {
-    setSelectedDay(currentDayKey)
     const nextDay = fromKey(currentDayKey)
     setViewMonth((current) =>
       current.getMonth() === nextDay.getMonth() && current.getFullYear() === nextDay.getFullYear()
@@ -82,7 +89,6 @@ function Dashboard() {
   function moveMonth(delta: number) {
     setViewMonth((current) => {
       const next = new Date(current.getFullYear(), current.getMonth() + delta, 1, 12)
-      setSelectedDay(toKey(next))
       return next
     })
   }
@@ -102,11 +108,11 @@ function Dashboard() {
   }
 
   return (
-    <div className={clsx('min-h-dvh', !gradientBackgroundEnabled && 'bg-white')}>
+    <div className={clsx('min-h-dvh', !gradientBackgroundEnabled && 'bg-surface')}>
       {(pullDistance > 0 || isRefreshing) && (
         <div
           className={clsx(
-            'pointer-events-none fixed inset-x-0 top-0 z-[6] mx-auto flex w-fit items-center gap-2 rounded-full bg-ink px-3 py-2 font-mono text-[10px] uppercase tracking-[.06em] text-white opacity-90 shadow-[0_8px_24px_rgb(21_21_21_/_0.16)]',
+            'pointer-events-none fixed inset-x-0 top-3 z-30 mx-auto flex w-fit items-center gap-2 rounded-[12px] bg-ink px-3 py-2 font-mono text-[10px] uppercase tracking-[.08em] text-white opacity-95 shadow-[0_8px_24px_rgb(21_21_21_/_0.16)]',
             isRefreshing && 'transition-transform duration-200',
           )}
           style={{ transform: `translateY(${pullDistance}px)` }}
@@ -115,98 +121,60 @@ function Dashboard() {
           <span>{isRefreshing ? 'Refreshing' : pullDistance >= 56 ? 'Release to refresh' : 'Pull to refresh'}</span>
         </div>
       )}
-      <main id="top" className="mx-auto w-[min(940px,calc(100%-48px))] max-[700px]:w-[calc(100%-32px)]">
-        <header className="sticky top-0 z-[3] flex min-h-12 items-center justify-between border-b border-line bg-white/70 pt-[max(10px,env(safe-area-inset-top))] backdrop-blur-[24px] max-[700px]:-mx-4 max-[700px]:px-4">
-          <a className="shrink-0 font-mono text-[11px] tracking-[.06em] text-muted no-underline" href="#top">
-            exodo / έξοδο
+      <main
+        id="top"
+        className="mx-auto w-[min(1120px,calc(100%-40px))] pb-20 max-[700px]:w-[calc(100%-32px)] max-[700px]:pb-32">
+        <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between gap-6 border-b border-line bg-page/85 pt-[max(10px,env(safe-area-inset-top))] backdrop-blur-xl max-[700px]:-mx-4 max-[700px]:px-4">
+          <a
+            className="flex shrink-0 items-center gap-2 font-mono text-[11px] tracking-[.04em] text-ink no-underline"
+            href="#top">
+            <span className="grid size-7 place-items-center rounded-[9px] bg-ink font-sans text-xs font-semibold text-white">
+              e
+            </span>
+            <span>exodo / έξοδο</span>
           </a>
-          <span className="hidden font-mono text-[10px] uppercase tracking-[.08em] text-muted max-[700px]:block">
+          <span className="hidden font-mono text-[10px] uppercase tracking-[.1em] text-muted max-[700px]:block">
             {activeTab}
           </span>
-          <nav className="flex gap-6 max-[700px]:hidden" aria-label="Primary navigation">
-            <Button
-              variant="ghost"
-              className={clsx(
-                'relative rounded-xl px-0 py-3 text-xs font-semibold text-muted transition hover:text-ink',
-                activeTab === 'today' &&
-                  'text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-ink',
-              )}
-              type="button"
-              onClick={() => navigateTab('today')}>
-              Today
-            </Button>
-            <Button
-              variant="ghost"
-              className={clsx(
-                'relative rounded-xl px-0 py-3 text-xs font-semibold text-muted transition hover:text-ink',
-                activeTab === 'overview' &&
-                  'text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-ink',
-              )}
-              type="button"
-              onClick={() => navigateTab('overview')}>
-              Overview
-            </Button>
-            <Button
-              variant="ghost"
-              className={clsx(
-                'relative rounded-xl px-0 py-3 text-xs font-semibold text-muted transition hover:text-ink',
-                activeTab === 'notifications' &&
-                  'text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-ink',
-              )}
-              type="button"
-              onClick={() => navigateTab('notifications')}>
-              Notifications
-            </Button>
-            <Button
-              variant="ghost"
-              className={clsx(
-                'relative rounded-xl px-0 py-3 text-xs font-semibold text-muted transition hover:text-ink',
-                activeTab === 'settings' &&
-                  'text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-ink',
-              )}
-              type="button"
-              onClick={() => navigateTab('settings')}>
-              Settings
-            </Button>
-            <Button
-              variant="ghost"
-              className={clsx(
-                'relative rounded-xl px-0 py-3 text-xs font-semibold text-muted transition hover:text-ink',
-                activeTab === 'analysis' &&
-                  'text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-ink',
-              )}
-              type="button"
-              onClick={() => navigateTab('analysis')}>
-              Analysis
-            </Button>
+          <nav className="flex items-center gap-1 max-[700px]:hidden" aria-label="Primary navigation">
+            {primaryTabs.map((tab) => (
+              <Button
+                key={tab.id}
+                variant="nav"
+                size="nav"
+                data-active={activeTab === tab.id}
+                aria-current={activeTab === tab.id ? 'page' : undefined}
+                type="button"
+                onClick={() => navigateTab(tab.id)}>
+                {tab.label}
+              </Button>
+            ))}
           </nav>
         </header>
         {persistenceError && (
-          <p
-            className="m-0 rounded-[14px] border border-line-strong bg-soft px-3 py-[11px] text-[11px] leading-[1.55] text-danger"
-            role="alert">
+          <StateMessage tone="danger" className="mt-4">
             {persistenceError}
-          </p>
+          </StateMessage>
         )}
         {activeTab === 'today' && (
           <>
-            <section className="grid grid-cols-[1.2fr_.8fr] items-end gap-10 pt-12 pb-14 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both] max-[700px]:grid-cols-1 max-[700px]:gap-7 max-[700px]:pt-8 max-[700px]:pb-[45px]">
+            <section className="grid grid-cols-[minmax(0,1.3fr)_minmax(220px,.7fr)] items-end gap-12 pt-16 pb-14 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both] max-[700px]:grid-cols-1 max-[700px]:gap-7 max-[700px]:pt-10 max-[700px]:pb-10">
               <div>
-                <p className="mb-[15px] font-mono text-[11px] uppercase tracking-[.12em] text-muted">
+                <p className="ui-eyebrow mb-4">
                   {currentDay.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                 </p>
-                <h1 className="mb-0 text-[clamp(46px,7vw,78px)] font-semibold leading-[.98] tracking-[-.09em] max-[430px]:text-[47px]">
+                <h1 className="m-0 max-w-[10ch] text-[clamp(48px,7vw,84px)] font-semibold leading-[.92] tracking-[-.095em] max-[430px]:text-[48px]">
                   Spend what today
                   <br />
                   <em className="not-italic text-ink">makes possible.</em>
                 </h1>
               </div>
-              <p className="mb-2 max-w-[240px] text-sm leading-[1.7] text-muted max-[700px]:mb-0">
+              <p className="ui-page-description mb-1 max-[700px]:mb-0">
                 Income becomes a daily allowance. Each expense makes the rest of today visible.
               </p>
             </section>
             <SummaryPanels entries={entries} dayKey={currentDayKey} budgets={budgets} userId={user?.id} />
-            <div className="pt-16">
+            <div className="pt-24 max-[700px]:pt-16">
               <ActivityList
                 entries={entries}
                 todayKey={currentDayKey}
@@ -220,9 +188,13 @@ function Dashboard() {
             </div>
           </>
         )}
-        {activeTab === 'overview' && <OverviewView accumulation={accumulation} />}
+        {activeTab === 'overview' && (
+          <section className="pt-16 max-[700px]:pt-10">
+            <OverviewView accumulation={accumulation} />
+          </section>
+        )}
         {activeTab === 'notifications' && (
-          <section className="pt-6">
+          <section className="pt-16 max-[700px]:pt-10">
             <NotificationsView />
           </section>
         )}
@@ -235,14 +207,14 @@ function Dashboard() {
           />
         )}
         {activeTab === 'settings' && (
-          <section className="pt-6">
+          <section className="pt-16 max-[700px]:pt-10">
             <SettingsView userId={user?.id} entries={entries} />
           </section>
         )}
       </main>
-      <footer className="mx-auto mt-[110px] flex w-[min(1180px,calc(100%-48px))] justify-between border-t border-line pt-4 font-mono text-[11px] tracking-[.06em] text-muted max-[700px]:mt-20 max-[700px]:w-[calc(100%-32px)]">
+      <footer className="mx-auto flex w-[min(1120px,calc(100%-40px))] justify-between border-t border-line py-5 font-mono text-[10px] tracking-[.06em] text-muted max-[700px]:w-[calc(100%-32px)] max-[700px]:pb-28">
         <span>exodo / έξοδο</span>
-        <span>money is a daily practice</span>
+        <span>money / a daily practice</span>
       </footer>
       <MobileTabBar activeTab={activeTab} onChange={navigateTab} onRecord={() => openComposer('expense')} />
       {composerOpen && (

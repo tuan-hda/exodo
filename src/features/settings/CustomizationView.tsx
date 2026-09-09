@@ -1,31 +1,27 @@
 'use client'
 
-import { ArrowLeft, Check } from '@phosphor-icons/react'
+import { Check } from '@phosphor-icons/react'
 import { Button } from '../../components/ui/button'
 import { Card } from '../../components/ui/card'
+import { PageHeader } from '../../components/PageHeader'
 import { useBackgroundPreference } from './use-background-preference'
 
 export function CustomizationView({ onBack }: { onBack: () => void }) {
   const { enabled, setEnabled } = useBackgroundPreference()
 
   return (
-    <section className="mx-auto max-w-[620px] pb-8">
-      <Button
-        variant="outline"
-        size="sm"
-        className="mt-8 text-xs font-semibold text-muted"
-        type="button"
-        onClick={onBack}>
-        <ArrowLeft size={17} /> Settings
-      </Button>
-      <div className="mt-8">
-        <p className="mb-[15px] font-mono text-[11px] uppercase tracking-[.12em] text-muted">appearance</p>
-        <h1 className="text-[clamp(42px,7vw,68px)]">Customization</h1>
-      </div>
-      <Card className="mt-8 flex items-center justify-between gap-4 rounded-[20px] border-line bg-white p-5">
+    <section className="mx-auto grid max-w-[620px] gap-8 pb-8 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both]">
+      <PageHeader
+        eyebrow="appearance"
+        title="Customization"
+        description="Keep the dashboard calm and focused on the money that matters today."
+        backLabel="Settings"
+        onBack={onBack}
+      />
+      <Card tone="soft" className="flex items-center justify-between gap-4 p-5">
         <div>
           <strong className="block text-sm font-semibold">Gradient background</strong>
-          <p className="mt-1 text-xs text-muted">Show the soft color wash behind the dashboard</p>
+          <p className="mt-1 text-xs leading-[1.5] text-muted">Show the soft color wash behind the dashboard.</p>
         </div>
         <Button
           variant={enabled ? 'default' : 'outline'}

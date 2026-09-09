@@ -2,13 +2,10 @@ import { Check, CircleNotch } from '@phosphor-icons/react'
 import { Button } from '../../components/ui/button'
 import { Card } from '../../components/ui/card'
 import { Input } from '../../components/ui/input'
+import { StateMessage } from '../../components/StateMessage'
 import { ComposerStepActions } from './ComposerStepActions'
 import { evaluateExpression, formatMoney } from './entry-utils'
 import type { Entry, EntryType } from './types'
-
-const errorClassName = 'm-0 border border-line-strong bg-soft px-3 py-[11px] text-[11px] leading-[1.55] text-danger'
-const saveButtonClassName =
-  'h-10 min-h-10 w-auto border border-ink bg-ink px-4 py-2 text-sm font-bold text-white shadow-[0_2px_5px_rgb(21_21_21_/_0.08)] transition active:scale-[.98] flex-1'
 
 export function ComposerReviewStep({
   entry,
@@ -39,7 +36,7 @@ export function ComposerReviewStep({
 }) {
   return (
     <section className="grid content-start gap-4" aria-label="Review record">
-      <Card className="grid gap-3 rounded-[18px] bg-soft p-4">
+      <Card tone="soft" className="grid gap-3 p-4">
         <div className="flex items-end justify-between border-b border-line-strong pb-3">
           <span className="font-mono text-[10px] uppercase tracking-[.08em] text-muted">
             {type === 'income' ? 'Income' : 'Expense'}
@@ -72,13 +69,9 @@ export function ComposerReviewStep({
           onChange={(event) => onOccurredAtChange(event.target.value)}
         />
       </label>
-      {error && (
-        <p className={errorClassName} role="alert">
-          {error}
-        </p>
-      )}
+      {error && <StateMessage tone="danger">{error}</StateMessage>}
       <ComposerStepActions disabled={disabled} onBack={onBack}>
-        <Button className={saveButtonClassName} disabled={disabled} type="submit" variant="default">
+        <Button className="flex-1 gap-2 text-sm font-semibold" disabled={disabled} type="submit" variant="default">
           {isSaving ? (
             <>
               <CircleNotch className="animate-spin" size={17} /> Saving…

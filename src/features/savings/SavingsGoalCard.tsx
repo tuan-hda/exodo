@@ -14,13 +14,13 @@ export function SavingsGoalCard({
   deposits: SavingsDeposit[]
   onAdd?: (goalId: string) => void
 }) {
-  const percentage = Math.min(100, (goal.savedAmount / goal.targetAmount) * 100)
+  const percentage = goal.targetAmount ? Math.min(100, (goal.savedAmount / goal.targetAmount) * 100) : 0
   const recentDeposits = deposits.filter((deposit) => deposit.goalId === goal.id).slice(0, 4)
   return (
-    <Card className="px-[43px] py-[35px] max-[700px]:p-[26px]">
+    <Card className="p-6 md:p-7">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="grid size-11 place-items-center rounded-2xl bg-ink text-xl" aria-hidden="true">
+          <span className="grid size-11 place-items-center rounded-[14px] bg-ink text-xl text-white" aria-hidden="true">
             {goal.icon || '✈️'}
           </span>
           <div>
@@ -40,18 +40,18 @@ export function SavingsGoalCard({
       </div>
       <div className="mt-5 flex items-end justify-between text-sm">
         <span>
-          <strong className="text-xl">{formatShort(goal.savedAmount)}</strong> saved
+          <strong className="ui-number text-xl font-semibold">{formatShort(goal.savedAmount)}</strong> saved
         </span>
-        <span className="font-mono text-xs text-muted">{Math.round(percentage)}%</span>
+        <span className="ui-number text-xs text-muted">{Math.round(percentage)}%</span>
       </div>
-      <Progress className="mt-3" value={percentage} />
+      <Progress className="mt-3" value={percentage} tone="success" />
       <div className="mt-3 flex justify-between text-xs text-muted">
-        <span>{formatShort(Math.max(0, goal.targetAmount - goal.savedAmount))} remaining</span>
-        <span>Target {formatShort(goal.targetAmount)}</span>
+        <span className="ui-number">{formatShort(Math.max(0, goal.targetAmount - goal.savedAmount))} remaining</span>
+        <span className="ui-number">Target {formatShort(goal.targetAmount)}</span>
       </div>
       {recentDeposits.length > 0 && (
         <div className="mt-5 border-t border-line pt-3">
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-[.08em] text-muted">Recent contributions</p>
+          <p className="ui-eyebrow mb-2">Recent contributions</p>
           {recentDeposits.map((deposit) => (
             <div className="flex justify-between py-1 text-xs" key={deposit.id}>
               <span>{deposit.source === 'automatic' ? 'Monthly remainder' : 'Manual deposit'}</span>

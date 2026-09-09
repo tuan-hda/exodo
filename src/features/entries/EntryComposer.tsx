@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { ArrowDown, ArrowUp, Check, Trash, X } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { Sheet, SheetContent, SheetTitle } from '../../components/ui/sheet'
@@ -12,6 +12,7 @@ import { ComposerCategoryStep } from './ComposerCategoryStep'
 import { ComposerReviewStep } from './ComposerReviewStep'
 import { evaluateExpression, formatAmountExpression, getCurrentTime, todayKey } from './entry-utils'
 import type { Entry, EntryType } from './types'
+import { useMediaQuery } from '../../hooks/use-media-query'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,16 +51,8 @@ export function EntryComposer({
   const [title, setTitle] = useState(entry?.title ?? '')
   const [category, setCategory] = useState<Category>(entry?.category ?? defaultCategory(type))
   const [error, setError] = useState('')
-  const [isMobile, setIsMobile] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
-
-  useEffect(() => {
-    const media = window.matchMedia('(max-width: 700px)')
-    const update = () => setIsMobile(media.matches)
-    update()
-    media.addEventListener('change', update)
-    return () => media.removeEventListener('change', update)
-  }, [])
+  const isMobile = useMediaQuery('(max-width: 700px)')
 
   function validateAmount() {
     try {
@@ -123,7 +116,7 @@ export function EntryComposer({
         side="bottom"
         showCloseButton={false}
         className={clsx(
-          'max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-[28px] border border-line-strong bg-white p-[26px] text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)] [margin-inline:auto] [padding-top:max(16px,env(safe-area-inset-top))] [padding-bottom:max(16px,env(safe-area-inset-bottom))] max-[700px]:flex max-[700px]:min-h-0 max-[700px]:max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] max-[700px]:w-full max-[700px]:min-w-0 max-[700px]:overflow-x-hidden max-[700px]:rounded-t-[28px] max-[700px]:rounded-b-none max-[700px]:border-0 max-[700px]:p-5 max-[700px]:[margin-inline:0]',
+          'max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-[24px] border border-line-strong bg-surface p-6 text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)] [margin-inline:auto] [padding-top:max(16px,env(safe-area-inset-top))] [padding-bottom:max(16px,env(safe-area-inset-bottom))] max-[700px]:flex max-[700px]:min-h-0 max-[700px]:max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] max-[700px]:w-full max-[700px]:min-w-0 max-[700px]:overflow-x-hidden max-[700px]:rounded-t-[24px] max-[700px]:rounded-b-none max-[700px]:border-0 max-[700px]:p-5 max-[700px]:[margin-inline:0]',
           type,
         )}
         aria-busy={isSaving}>
@@ -145,10 +138,11 @@ export function EntryComposer({
               </Button>
             )}
             <Button
-              variant="outline"
+              variant={type === 'income' ? 'secondary' : 'outline'}
+              size="sm"
               className={clsx(
-                'inline-flex items-center gap-1.5 rounded-xl border border-line-strong bg-soft px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[.06em] text-muted max-[700px]:px-3 max-[700px]:py-2 max-[700px]:text-[11px]',
-                type === 'income' && 'border-[#7fbe91] bg-[#dff3e5] text-[#176b3a]',
+                'font-mono text-[10px] uppercase tracking-[.06em] max-[700px]:text-[11px]',
+                type === 'income' && 'text-success',
               )}
               type="button"
               disabled={isSaving}
@@ -160,7 +154,7 @@ export function EntryComposer({
             <Button
               variant="outline"
               size="icon-lg"
-              className="size-10 rounded-xl p-0 text-ink"
+              className="text-ink"
               type="button"
               disabled={isSaving}
               onClick={onClose}
@@ -181,9 +175,9 @@ export function EntryComposer({
               key={label}>
               <i
                 className={clsx(
-                  'grid size-5 shrink-0 place-items-center rounded-full border border-line-strong bg-white not-italic',
+                  'grid size-5 shrink-0 place-items-center rounded-full border border-line-strong bg-surface not-italic',
                   step > index + 1 && 'border-ink text-ink',
-                  step === index + 1 && 'border-ink bg-white text-ink',
+                  step === index + 1 && 'border-ink bg-surface text-ink',
                 )}>
                 {step > index + 1 ? <Check size={11} weight="bold" /> : index + 1}
               </i>

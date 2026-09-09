@@ -153,6 +153,8 @@ export function PieChart({
               key={segment.category}>
               <button
                 type="button"
+                aria-label={`Select ${segment.category}`}
+                onClick={() => onSelect(segment.category)}
                 className={clsx(
                   'grid size-14 place-items-center rounded-full border-[3px] shadow-[0_2px_8px_rgb(21_21_21_/_0.12)] transition-transform duration-[600ms] ease-[cubic-bezier(.05,.78,.18,1)] max-[430px]:size-11',
                   segment.category === selectedCategory && segment.percentage < MIN_LABEL_PERCENTAGE
@@ -171,7 +173,7 @@ export function PieChart({
             </span>
           ))}
       </div>
-      <div className="absolute inset-[25%] grid place-items-center rounded-full bg-white text-center">
+      <div className="absolute inset-[25%] grid place-items-center rounded-full bg-surface text-center">
         <strong className="font-mono text-lg font-semibold tracking-[-.05em]">
           <CountUp value={total} formatValue={formatShort} />
         </strong>

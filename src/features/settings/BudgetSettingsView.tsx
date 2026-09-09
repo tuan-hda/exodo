@@ -2,13 +2,15 @@
 
 import { useState } from 'react'
 import { clsx } from 'clsx'
-import { ArrowLeft, Trash } from '@phosphor-icons/react'
+import { Trash } from '@phosphor-icons/react'
 import { useUser } from '@clerk/nextjs'
 import { Button } from '../../components/ui/button'
 import { categoryClass, categoryIcon, expenseCategories } from '../entries/CategoryPicker'
 import { formatMoneyInput, formatShort } from '../entries/entry-utils'
 import { useBudgets } from '../budgets/use-budgets'
 import { Input } from '@/components/ui/input'
+import { PageHeader } from '@/components/PageHeader'
+import { StateMessage } from '@/components/StateMessage'
 
 export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
   const { user } = useUser()
@@ -23,28 +25,23 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <section className="mx-auto max-w-[620px] pb-8">
-      <Button
-        variant="outline"
-        size="sm"
-        className="mt-8 text-xs font-semibold text-muted"
-        type="button"
-        onClick={onBack}>
-        <ArrowLeft size={17} /> Settings
-      </Button>
-      <div className="mt-8">
-        <p className="mb-[15px] font-mono text-[11px] uppercase tracking-[.12em] text-muted">recurring controls</p>
-        <h1 className="text-[clamp(42px,7vw,68px)]">Budget settings</h1>
-        <p className="mt-4 text-sm text-muted">These limits apply automatically to every month.</p>
-      </div>
-      <div className="mt-8 grid grid-cols-2 gap-2">
+    <section className="mx-auto grid max-w-[620px] gap-8 pb-8 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both]">
+      <PageHeader
+        eyebrow="recurring controls"
+        title="Budget settings"
+        description="These limits apply automatically to every month."
+        backLabel="Settings"
+        onBack={onBack}
+      />
+      <div className="grid grid-cols-2 gap-2">
         {expenseCategories.map((item) => (
           <button
             key={item}
             type="button"
             className={clsx(
-              'inline-flex min-h-14 items-center gap-2.5 rounded-xl border border-line bg-soft px-4 text-left text-sm text-muted transition hover:text-ink',
-              category === item && 'border-ink bg-white text-ink',
+              'inline-flex min-h-14 items-center gap-2.5 rounded-[14px] border px-4 text-left text-sm text-muted transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ink',
+              categoryClass(item),
+              category === item && 'border-ink bg-surface text-ink shadow-[0_2px_8px_rgb(21_21_21_/_0.06)]',
             )}
             onClick={() => setCategory(item)}>
             <span className={categoryClass(item)}>{categoryIcon(item, 18)}</span>
@@ -52,7 +49,7 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
           </button>
         ))}
       </div>
-      <div className="mt-5 grid gap-2">
+      <div className="grid gap-2">
         <label className="text-[11px] font-bold text-muted" htmlFor="budget-amount">
           Monthly limit for {category}
         </label>
@@ -62,12 +59,11 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
             inputMode="numeric"
             value={amount}
             onChange={(event) => setAmount(formatMoneyInput(event.target.value))}
-            className="min-w-0 w-full rounded-[14px] border border-line-strong px-3 py-2 text-base outline-0 focus:border-ink"
+            className="w-full"
             placeholder={currentBudget ? Number(currentBudget.amount).toLocaleString('en-US') : '0'}
           />
           <Button
-            variant="outline"
-            className="h-10 min-h-10 w-full text-xs font-bold text-ink disabled:pointer-events-none"
+            className="w-full text-xs font-semibold disabled:pointer-events-none"
             type="button"
             onClick={handleSave}
             disabled={isSaving || !amount.trim()}>
@@ -78,26 +74,16 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
       {isLoading && (
         <p className="m-0 mt-4 font-mono text-[10px] uppercase tracking-[.06em] text-muted">Loading budgets…</p>
       )}
-      {error && (
-        <p
-          className="m-0 rounded-[14px] border border-line-strong bg-soft px-3 py-[11px] text-[11px] leading-[1.55] text-danger"
-          role="alert">
-          {error}
-        </p>
-      )}
+      {error && <StateMessage tone="danger">{error}</StateMessage>}
       {budgets.length > 0 && (
-        <div className="mt-7 border-t border-line pt-4">
-          <p className="m-0 mt-4 font-mono text-[10px] uppercase tracking-[.06em] text-muted">Recurring budgets</p>
+        <section className="grid gap-3 border-t border-line pt-5" aria-label="Recurring budgets">
+          <p className="ui-eyebrow m-0">Recurring budgets</p>
           {budgets.map((budget) => (
             <div
-              className="flex min-h-[54px] items-center gap-3 border-b border-line font-mono text-xs"
+              className="flex min-h-14 items-center gap-3 border-b border-line font-mono text-xs last:border-b-0"
               key={budget.id}>
               <span className="flex min-w-0 flex-1 items-center gap-2">
-                <span
-                  className={clsx(
-                    'grid size-7 shrink-0 place-items-center rounded-full border text-current',
-                    categoryClass(budget.category),
-                  )}>
+                <span className={clsx('ui-icon-tile size-8 rounded-full', categoryClass(budget.category))}>
                   {categoryIcon(budget.category, 16)}
                 </span>
                 {budget.category}
@@ -106,7 +92,7 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
               <Button
                 variant="ghost"
                 size="icon-xs"
-                className="rounded-xl p-1 text-muted transition hover:text-danger"
+                className="text-muted hover:text-danger"
                 type="button"
                 aria-label={`Remove ${budget.category} budget`}
                 onClick={() => removeBudget(budget)}>
@@ -114,7 +100,7 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
               </Button>
             </div>
           ))}
-        </div>
+        </section>
       )}
     </section>
   )

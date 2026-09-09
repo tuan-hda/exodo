@@ -1,6 +1,7 @@
 'use client'
 
 import { Backspace } from '@phosphor-icons/react'
+import { clsx } from 'clsx'
 import { triggerHaptic } from '@/lib/haptics'
 import { formatAmountExpression } from './entry-utils'
 
@@ -34,24 +35,19 @@ export function CalculatorKeypad({
       </div>
       <div className="mt-2 grid grid-cols-4 gap-1.5">
         {['1', '2', '3', '÷', '4', '5', '6', '×', '7', '8', '9', '−', '0', '000', '⌫', '+'].map((key) => (
-          <div className="relative" key={key}>
-            <button
-              disabled={disabled}
-              type="button"
-              tabIndex={-1}
-              aria-hidden="true"
-              className={`pointer-events-none inline-flex min-h-[52px] w-full items-center justify-center rounded-xl border ${['÷', '×', '−', '+'].includes(key) ? 'border-line-strong' : 'border-line'} ${key === '⌫' ? 'bg-white text-muted' : 'bg-soft text-ink'} font-mono text-base transition active:scale-[.97] disabled:cursor-wait disabled:opacity-50 max-[700px]:min-h-[58px]`}>
-              {key === '⌫' ? <Backspace size={21} weight="regular" /> : key}
-            </button>
-            <input
-              type="checkbox"
-              ref={(input) => input?.setAttribute('switch', '')}
-              disabled={disabled}
-              aria-label={key === '⌫' ? 'Delete last character' : key}
-              className="absolute inset-0 z-10 m-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-wait"
-              onChange={() => pressKey(key)}
-            />
-          </div>
+          <button
+            key={key}
+            disabled={disabled}
+            type="button"
+            aria-label={key === '⌫' ? 'Delete last character' : key}
+            className={clsx(
+              'inline-flex min-h-[52px] w-full items-center justify-center rounded-[12px] border font-mono text-base transition-colors active:scale-[.97] disabled:cursor-wait disabled:opacity-50 max-[700px]:min-h-[58px]',
+              ['÷', '×', '−', '+'].includes(key) ? 'border-line-strong' : 'border-line',
+              key === '⌫' ? 'bg-surface text-muted hover:bg-soft' : 'bg-soft text-ink hover:bg-line',
+            )}
+            onClick={() => pressKey(key)}>
+            {key === '⌫' ? <Backspace size={21} weight="regular" /> : key}
+          </button>
         ))}
       </div>
     </div>

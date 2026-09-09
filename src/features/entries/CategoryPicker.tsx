@@ -106,8 +106,9 @@ export function CategoryPicker({
             disabled={disabled}
             type="button"
             className={clsx(
-              'inline-flex min-h-14 w-full items-center justify-start gap-2.5 rounded-xl border px-4 py-3 text-left text-sm font-medium transition hover:text-ink active:scale-[.98] disabled:cursor-wait disabled:opacity-50',
+              'inline-flex min-h-14 w-full items-center justify-start gap-2.5 rounded-[14px] border px-4 py-3 text-left text-sm font-medium transition-colors hover:text-ink active:scale-[.98] disabled:cursor-wait disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ink',
               categoryClass(item),
+              value === item && 'border-ink bg-surface shadow-[0_2px_8px_rgb(21_21_21_/_0.06)]',
             )}
             style={categoryBorderStyle(item)}
             aria-label={item}

@@ -2,6 +2,7 @@ import { CalendarDots, CaretLeft, CaretRight, ClockCounterClockwise, MagnifyingG
 import { clsx } from 'clsx'
 import { useState } from 'react'
 import { Button } from '../../components/ui/button'
+import { EmptyState } from '../../components/EmptyState'
 import { fromKey } from '../finance/allocation'
 import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
 import { entryDate, formatShort } from '../entries/entry-utils'
@@ -83,22 +84,25 @@ export function ActivityList({
 
   return (
     <section className="animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_260ms_both]">
-      <div className="flex items-end justify-between">
+      <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="mb-[15px] font-mono text-[11px] uppercase tracking-[.12em] text-muted">recent activity</p>
-          <h2 className="mb-[17px] text-[clamp(30px,4vw,44px)] font-semibold leading-none tracking-[-.07em]">
-            What moved.
-          </h2>
+          <p className="ui-eyebrow mb-3">recent activity</p>
+          <h2 className="ui-section-title m-0">What moved.</h2>
         </div>
-        <ClockCounterClockwise className="text-muted" size={22} />
+        <span className="ui-icon-tile size-10 rounded-full" aria-hidden="true">
+          <ClockCounterClockwise className="text-muted" size={19} />
+        </span>
       </div>
       {entries.length > 0 && (
         <div className="mt-5 flex items-center justify-between gap-3">
-          <label className="flex min-w-0 flex-1 items-center gap-2 rounded-[14px] border border-line-strong bg-white px-3 text-muted">
-            <MagnifyingGlass size={16} />
+          <label className="relative block min-w-0 flex-1">
+            <MagnifyingGlass
+              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted"
+              size={16}
+            />
             <span className="sr-only">Search activity</span>
             <Input
-              className="border-0 bg-transparent px-0 text-base text-ink outline-0 placeholder:text-muted"
+              className="pl-10"
               value={query}
               onChange={(event) => updateQuery(event.target.value)}
               placeholder="Search activity"
@@ -115,7 +119,8 @@ export function ActivityList({
           aria-label="Activity months">
           <Button
             variant="ghost"
-            className="min-w-0 items-center justify-start gap-1 rounded-xl px-2 py-2 text-left font-mono text-[10px] text-muted transition hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
+            size="sm"
+            className="min-w-0 justify-start gap-1 px-2 text-left font-mono text-[10px] text-muted hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
             disabled={!previousMonth}
             type="button"
             onClick={() => previousMonth && setSelectedMonth(previousMonth)}
@@ -129,7 +134,8 @@ export function ActivityList({
           </div>
           <Button
             variant="ghost"
-            className="min-w-0 items-center justify-end gap-1 rounded-xl px-2 py-2 text-right font-mono text-[10px] text-muted transition hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
+            size="sm"
+            className="min-w-0 justify-end gap-1 px-2 text-right font-mono text-[10px] text-muted hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
             disabled={!nextMonth}
             type="button"
             onClick={() => nextMonth && setSelectedMonth(nextMonth)}
@@ -143,13 +149,11 @@ export function ActivityList({
         {activeGroup ? (
           <section className="border-b border-line-strong">
             <div className="flex items-center justify-between gap-3 border-b border-line py-3">
-              <h3 className="m-0 font-mono text-[10px] font-normal uppercase tracking-[.08em] text-muted">
-                {activeGroup.label}
-              </h3>
+              <h3 className="ui-eyebrow m-0">{activeGroup.label}</h3>
               <Button
                 variant="outline"
                 size="sm"
-                className="font-mono"
+                className="font-mono text-[10px]"
                 type="button"
                 onClick={() => onOpenAnalysis(activeGroup.key)}>
                 Analysis
@@ -157,18 +161,18 @@ export function ActivityList({
             </div>
             <button
               type="button"
-              className="flex w-full items-center justify-between gap-3 border-b border-line bg-transparent px-0 py-4 text-left"
+              className="flex min-h-[76px] w-full items-center justify-between gap-3 border-b border-line bg-transparent px-2 py-4 text-left transition-colors hover:bg-soft focus-visible:bg-soft"
               onClick={() => onOpenAnalysis(activeGroup.key)}
               aria-label={`Analyze ${activeGroup.label}`}>
               <span className="grid gap-1">
                 <b className="font-mono text-[9px] font-normal uppercase tracking-[.08em] text-muted">Income</b>
-                <strong className="font-mono text-xs font-normal text-[#176b3a]">
+                <strong className="ui-number text-xs font-normal text-success">
                   +{formatShort(activeGroup.income)}
                 </strong>
               </span>
               <span className="grid justify-items-center gap-1 text-center">
                 <b className="font-mono text-[9px] font-normal uppercase tracking-[.08em] text-muted">Expense</b>
-                <strong className="font-mono text-xs font-normal text-[#a84528]">
+                <strong className="ui-number text-xs font-normal text-danger">
                   -{formatShort(activeGroup.expense)}
                 </strong>
               </span>
@@ -176,8 +180,8 @@ export function ActivityList({
                 <b className="font-mono text-[9px] font-normal uppercase tracking-[.08em] text-muted">Leftover</b>
                 <strong
                   className={clsx(
-                    'font-mono text-xs font-normal',
-                    activeGroup.income - activeGroup.expense < 0 ? 'text-[#a84528]' : 'text-ink',
+                    'ui-number text-xs font-normal',
+                    activeGroup.income - activeGroup.expense < 0 ? 'text-danger' : 'text-ink',
                   )}>
                   {formatShort(activeGroup.income - activeGroup.expense)}
                 </strong>
@@ -189,13 +193,11 @@ export function ActivityList({
                   {day.label}
                 </h4>
                 {day.entries.map((entry) => (
-                  <div
-                    className="grid min-h-[67px] cursor-pointer grid-cols-[34px_1fr_auto] items-center gap-[13px] border-b border-line transition-colors max-[430px]:grid-cols-[30px_1fr_auto] max-[430px]:gap-[9px]"
+                  <button
+                    className="grid min-h-[67px] w-full cursor-pointer grid-cols-[34px_1fr_auto] items-center gap-[13px] border-b border-line bg-transparent text-left transition-colors hover:bg-soft focus-visible:bg-soft max-[430px]:grid-cols-[30px_1fr_auto] max-[430px]:gap-[9px]"
                     key={entry.id}
                     onClick={() => onEdit(entry)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(event) => event.key === 'Enter' && onEdit(entry)}>
+                    type="button">
                     <span
                       className={clsx(
                         'grid size-[29px] place-items-center rounded-full border text-current',
@@ -213,13 +215,13 @@ export function ActivityList({
                     </span>
                     <b
                       className={clsx(
-                        'font-mono text-base font-semibold',
-                        entry.type === 'expense' ? 'text-[#a84528]' : 'text-[#176b3a]',
+                        'ui-number text-base font-semibold',
+                        entry.type === 'expense' ? 'text-danger' : 'text-success',
                       )}>
                       {entry.type === 'income' ? '+' : '-'}
                       {formatShort(entry.amount)}
                     </b>
-                  </div>
+                  </button>
                 ))}
               </section>
             ))}
@@ -228,12 +230,16 @@ export function ActivityList({
             </p>
           </section>
         ) : (
-          <div className="grid justify-items-center gap-3 px-[45px] py-[45px] text-muted">
-            <CalendarDots size={22} />
-            <p className="m-0 text-[13px]">
-              {entries.length ? 'No matching records found.' : 'Your first record will show up here.'}
-            </p>
-          </div>
+          <EmptyState
+            className="mt-4"
+            icon={<CalendarDots size={21} />}
+            title={entries.length ? 'No matching records found' : 'No activity yet'}
+            description={
+              entries.length
+                ? 'Try a different search or choose another month.'
+                : 'Your first record will show up here.'
+            }
+          />
         )}
       </div>
     </section>

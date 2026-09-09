@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { clsx } from 'clsx'
-import { Card } from '../../components/ui/card'
+import { Card, type cardVariants } from '../../components/ui/card'
+import type { VariantProps } from 'class-variance-authority'
 
 export function DashboardPanel({
   children,
@@ -9,6 +10,7 @@ export function DashboardPanel({
   className = '',
   asideClassName = '',
   ariaLabel,
+  tone,
 }: {
   children: ReactNode
   label?: string
@@ -16,18 +18,15 @@ export function DashboardPanel({
   className?: string
   asideClassName?: string
   ariaLabel?: string
+  tone?: VariantProps<typeof cardVariants>['tone']
 }) {
   return (
-    <Card className={clsx(className)} aria-label={ariaLabel}>
+    <Card tone={tone} className={clsx(className)} aria-label={ariaLabel}>
       {(label || aside) && (
         <div className="col-span-full flex w-full items-start justify-between gap-4">
-          {label && <span className="font-mono text-[11px] uppercase tracking-[.12em] text-muted">{label}</span>}
+          {label && <span className="ui-eyebrow">{label}</span>}
           {aside && (
-            <span
-              className={clsx(
-                'flex shrink-0 items-center gap-3 text-right font-mono text-[11px] uppercase tracking-[.12em] text-muted',
-                asideClassName,
-              )}>
+            <span className={clsx('ui-eyebrow flex shrink-0 items-center gap-3 text-right', asideClassName)}>
               {aside}
             </span>
           )}

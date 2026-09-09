@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ArrowLeft, CaretLeft, CaretRight, TrendDown, TrendUp, X } from '@phosphor-icons/react'
+import { CaretLeft, CaretRight, TrendDown, TrendUp, X } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { Button } from '../../components/ui/button'
 import { Card } from '../../components/ui/card'
+import { PageHeader } from '../../components/PageHeader'
 import { AnimatedList } from '../../components/ui/animated-list'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
 import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
@@ -51,8 +52,8 @@ function CategoryDetail({
               </div>
               <strong
                 className={clsx(
-                  'font-mono text-base font-semibold',
-                  type === 'expense' ? 'text-[#a84528]' : 'text-[#176b3a]',
+                  'ui-number text-base font-semibold',
+                  type === 'expense' ? 'text-danger' : 'text-success',
                 )}>
                 {type === 'expense' ? '-' : '+'}
                 {formatShort(entry.amount)}
@@ -87,18 +88,32 @@ function DistributionCard({
   return (
     <div aria-label={`${type} distribution`}>
       <Card className="p-5 max-[700px]:p-4">
-        <div className="mb-7 flex items-start justify-between gap-3">
-          <div>
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-[.12em] text-muted">{type}</p>
+        {slices.length ? (
+          <>
+            <div className="mb-7 flex items-start justify-between gap-3">
+              <p className="ui-eyebrow m-0">{type}</p>
+              {isIncome ? (
+                <TrendUp className="text-success" size={21} />
+              ) : (
+                <TrendDown className="text-danger" size={21} />
+              )}
+            </div>
+            <PieChart slices={slices} total={total} selectedCategory={selectedCategory} onSelect={onSelectCategory} />
+            <div className="h-10" />
+          </>
+        ) : (
+          <div className="grid min-h-[360px] place-items-center content-center gap-3 p-8 text-center">
+            <span className="ui-icon-tile size-11 rounded-full" aria-hidden="true">
+              {isIncome ? <TrendUp size={20} /> : <TrendDown size={20} />}
+            </span>
+            <div className="grid gap-1">
+              <h3 className="m-0 text-base font-semibold">No {type} records</h3>
+              <p className="m-0 max-w-[30ch] text-sm leading-[1.55] text-muted">
+                Add a record in this month to see its distribution.
+              </p>
+            </div>
           </div>
-          {isIncome ? (
-            <TrendUp className="text-[#176b3a]" size={21} />
-          ) : (
-            <TrendDown className="text-[#a84528]" size={21} />
-          )}
-        </div>
-        <PieChart slices={slices} total={total} selectedCategory={selectedCategory} onSelect={onSelectCategory} />
-        <div className="h-10" />
+        )}
       </Card>
       {selectedCategory ? (
         <CategoryDetail category={selectedCategory} type={type} entries={entries} onClose={onCloseCategory} />
@@ -125,8 +140,8 @@ function DistributionCard({
               </span>
               <strong
                 className={clsx(
-                  'font-mono text-base font-semibold',
-                  type === 'expense' ? 'text-[#a84528]' : 'text-[#176b3a]',
+                  'ui-number text-base font-semibold',
+                  type === 'expense' ? 'text-danger' : 'text-success',
                 )}>
                 {type === 'expense' ? '-' : '+'}
                 {formatShort(slice.amount)}
@@ -166,53 +181,43 @@ export function AnalysisView({
   }
 
   return (
-    <section className="pt-[106px] animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_120ms_both] max-[700px]:pt-[75px]">
-      <Button
-        variant="outline"
-        size="sm"
-        className="mb-8 gap-2 border-line-strong px-3.5 font-mono text-[10px] uppercase tracking-[.08em] text-muted hover:border-ink hover:text-ink"
-        type="button"
-        onClick={onBack}>
-        <ArrowLeft size={15} />
-        Dashboard
-      </Button>
-      <div className="flex items-center justify-between gap-5">
-        <div>
-          <p className="mb-[15px] font-mono text-[11px] uppercase tracking-[.12em] text-muted">the month analysis</p>
-          <h2 className="mb-[17px] text-[clamp(30px,4vw,44px)] font-semibold leading-none tracking-[-.07em]">
-            {monthLabel}
-          </h2>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-[34px] rounded-xl p-0 text-[22px]"
-            type="button"
-            onClick={() => onMonthChange(-1)}
-            aria-label="Previous month">
-            <CaretLeft size={17} />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-[34px] rounded-xl p-0 text-[22px]"
-            type="button"
-            onClick={() => onMonthChange(1)}
-            aria-label="Next month">
-            <CaretRight size={17} />
-          </Button>
-        </div>
-      </div>
-      <div className="mt-3 mb-7 flex gap-5 border-y border-line py-3 font-mono text-[10px] uppercase tracking-[.08em] text-muted max-[430px]:gap-3 max-[430px]:text-[9px]">
+    <section className="grid gap-8 pb-12 pt-16 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_120ms_both] max-[700px]:pt-10">
+      <PageHeader
+        eyebrow="the month analysis"
+        title={monthLabel}
+        description="See where the month went, then select a category to review its transactions."
+        backLabel="Dashboard"
+        onBack={onBack}
+        actions={
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="icon-sm"
+              type="button"
+              onClick={() => onMonthChange(-1)}
+              aria-label="Previous month">
+              <CaretLeft size={17} />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              type="button"
+              onClick={() => onMonthChange(1)}
+              aria-label="Next month">
+              <CaretRight size={17} />
+            </Button>
+          </div>
+        }
+      />
+      <div className="flex gap-5 border-y border-line py-3 font-mono text-[10px] uppercase tracking-[.08em] text-muted max-[430px]:gap-3 max-[430px]:text-[9px]">
         <span>
-          <b className="font-normal text-[#176b3a]">+{formatShort(income)}</b> income
+          <b className="ui-number font-normal text-success">+{formatShort(income)}</b> income
         </span>
         <span>
-          <b className="font-normal text-[#a84528]">-{formatShort(expense)}</b> expense
+          <b className="ui-number font-normal text-danger">-{formatShort(expense)}</b> expense
         </span>
         <span>
-          <b className="font-normal text-ink">{monthEntries.length}</b> records
+          <b className="ui-number font-normal text-ink">{monthEntries.length}</b> records
         </span>
       </div>
       <Tabs value={activeType} onValueChange={(value) => setActiveType(value as Entry['type'])}>

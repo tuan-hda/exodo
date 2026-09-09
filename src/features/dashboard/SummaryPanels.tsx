@@ -30,30 +30,39 @@ export function SummaryPanels({
 
   return (
     <section
-      className="grid grid-cols-1 gap-3.5 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_80ms_both]"
+      className="grid grid-cols-1 gap-4 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_80ms_both]"
       aria-label="Money summary">
       <FadeContent>
         <DashboardPanel
           className={clsx(
-            '!grid min-h-[250px] grid-cols-[1fr_auto] grid-rows-[auto_1fr] items-center justify-between rounded-[28px] border border-line bg-white px-[43px] py-[35px] text-ink transition-colors duration-300 max-[700px]:min-h-[220px] max-[700px]:p-[26px]',
-            availableToday < 0 && 'border-ink',
+            'grid min-h-[240px] grid-cols-[1fr_auto] grid-rows-[auto_1fr] items-center justify-between p-7 text-ink md:p-9',
+            availableToday < 0 && 'border-danger/40',
           )}
-          asideClassName="grid justify-items-end gap-[13px]"
+          asideClassName="grid justify-items-end gap-3"
           label="available today"
-          aside={<span>{availableToday < 0 ? 'over pace' : 'on pace'}</span>}
+          aside={
+            <span className={availableToday < 0 ? 'text-danger' : 'text-success'}>
+              {availableToday < 0 ? 'over pace' : 'on pace'}
+            </span>
+          }
           ariaLabel="Today's available amount">
           <div className="col-start-1 row-start-2 today-copy">
-            <strong className="block text-[clamp(34px,4vw,54px)] font-semibold leading-[.9] tracking-[-.09em]">
+            <span className="ui-eyebrow block mb-3">spendable now</span>
+            <strong className="ui-number block text-[clamp(38px,5vw,62px)] font-sans font-semibold leading-[.9] tracking-[-.09em]">
               <CountUp value={availableToday} formatValue={formatMoney} />
             </strong>
-            <span className="mt-5 block font-mono text-[11px]">
+            <span className="mt-5 block max-w-[38ch] font-mono text-[11px] leading-[1.5] text-muted">
               {todayIncome
                 ? `${formatMoney(todayIncome)} allocated - ${formatMoney(todaySpent)} spent`
                 : 'Add income to set your daily pace'}
             </span>
           </div>
           <div className="col-start-2 row-start-2 self-center justify-self-end">
-            <div className="grid size-[52px] place-items-center rounded-full border border-line-strong">
+            <div
+              className={clsx(
+                'ui-icon-tile size-14 rounded-full bg-surface',
+                availableToday < 0 && 'border-danger/40 text-danger',
+              )}>
               <Check size={24} weight="bold" />
             </div>
           </div>

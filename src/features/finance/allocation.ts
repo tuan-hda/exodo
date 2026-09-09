@@ -4,10 +4,6 @@ export type IncomeLike = {
   date: string
 }
 
-export function toKey(date: Date) {
-  return date.toISOString().slice(0, 10)
-}
-
 export function fromKey(value: string) {
   return new Date(`${value}T12:00:00`)
 }

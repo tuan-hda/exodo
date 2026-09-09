@@ -38,25 +38,23 @@ export function BudgetProgress({
 
   return (
     <DashboardPanel
-      className="min-h-[180px] rounded-[28px] border-line bg-white px-[43px] py-[35px] max-[700px]:p-[26px]"
+      className="p-7 md:p-9"
       label="monthly limits"
       aside={`${budgetRows.length} set`}
       ariaLabel="Monthly limits">
       <div className="flex items-end justify-between gap-4">
-        <h3
-          id="budget-progress-title"
-          className="m-0 text-[clamp(28px,4vw,40px)] font-semibold leading-none tracking-[-.07em]">
+        <h3 id="budget-progress-title" className="ui-section-title m-0">
           By category
         </h3>
       </div>
-      <div className="mt-5 grid gap-5">
+      <div className="mt-7 grid gap-6">
         {budgetRows.map((row) => (
-          <div className="grid gap-2" key={row.id}>
+          <div className="grid gap-2.5" key={row.id}>
             <div className="flex items-center justify-between gap-3 font-mono text-xs">
               <span className="flex items-center gap-2">
                 <span
                   className={clsx(
-                    'grid size-7 shrink-0 place-items-center rounded-full border text-current',
+                    'grid size-9 shrink-0 place-items-center rounded-[12px] border text-current',
                     categoryClass(row.category),
                   )}>
                   {categoryIcon(row.category, 15)}
@@ -64,18 +62,15 @@ export function BudgetProgress({
                 {row.category}
               </span>
               <div className="grid justify-items-end gap-0.5 text-right">
-                <strong className={clsx('font-normal', row.percent > 100 ? 'text-[#a84528]' : 'text-ink')}>
+                <strong className={clsx('font-normal', row.percent > 100 ? 'text-danger' : 'text-ink')}>
                   {formatShort(row.spent)} <small className="text-muted">/ {formatShort(row.amount)}</small>
                 </strong>
                 <small className="text-[10px] font-normal text-muted">{formatShort(row.dailyAllowance)} / day</small>
               </div>
             </div>
-            <Progress
-              value={Math.min(row.percent, 100)}
-              className={clsx(row.percent > 100 && '[&_[data-slot=progress-indicator]]:bg-[#a84528]')}
-            />
+            <Progress value={Math.min(row.percent, 100)} tone={row.percent > 100 ? 'danger' : 'default'} />
             {row.percent > 100 && (
-              <small className="text-[10px] text-[#a84528]">{formatShort(row.spent - row.amount)} over</small>
+              <small className="text-[10px] text-danger">{formatShort(row.spent - row.amount)} over</small>
             )}
           </div>
         ))}
