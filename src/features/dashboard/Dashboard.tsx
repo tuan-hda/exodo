@@ -3,14 +3,13 @@
 import { useEffect, useState } from 'react'
 import { clsx } from 'clsx'
 import { useUser } from '@clerk/nextjs'
-import { ArrowClockwise, Plus } from '@phosphor-icons/react'
-import { Button } from '@/components/ui/button'
+import { ArrowClockwise } from '@phosphor-icons/react'
 import { fromKey } from '@/features/finance/allocation'
 import { SettingsView } from '@/features/settings/SettingsView'
 import { ActivityList } from '@/features/activity/ActivityList'
 import { EntryComposer } from '@/features/entries/EntryComposer'
 import { MobileTabBar } from '@/features/navigation/MobileTabBar'
-import { getAppTabFromSearch, navigationItems, type AppTab } from '@/features/navigation/navigation'
+import { getAppTabFromSearch, type AppTab } from '@/features/navigation/navigation'
 import { NotificationsView } from '@/features/notifications/NotificationsView'
 import { SummaryPanels } from './SummaryPanels'
 import { useEntries } from '@/features/entries/use-entries'
@@ -22,6 +21,7 @@ import { AnalysisView } from '@/features/analysis/AnalysisView'
 import { OverviewView } from '@/features/overview/OverviewView'
 import { useBackgroundPreference } from '@/features/settings/use-background-preference'
 import { StateMessage } from '@/components/StateMessage'
+import { DashboardHeader } from './DashboardHeader'
 
 function Dashboard() {
   const { user } = useUser()
@@ -139,38 +139,7 @@ function Dashboard() {
         </div>
       )}
       <main id="top" className="mx-auto w-[min(1120px,calc(100%-40px))] pb-20 max-md:w-[calc(100%-32px)] max-md:pb-32">
-        <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between gap-6 border-b border-line bg-page/85 pt-[max(10px,env(safe-area-inset-top))] backdrop-blur-xl max-md:-mx-4 max-md:px-4">
-          <a
-            className="flex shrink-0 items-center gap-2 font-mono text-[11px] tracking-[.04em] text-ink no-underline"
-            href="#top">
-            <span className="grid size-7 place-items-center rounded-chip bg-ink font-sans text-xs font-semibold text-white">
-              e
-            </span>
-            <span>exodo / έξοδο</span>
-          </a>
-          <span className="hidden font-mono text-[10px] uppercase tracking-[.1em] text-muted max-md:block">
-            {activeTab}
-          </span>
-          <div className="flex items-center gap-2 max-md:hidden">
-            <nav className="flex items-center gap-1" aria-label="Primary navigation">
-              {navigationItems.map((tab) => (
-                <Button
-                  key={tab.id}
-                  variant="nav"
-                  size="nav"
-                  data-active={activeTab === tab.id}
-                  aria-current={activeTab === tab.id ? 'page' : undefined}
-                  type="button"
-                  onClick={() => navigateTab(tab.id)}>
-                  {tab.label}
-                </Button>
-              ))}
-            </nav>
-            <Button size="sm" type="button" onClick={() => openComposer('expense')} aria-label="Record an expense">
-              <Plus size={15} weight="bold" /> Record
-            </Button>
-          </div>
-        </header>
+        <DashboardHeader activeTab={activeTab} onNavigate={navigateTab} onRecord={() => openComposer('expense')} />
         <div id="main-content" tabIndex={-1} className="outline-none">
           {persistenceError && (
             <StateMessage tone="danger" className="mt-4">
