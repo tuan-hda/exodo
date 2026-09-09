@@ -53,13 +53,21 @@ export function usePullToRefresh(onRefresh: () => Promise<boolean>) {
       }
     }
 
+    function handleTouchCancel() {
+      tracking = false
+      pullDistanceRef.current = 0
+      setPullDistance(0)
+    }
+
     window.addEventListener('touchstart', handleTouchStart, { passive: true })
     window.addEventListener('touchmove', handleTouchMove, { passive: false })
     window.addEventListener('touchend', handleTouchEnd)
+    window.addEventListener('touchcancel', handleTouchCancel)
     return () => {
       window.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchend', handleTouchEnd)
+      window.removeEventListener('touchcancel', handleTouchCancel)
     }
   }, [])
 
