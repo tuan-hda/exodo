@@ -41,7 +41,7 @@ function CategoryDetail({
       {categoryEntries.length ? (
         <AnimatedList items={categoryEntries} getKey={(entry) => entry.id}>
           {(entry) => (
-            <div className="analysis-detail-item flex min-h-16 items-center gap-3 border-b border-line py-3">
+            <div className="flex min-h-16 items-center gap-3 border-b border-line py-3">
               <div className="min-w-0 flex-1">
                 <strong className="block truncate text-sm font-medium text-ink">{entry.title || category}</strong>
                 <small className="ui-meta mt-1 block">
