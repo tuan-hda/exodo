@@ -33,9 +33,16 @@ const primaryTabs: Array<{ id: AppTab; label: string }> = [
 function Dashboard() {
   const { user } = useUser()
   const { enabled: gradientBackgroundEnabled } = useBackgroundPreference()
-  const { entries, accumulation, persistenceError, isSaving, saveEntry, removeEntry, refreshEntries } = useEntries(
-    user?.id,
-  )
+  const {
+    entries,
+    accumulation,
+    persistenceError,
+    isLoading: entriesLoading,
+    isSaving,
+    saveEntry,
+    removeEntry,
+    refreshEntries,
+  } = useEntries(user?.id)
   const { pullDistance, isRefreshing } = usePullToRefresh(refreshEntries)
   const currentDayKey = useDayBoundary()
   const currentDay = fromKey(currentDayKey)
@@ -44,7 +51,7 @@ function Dashboard() {
   const [editingEntry, setEditingEntry] = useState<Entry | undefined>()
   const [viewMonth, setViewMonth] = useState(new Date(currentDay.getFullYear(), currentDay.getMonth(), 1, 12))
   const [activeTab, setActiveTab] = useState<AppTab>('today')
-  const { budgets } = useBudgets(user?.id)
+  const { budgets, isLoading: budgetsLoading } = useBudgets(user?.id)
 
   useEffect(() => {
     const nextDay = fromKey(currentDayKey)
@@ -173,10 +180,17 @@ function Dashboard() {
                 Income becomes a daily allowance. Each expense makes the rest of today visible.
               </p>
             </section>
-            <SummaryPanels entries={entries} dayKey={currentDayKey} budgets={budgets} userId={user?.id} />
+            <SummaryPanels
+              entries={entries}
+              dayKey={currentDayKey}
+              budgets={budgets}
+              budgetsLoading={budgetsLoading}
+              userId={user?.id}
+            />
             <div className="pt-24 max-[700px]:pt-16">
               <ActivityList
                 entries={entries}
+                isLoading={entriesLoading}
                 todayKey={currentDayKey}
                 onEdit={(entry) => openComposer(entry.type, entry)}
                 onOpenAnalysis={(monthKey) => {

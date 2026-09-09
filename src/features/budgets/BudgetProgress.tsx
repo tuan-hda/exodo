@@ -4,17 +4,20 @@ import { entryDate, formatShort } from '../entries/entry-utils'
 import type { Entry } from '../entries/types'
 import type { CategoryBudget } from './types'
 import { Progress } from '../../components/ui/progress'
+import { Skeleton } from '../../components/ui/skeleton'
 import { DashboardPanel } from '../dashboard/DashboardPanel'
 import { dailyBudgetAllowance, remainingDaysInMonth } from './budget-utils'
 
 export function BudgetProgress({
   budgets,
   entries,
+  isLoading,
   monthStart,
   dayKey,
 }: {
   budgets: CategoryBudget[]
   entries: Entry[]
+  isLoading: boolean
   monthStart: string
   dayKey: string
 }) {
@@ -34,7 +37,30 @@ export function BudgetProgress({
     }
   })
 
-  if (!budgetRows.length) return null
+  if (!budgetRows.length && !isLoading) return null
+
+  if (!budgetRows.length) {
+    return (
+      <DashboardPanel
+        className="grid gap-6 p-7 md:p-9"
+        label="monthly limits"
+        aside="loading"
+        ariaLabel="Loading monthly limits">
+        <Skeleton className="h-10 w-48" />
+        <div className="grid gap-5">
+          {Array.from({ length: 2 }, (_, index) => (
+            <div className="grid gap-2.5" key={index}>
+              <div className="flex items-center justify-between gap-3">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-4 w-36" />
+              </div>
+              <Skeleton className="h-2.5 w-full" />
+            </div>
+          ))}
+        </div>
+      </DashboardPanel>
+    )
+  }
 
   return (
     <DashboardPanel

@@ -14,11 +14,13 @@ export function SummaryPanels({
   entries,
   dayKey,
   budgets,
+  budgetsLoading,
   userId,
 }: {
   entries: Entry[]
   dayKey: string
   budgets: CategoryBudget[]
+  budgetsLoading: boolean
   userId?: string
 }) {
   const allocationEntries = entries.map((entry) => ({ type: entry.type, amount: entry.amount, date: entryDate(entry) }))
@@ -68,7 +70,13 @@ export function SummaryPanels({
           </div>
         </DashboardPanel>
       </FadeContent>
-      <BudgetProgress budgets={budgets} entries={entries} monthStart={`${dayKey.slice(0, 7)}-`} dayKey={dayKey} />
+      <BudgetProgress
+        budgets={budgets}
+        isLoading={budgetsLoading}
+        entries={entries}
+        monthStart={`${dayKey.slice(0, 7)}-`}
+        dayKey={dayKey}
+      />
       <SavingsGoalsPanel userId={userId} entries={entries} />
     </section>
   )

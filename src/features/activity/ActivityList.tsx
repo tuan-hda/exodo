@@ -3,6 +3,7 @@ import { clsx } from 'clsx'
 import { useState } from 'react'
 import { Button } from '../../components/ui/button'
 import { EmptyState } from '../../components/EmptyState'
+import { Skeleton } from '../../components/ui/skeleton'
 import { fromKey } from '../finance/allocation'
 import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
 import { entryDate, formatShort } from '../entries/entry-utils'
@@ -32,11 +33,13 @@ function groupByDate(entries: Entry[]) {
 
 export function ActivityList({
   entries,
+  isLoading = false,
   todayKey,
   onEdit,
   onOpenAnalysis,
 }: {
   entries: Entry[]
+  isLoading?: boolean
   todayKey: string
   onEdit: (entry: Entry) => void
   onOpenAnalysis: (monthKey: string) => void
@@ -229,6 +232,19 @@ export function ActivityList({
               End of transactions
             </p>
           </section>
+        ) : isLoading ? (
+          <div className="mt-4 grid gap-3" aria-label="Loading activity">
+            {Array.from({ length: 4 }, (_, index) => (
+              <div className="flex min-h-[67px] items-center gap-3 border-b border-line" key={index}>
+                <Skeleton className="size-8 rounded-full" />
+                <div className="grid flex-1 gap-2">
+                  <Skeleton className="h-3 w-32" />
+                  <Skeleton className="h-2.5 w-24" />
+                </div>
+                <Skeleton className="h-3 w-20" />
+              </div>
+            ))}
+          </div>
         ) : (
           <EmptyState
             className="mt-4"

@@ -19,6 +19,7 @@ export function useEntries(userId?: string) {
   const [accumulation, setAccumulation] = useState<number | null>(null)
   const [persistenceError, setPersistenceError] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+  const [isLoading, setIsLoading] = useState(Boolean(userId))
 
   const fetchEntries = useCallback(async () => {
     const supabase = await getSupabase()
@@ -36,7 +37,11 @@ export function useEntries(userId?: string) {
     let cancelled = false
 
     async function loadEntries() {
-      if (!userId) return
+      if (!userId) {
+        setIsLoading(false)
+        return
+      }
+      setIsLoading(true)
       const cachedEntries = readEntriesCache(userId)
       if (cachedEntries) {
         setEntries(cachedEntries)
@@ -67,6 +72,8 @@ export function useEntries(userId?: string) {
           }
           setPersistenceError('Could not load your records. Please try again.')
         }
+      } finally {
+        if (!cancelled) setIsLoading(false)
       }
     }
 
@@ -160,5 +167,5 @@ export function useEntries(userId?: string) {
     }
   }, [fetchEntries, userId])
 
-  return { entries, accumulation, persistenceError, isSaving, saveEntry, removeEntry, refreshEntries }
+  return { entries, accumulation, persistenceError, isLoading, isSaving, saveEntry, removeEntry, refreshEntries }
 }

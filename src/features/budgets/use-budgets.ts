@@ -39,7 +39,7 @@ function normalizeBudget(budget: StoredCategoryBudget): CategoryBudget {
 export function useBudgets(userId: string | undefined) {
   const { getSupabase } = useSupabase()
   const [budgets, setBudgets] = useState<CategoryBudget[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(Boolean(userId))
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
 
