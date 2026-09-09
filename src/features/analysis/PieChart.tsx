@@ -3,6 +3,7 @@
 import type { KeyboardEvent } from 'react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { clsx } from 'clsx'
+import { useReducedMotion } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { categoryChartColor, categoryClass, categoryIcon } from '@/features/entries/CategoryPicker'
 import { formatMoney } from '@/lib/money'
@@ -35,6 +36,7 @@ export function PieChart({
 }) {
   const [outerRadius, setOuterRadius] = useState(48)
   const [visualSelectedCategory, setVisualSelectedCategory] = useState<string | null>(null)
+  const prefersReducedMotion = useReducedMotion()
   const animationFrame = useRef<number | null>(null)
   const chartRef = useRef<HTMLDivElement>(null)
   const badgeRefs = useRef<Record<string, HTMLSpanElement | null>>({})
@@ -45,6 +47,12 @@ export function PieChart({
     const categoryToAnimate = selectedCategory ?? visualSelectedCategory
 
     if (!categoryToAnimate) return
+    if (prefersReducedMotion) {
+      if (animationFrame.current) cancelAnimationFrame(animationFrame.current)
+      setOuterRadius(targetRadius)
+      setVisualSelectedCategory(selectedCategory)
+      return
+    }
     if (selectedCategory) setVisualSelectedCategory(selectedCategory)
     const startTime = performance.now()
 
@@ -65,7 +73,7 @@ export function PieChart({
     return () => {
       if (animationFrame.current) cancelAnimationFrame(animationFrame.current)
     }
-  }, [selectedCategory])
+  }, [prefersReducedMotion, selectedCategory])
 
   let offset = 0
   const segments = slices.map((slice) => {
