@@ -59,7 +59,7 @@ export function SummaryPanels({
           </div>
         </DashboardPanel>
       </FadeContent>
-      <BudgetProgress budgets={budgets} entries={entries} monthStart={`${dayKey.slice(0, 7)}-`} />
+      <BudgetProgress budgets={budgets} entries={entries} monthStart={`${dayKey.slice(0, 7)}-`} dayKey={dayKey} />
       <SavingsGoalsPanel userId={userId} entries={entries} />
     </section>
   )

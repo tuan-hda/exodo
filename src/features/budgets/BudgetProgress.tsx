@@ -5,16 +5,20 @@ import type { Entry } from '../entries/types'
 import type { CategoryBudget } from './types'
 import { Progress } from '../../components/ui/progress'
 import { DashboardPanel } from '../dashboard/DashboardPanel'
+import { dailyBudgetAllowance, remainingDaysInMonth } from './budget-utils'
 
 export function BudgetProgress({
   budgets,
   entries,
   monthStart,
+  dayKey,
 }: {
   budgets: CategoryBudget[]
   entries: Entry[]
   monthStart: string
+  dayKey: string
 }) {
+  const daysRemaining = remainingDaysInMonth(dayKey)
   const budgetRows = budgets.map((budget) => {
     const spent = entries
       .filter(
@@ -22,7 +26,12 @@ export function BudgetProgress({
           entry.type === 'expense' && entry.category === budget.category && entryDate(entry).startsWith(monthStart),
       )
       .reduce((sum, entry) => sum + entry.amount, 0)
-    return { ...budget, spent, percent: budget.amount ? (spent / budget.amount) * 100 : 0 }
+    return {
+      ...budget,
+      spent,
+      dailyAllowance: dailyBudgetAllowance(budget.amount, spent, daysRemaining),
+      percent: budget.amount ? (spent / budget.amount) * 100 : 0,
+    }
   })
 
   if (!budgetRows.length) return null
@@ -54,9 +63,12 @@ export function BudgetProgress({
                 </span>
                 {row.category}
               </span>
-              <strong className={clsx('font-normal', row.percent > 100 ? 'text-[#a84528]' : 'text-ink')}>
-                {formatShort(row.spent)} <small className="text-muted">/ {formatShort(row.amount)}</small>
-              </strong>
+              <div className="grid justify-items-end gap-0.5 text-right">
+                <strong className={clsx('font-normal', row.percent > 100 ? 'text-[#a84528]' : 'text-ink')}>
+                  {formatShort(row.spent)} <small className="text-muted">/ {formatShort(row.amount)}</small>
+                </strong>
+                <small className="text-[10px] font-normal text-muted">{formatShort(row.dailyAllowance)} / day</small>
+              </div>
             </div>
             <Progress
               value={Math.min(row.percent, 100)}
