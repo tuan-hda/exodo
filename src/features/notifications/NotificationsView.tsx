@@ -9,10 +9,20 @@ import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function NotificationsView() {
-  const [status, setStatus] = useState<'loading' | 'connected' | 'disconnected' | 'error'>('loading')
+  const [status, setStatus] = useState<'loading' | 'connected' | 'disconnected' | 'unavailable' | 'error'>('loading')
   const [gmailEmail, setGmailEmail] = useState('')
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState<'connected' | 'error' | null>(null)
   const [retryKey, setRetryKey] = useState(0)
+
+  useEffect(() => {
+    const result = new URLSearchParams(window.location.search).get('gmail')
+    if (result !== 'connected' && result !== 'error') return
+    setNotice(result)
+    const url = new URL(window.location.href)
+    url.searchParams.delete('gmail')
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`)
+  }, [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -22,6 +32,10 @@ export function NotificationsView() {
       setError('')
       try {
         const response = await fetch('/api/gmail/status', { cache: 'no-store', signal: controller.signal })
+        if (response.status === 403) {
+          setStatus('unavailable')
+          return
+        }
         if (!response.ok) throw new Error('Unable to load Gmail status.')
         const data = (await response.json()) as { connected?: boolean; email?: string }
         setStatus(data.connected ? 'connected' : 'disconnected')
@@ -64,9 +78,11 @@ export function NotificationsView() {
               ? 'Checking whether transaction alerts are ready to review.'
               : status === 'error'
                 ? 'We could not confirm the connection status.'
-                : connected
-                  ? `Transaction alerts from ${gmailEmail} will appear here for you to name, categorize, and approve.`
-                  : 'Connect your Gmail so Exodo can find transaction alerts for your review.'
+                : status === 'unavailable'
+                  ? 'Gmail notifications are not enabled for this account.'
+                  : connected
+                    ? `Transaction alerts from ${gmailEmail} will appear here for you to name, categorize, and approve.`
+                    : 'Connect your Gmail so Exodo can find transaction alerts for your review.'
           }
           className="justify-items-center gap-0"
         />
@@ -79,12 +95,16 @@ export function NotificationsView() {
         </Card>
       ) : (
         <div className="grid justify-items-center gap-3">
+          {notice === 'connected' && (
+            <StateMessage tone="success">Gmail connected. Exodo can review alerts now.</StateMessage>
+          )}
+          {notice === 'error' && <StateMessage tone="danger">Gmail connection failed. Try again.</StateMessage>}
           {status === 'error' && <StateMessage tone="danger">{error}</StateMessage>}
           {status === 'error' ? (
             <Button variant="outline" type="button" onClick={() => setRetryKey((key) => key + 1)}>
               <ArrowClockwise size={17} /> Try again
             </Button>
-          ) : (
+          ) : status === 'unavailable' ? null : (
             <Button asChild variant="outline-muted">
               <a href="/api/gmail/connect">
                 <EnvelopeSimple size={17} /> {connected ? 'Reconnect Gmail' : 'Connect Gmail'}
