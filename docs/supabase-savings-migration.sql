@@ -5,7 +5,7 @@ create table if not exists public.savings_goals (
   target_amount numeric not null check (target_amount > 0),
   saved_amount numeric not null default 0 check (saved_amount >= 0),
   target_date date,
-  icon text not null default '✈️',
+  icon text not null default 'target',
   priority integer not null default 0,
   status text not null default 'active' check (status in ('active', 'paused', 'completed')),
   created_at timestamptz not null default now(),
