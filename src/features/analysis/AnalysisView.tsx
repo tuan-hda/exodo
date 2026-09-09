@@ -14,6 +14,7 @@ import { formatMoney } from '@/features/entries/entry-utils'
 import type { Entry } from '@/features/entries/types'
 import { formatPercentage, getMonthEntries, groupByCategory } from './analysis-utils'
 import { PieChart } from './PieChart'
+import { formatMonthLabel } from '@/lib/date-format'
 
 function CategoryDetail({
   category,
@@ -185,7 +186,7 @@ export function AnalysisView({
   const [activeType, setActiveType] = useState<Entry['type']>('expense')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const monthEntries = getMonthEntries(entries, viewMonth)
-  const monthLabel = viewMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+  const monthLabel = formatMonthLabel(viewMonth)
   const income = monthEntries.filter((entry) => entry.type === 'income').reduce((sum, entry) => sum + entry.amount, 0)
   const expense = monthEntries.filter((entry) => entry.type === 'expense').reduce((sum, entry) => sum + entry.amount, 0)
 

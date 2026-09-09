@@ -22,6 +22,7 @@ import { OverviewView } from '@/features/overview/OverviewView'
 import { useBackgroundPreference } from '@/features/settings/use-background-preference'
 import { StateMessage } from '@/components/StateMessage'
 import { DashboardHeader } from './DashboardHeader'
+import { formatLongDate } from '@/lib/date-format'
 
 function Dashboard() {
   const { user } = useUser()
@@ -150,9 +151,7 @@ function Dashboard() {
             <>
               <section className="ui-page-enter grid grid-cols-[minmax(0,1.3fr)_minmax(220px,.7fr)] items-end gap-12 pt-16 pb-14 max-md:grid-cols-1 max-md:gap-7 max-md:pt-10 max-md:pb-10">
                 <div>
-                  <p className="ui-eyebrow mb-4">
-                    {currentDay.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                  </p>
+                  <p className="ui-eyebrow mb-4">{formatLongDate(currentDay)}</p>
                   <h1 className="m-0 max-w-[10ch] text-[clamp(48px,7vw,84px)] font-semibold leading-[.92] tracking-[-.095em] max-xs:text-[48px]">
                     Spend what today
                     <br />

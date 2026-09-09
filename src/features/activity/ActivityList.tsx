@@ -4,21 +4,21 @@ import { useEffect, useState } from 'react'
 import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { fromKey } from '@/features/finance/allocation'
 import { categoryClass, categoryIcon } from '@/features/entries/CategoryPicker'
 import { entryDate, formatMoney } from '@/features/entries/entry-utils'
 import type { Entry } from '@/features/entries/types'
 import { Input } from '@/components/ui/input'
+import { formatLongDate, formatMonthChip, formatMonthLabel } from '@/lib/date-format'
 
 type ActivityDay = { key: string; label: string; entries: Entry[] }
 type ActivityMonth = { key: string; label: string; entries: Entry[]; income: number; expense: number }
 
 function monthChip(key: string) {
-  return fromKey(`${key}-01`).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  return formatMonthChip(`${key}-01`)
 }
 
 function dateLabel(key: string) {
-  return fromKey(key).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+  return formatLongDate(key)
 }
 
 function groupByDate(entries: Entry[]) {
@@ -68,7 +68,7 @@ export function ActivityList({
     } else {
       groups.push({
         key,
-        label: fromKey(`${key}-01`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+        label: formatMonthLabel(`${key}-01`),
         entries: [entry],
         income: entry.type === 'income' ? entry.amount : 0,
         expense: entry.type === 'expense' ? entry.amount : 0,

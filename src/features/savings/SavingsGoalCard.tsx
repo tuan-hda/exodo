@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress'
 import { formatMoney } from '@/features/entries/entry-utils'
 import { SavingsIcon } from './savings-icons'
 import type { SavingsDeposit, SavingsGoal } from './types'
+import { formatMonthChip } from '@/lib/date-format'
 
 export function SavingsGoalCard({
   goal,
@@ -28,9 +29,7 @@ export function SavingsGoalCard({
           <div className="min-w-0">
             <h2 className="truncate text-lg font-semibold">{goal.name}</h2>
             <p className="mt-1 text-xs text-muted">
-              {goal.targetDate
-                ? `By ${new Date(`${goal.targetDate}T12:00:00`).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`
-                : 'No deadline'}
+              {goal.targetDate ? `By ${formatMonthChip(goal.targetDate)}` : 'No deadline'}
               {statusLabel && <span> · {statusLabel}</span>}
             </p>
           </div>
