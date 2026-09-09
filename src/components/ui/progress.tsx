@@ -22,7 +22,7 @@ function Progress({
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
         className={clsx(
-          'h-full w-full flex-1 bg-ink transition-transform duration-500',
+          'ui-progress-motion h-full w-full flex-1 bg-ink transition-transform',
           tone === 'success' && 'bg-success',
           tone === 'danger' && 'bg-danger',
         )}

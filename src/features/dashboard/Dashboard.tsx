@@ -133,7 +133,7 @@ function Dashboard() {
         <div
           className={clsx(
             'pointer-events-none fixed inset-x-0 top-3 z-30 mx-auto flex w-fit items-center gap-2 rounded-input bg-ink px-3 py-2 font-mono text-[10px] uppercase tracking-[.08em] text-white opacity-95 shadow-toast',
-            isRefreshing && 'transition-transform duration-200',
+            isRefreshing && 'ui-control-motion transition-transform',
           )}
           style={{ transform: `translateY(${pullDistance}px)` }}
           aria-live="polite">

@@ -33,6 +33,8 @@
   --shadow-toast: 0 8px 24px rgb(21 21 21 / 0.16);
   --shadow-input-inset: inset 0 1px 0 rgb(255 255 255 / 0.65);
   --motion-page-duration: 550ms;
+  --motion-control-duration: 200ms;
+  --motion-progress-duration: 500ms;
   --motion-pie-duration: 600ms;
   --motion-pie-reveal-duration: 1600ms;
   --motion-tab-duration: 650ms;
@@ -168,6 +170,15 @@
   .ui-expression {
     @apply font-mono text-xl text-ink;
     overflow-wrap: anywhere;
+  }
+
+  .ui-control-motion {
+    transition-duration: var(--motion-control-duration);
+    transition-timing-function: ease-out;
+  }
+
+  .ui-progress-motion {
+    transition-duration: var(--motion-progress-duration);
   }
 
   .ui-icon-tile {
