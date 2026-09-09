@@ -299,10 +299,11 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
   }, [entries, getSupabase, refresh, userId])
 
   useEffect(() => {
+    if (isLoading || !goals.length) return
     syncAutomaticRemainder().catch((syncError) => {
       console.error('Failed to sync automatic savings remainder', syncError)
       setError('Could not update automatic savings.')
     })
-  }, [syncAutomaticRemainder])
+  }, [goals.length, isLoading, syncAutomaticRemainder])
   return { goals, deposits, isLoading, isSaving, error, saveGoal, addDeposit, refresh }
 }

@@ -29,6 +29,16 @@ const primaryTabs: Array<{ id: AppTab; label: string }> = [
   { id: 'settings', label: 'Settings' },
 ]
 
+function isAppTab(value: string | null): value is AppTab {
+  return (
+    value === 'today' ||
+    value === 'overview' ||
+    value === 'analysis' ||
+    value === 'notifications' ||
+    value === 'settings'
+  )
+}
+
 function Dashboard() {
   const { user } = useUser()
   const { enabled: gradientBackgroundEnabled } = useBackgroundPreference()
@@ -60,6 +70,11 @@ function Dashboard() {
         : new Date(nextDay.getFullYear(), nextDay.getMonth(), 1, 12),
     )
   }, [currentDayKey])
+
+  useEffect(() => {
+    const requestedTab = new URLSearchParams(window.location.search).get('tab')
+    if (isAppTab(requestedTab)) setActiveTab(requestedTab)
+  }, [])
 
   useEffect(() => {
     function handleShortcut(event: KeyboardEvent) {
