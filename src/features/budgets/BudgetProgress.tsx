@@ -37,7 +37,7 @@ export function BudgetProgress({
       percent: budget.amount ? (spent / budget.amount) * 100 : 0,
     }
   })
-  const dailyPace = budgetRows.reduce((sum, row) => sum + row.dailyAllowance, 0)
+  const dailyPace = budgetRows.reduce((sum, row) => sum + Math.floor(row.dailyAllowance), 0)
 
   if (!budgetRows.length && !isLoading) {
     return (
@@ -124,7 +124,7 @@ export function BudgetProgress({
                 <strong className={clsx('ui-number font-normal', row.percent > 100 ? 'text-danger' : 'text-ink')}>
                   {formatMoney(row.spent)} <small className="text-muted">/ {formatMoney(row.amount)}</small>
                 </strong>
-                <small className="ui-meta ui-number">{formatMoney(row.dailyAllowance)} / day</small>
+                <small className="ui-meta ui-number">{formatMoney(Math.floor(row.dailyAllowance))} / day</small>
               </div>
             </div>
             <Progress
