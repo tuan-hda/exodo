@@ -2,24 +2,24 @@
 
 import { useSession } from '@clerk/nextjs'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { createClerkSupabaseClient } from '@/lib/supabase'
-
-let cachedSessionId: string | null | undefined
-let cachedClient: SupabaseClient | null = null
 
 export function useSupabase() {
   const { session } = useSession()
   const sessionId = session?.id ?? null
+  const sessionRef = useRef(session)
+  const clientRef = useRef<SupabaseClient | null>(null)
+  const clientSessionIdRef = useRef<string | null | undefined>(undefined)
+  sessionRef.current = session
 
   const getSupabase = useCallback(async () => {
-    if (!cachedClient || cachedSessionId !== sessionId) {
-      cachedSessionId = sessionId
-      const currentSession = session
-      cachedClient = createClerkSupabaseClient(async () => (await currentSession?.getToken()) ?? null)
+    if (!clientRef.current || clientSessionIdRef.current !== sessionId) {
+      clientSessionIdRef.current = sessionId
+      clientRef.current = createClerkSupabaseClient(async () => (await sessionRef.current?.getToken()) ?? null)
     }
-    return cachedClient
-  }, [session, sessionId])
+    return clientRef.current
+  }, [sessionId])
 
   return { getSupabase }
 }
