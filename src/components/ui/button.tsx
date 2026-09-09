@@ -62,6 +62,7 @@ function Button({
   variant = 'default',
   size = 'default',
   asChild = false,
+  type,
   onKeyDown,
   onPointerDown,
   ...props
@@ -77,6 +78,7 @@ function Button({
       data-variant={variant}
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
+      type={asChild ? undefined : (type ?? 'button')}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') triggerHaptic()
         onKeyDown?.(event)
