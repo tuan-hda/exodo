@@ -50,6 +50,7 @@ export function SavingsGoalsPanel({ userId, entries }: { userId?: string; entrie
         <SavingsDepositComposer
           goal={selectedGoal}
           isSaving={isSaving}
+          persistenceError={error}
           onClose={() => setDepositGoal(null)}
           onSave={(value, note) => addDeposit(selectedGoal.id, value, note)}
         />

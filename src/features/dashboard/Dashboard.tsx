@@ -230,6 +230,7 @@ function Dashboard() {
             setEditingEntry(undefined)
           }}
           onTypeChange={setComposerType}
+          persistenceError={persistenceError}
           onDelete={editingEntry ? () => removeEntry(editingEntry.id) : undefined}
           onSave={handleSave}
         />

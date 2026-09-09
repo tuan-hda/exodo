@@ -19,11 +19,13 @@ import { formatMoney } from '@/lib/money'
 export function SavingsDepositComposer({
   goal,
   isSaving,
+  persistenceError,
   onClose,
   onSave,
 }: {
   goal: SavingsGoal
   isSaving: boolean
+  persistenceError?: string
   onClose: () => void
   onSave: (amount: number, note: string) => Promise<boolean>
 }) {
@@ -101,7 +103,7 @@ export function SavingsDepositComposer({
               disabled={isSaving}
             />
           </label>
-          {error && <StateMessage tone="danger">{error}</StateMessage>}
+          {(error || persistenceError) && <StateMessage tone="danger">{error || persistenceError}</StateMessage>}
           <ComposerFooter>
             <Button className="w-full gap-2" disabled={isSaving} type="submit">
               {isSaving ? 'Saving…' : 'Save'} <Check size={17} />

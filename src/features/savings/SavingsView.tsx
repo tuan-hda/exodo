@@ -190,6 +190,7 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
         <SavingsDepositComposer
           goal={selectedGoal}
           isSaving={isSaving}
+          persistenceError={error}
           onClose={() => setDepositGoal(null)}
           onSave={(amount, note) => addDeposit(selectedGoal.id, amount, note)}
         />

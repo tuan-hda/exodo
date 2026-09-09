@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { ComposerHeader } from '@/components/ComposerHeader'
 import { FadeContent } from '@/components/ui/fade-content'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { StateMessage } from '@/components/StateMessage'
 import { defaultCategory, type Category } from '@/features/finance/category'
 import { ComposerAmountStep } from './ComposerAmountStep'
 import { ComposerCategoryStep } from './ComposerCategoryStep'
@@ -38,6 +39,7 @@ export function EntryComposer({
   onSave,
   onTypeChange,
   onDelete,
+  persistenceError,
 }: {
   entry?: Entry
   type: EntryType
@@ -47,6 +49,7 @@ export function EntryComposer({
   onSave: (entry: Entry) => Promise<boolean>
   onTypeChange: (type: EntryType) => void
   onDelete?: () => Promise<boolean>
+  persistenceError?: string
 }) {
   const [step, setStep] = useState<ComposerStep>(1)
   const [amount, setAmount] = useState(entry ? formatAmountExpression(String(entry.amount)) : '')
@@ -193,7 +196,7 @@ export function EntryComposer({
               <ComposerAmountStep
                 amount={amount}
                 disabled={isBusy}
-                error={error}
+                error={error || persistenceError || ''}
                 isMobile={isMobile}
                 onAmountChange={setAmount}
                 onClearError={() => setError('')}
@@ -231,6 +234,7 @@ export function EntryComposer({
               <AlertDialogTitle>Delete this transaction?</AlertDialogTitle>
               <AlertDialogDescription>This transaction will be permanently removed.</AlertDialogDescription>
             </AlertDialogHeader>
+            {persistenceError && <StateMessage tone="danger">{persistenceError}</StateMessage>}
             <AlertDialogFooter>
               <AlertDialogCancel disabled={isBusy}>Cancel</AlertDialogCancel>
               <AlertDialogAction disabled={isBusy} onClick={() => void handleDelete()}>
