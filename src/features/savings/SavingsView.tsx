@@ -27,6 +27,7 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
   const [icon, setIcon] = useState<SavingsIconName>(defaultSavingsIcon)
   const [iconPickerOpen, setIconPickerOpen] = useState(false)
   const [depositGoal, setDepositGoal] = useState<string | null>(null)
+  const [notice, setNotice] = useState('')
   const selectedGoal = goals.find((goal) => goal.id === depositGoal)
 
   const summary = {
@@ -35,6 +36,8 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
   }
   async function submitGoal(event: FormEvent) {
     event.preventDefault()
+    setNotice('')
+    const goalName = name.trim()
     const saved = await saveGoal({
       name,
       targetAmount: Number(target),
@@ -49,6 +52,7 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
       setIcon(defaultSavingsIcon)
       setIconPickerOpen(false)
       setShowForm(false)
+      setNotice(`${goalName} created.`)
     }
   }
   return (
@@ -66,6 +70,7 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
         }
       />
       {error && <StateMessage tone="danger">{error}</StateMessage>}
+      {notice && !error && <StateMessage tone="success">{notice}</StateMessage>}
       <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
         <MetricCard label="saved" value={formatMoney(summary.saved)} detail="across goals" isLoading={isLoading} />
         <MetricCard label="target" value={formatMoney(summary.target)} detail="across goals" isLoading={isLoading} />

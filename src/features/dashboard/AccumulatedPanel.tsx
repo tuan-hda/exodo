@@ -18,7 +18,7 @@ export function AccumulatedPanel({
       label="accumulated"
       aside={<span>all time</span>}
       ariaLabel="All-time accumulation">
-      <div className="col-start-1 row-start-2 accumulation-copy">
+      <div className="col-start-1 row-start-2">
         <strong className="ui-number block text-[clamp(38px,5vw,62px)] font-sans font-semibold leading-[.9] tracking-[-.09em]">
           {isLoading ? (
             <Skeleton className="h-14 w-64 max-w-full" />

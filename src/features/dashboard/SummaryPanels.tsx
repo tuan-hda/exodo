@@ -50,7 +50,7 @@ export function SummaryPanels({
           }
           ariaLabel="Today's available amount"
           ariaBusy={entriesLoading}>
-          <div className="col-start-1 row-start-2 today-copy">
+          <div className="col-start-1 row-start-2">
             <span className="ui-eyebrow block mb-3">spendable now</span>
             {entriesLoading ? (
               <>

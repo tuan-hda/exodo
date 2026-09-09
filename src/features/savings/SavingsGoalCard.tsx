@@ -22,9 +22,7 @@ export function SavingsGoalCard({
     <Card className="p-6 md:p-7">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span
-            className="grid size-11 place-items-center rounded-control bg-ink text-xl text-white"
-            aria-hidden="true">
+          <span className="ui-icon-tile-inverse size-11 rounded-control text-xl" aria-hidden="true">
             <SavingsIcon name={goal.icon} size={21} />
           </span>
           <div>

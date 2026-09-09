@@ -29,17 +29,26 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
   const [category, setCategory] = useState(expenseCategories[0])
   const [amount, setAmount] = useState('')
   const [budgetToRemove, setBudgetToRemove] = useState<CategoryBudget | null>(null)
+  const [notice, setNotice] = useState('')
   const { budgets, isLoading, isSaving, isRemoving, error, saveBudget, removeBudget } = useBudgets(user?.id)
   const currentBudget = budgets.find((budget) => budget.category === category)
 
   async function handleSave() {
+    setNotice('')
     const value = Number(amount.replace(/,/g, ''))
-    if (await saveBudget(category, value)) setAmount('')
+    if (await saveBudget(category, value)) {
+      setAmount('')
+      setNotice(`${category} budget saved.`)
+    }
   }
 
   async function handleRemove() {
     if (!budgetToRemove) return
-    if (await removeBudget(budgetToRemove)) setBudgetToRemove(null)
+    const removedCategory = budgetToRemove.category
+    if (await removeBudget(budgetToRemove)) {
+      setBudgetToRemove(null)
+      setNotice(`${removedCategory} budget removed.`)
+    }
   }
 
   return (
@@ -61,7 +70,10 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
             className={clsx(categoryClass(item))}
             data-selected={category === item}
             aria-pressed={category === item}
-            onClick={() => setCategory(item)}>
+            onClick={() => {
+              setNotice('')
+              setCategory(item)
+            }}>
             <span className={categoryClass(item)}>{categoryIcon(item, 18)}</span>
             {item}
           </Button>
@@ -101,6 +113,7 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
         </div>
       )}
       {error && <StateMessage tone="danger">{error}</StateMessage>}
+      {notice && !error && <StateMessage tone="success">{notice}</StateMessage>}
       {budgets.length > 0 && (
         <section className="grid gap-3 border-t border-line pt-5" aria-label="Recurring budgets">
           <p className="ui-eyebrow m-0">Recurring budgets</p>

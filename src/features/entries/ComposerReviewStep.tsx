@@ -39,7 +39,7 @@ export function ComposerReviewStep({
       <Card tone="soft" className="grid gap-3 p-4">
         <div className="flex items-end justify-between border-b border-line-strong pb-3">
           <span className="ui-label">{type === 'income' ? 'Income' : 'Expense'}</span>
-          <strong className="text-[25px] font-semibold tracking-[-.06em]">
+          <strong className="ui-number text-2xl font-semibold tracking-[-.05em]">
             {formatMoney(evaluateExpression(amount))}
           </strong>
         </div>

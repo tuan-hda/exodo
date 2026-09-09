@@ -154,6 +154,15 @@
     @apply grid shrink-0 place-items-center rounded-control border border-line bg-soft text-ink;
   }
 
+  .ui-icon-tile-inverse {
+    @apply grid shrink-0 place-items-center border border-ink bg-ink text-white;
+  }
+
+  .ui-mobile-tab-bar {
+    height: calc(68px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
   .ui-divider-list > * + * {
     @apply border-t border-line;
   }

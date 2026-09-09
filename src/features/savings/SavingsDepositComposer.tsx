@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react'
 import { Check, X } from '@phosphor-icons/react'
+import { StateMessage } from '@/components/StateMessage'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
@@ -60,7 +61,7 @@ export function SavingsDepositComposer({
           </Button>
         </div>
         <div className="mb-5 flex items-center gap-3 border-b border-line pb-4">
-          <span className="grid size-10 place-items-center rounded-input bg-ink text-lg text-white" aria-hidden="true">
+          <span className="ui-icon-tile-inverse size-10 rounded-input text-lg" aria-hidden="true">
             <SavingsIcon name={goal.icon} size={20} />
           </span>
           <div>
@@ -101,13 +102,7 @@ export function SavingsDepositComposer({
               disabled={isSaving}
             />
           </label>
-          {error && (
-            <p
-              className="m-0 rounded-control border-danger/25 bg-danger-soft px-3 py-3 text-xs leading-[1.55] text-danger"
-              role="alert">
-              {error}
-            </p>
-          )}
+          {error && <StateMessage tone="danger">{error}</StateMessage>}
           <div className="relative z-10 mt-2 flex items-start border-t border-line bg-surface pt-3 max-md:sticky max-md:bottom-0 max-md:-mx-5 max-md:mt-auto max-md:px-5 max-md:pt-4">
             <Button className="w-full gap-2 text-sm font-semibold" disabled={isSaving} type="submit">
               {isSaving ? 'Saving…' : 'Save'} <Check size={17} />
