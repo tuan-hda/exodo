@@ -165,13 +165,13 @@ export function PieChart({
                 className={clsx(
                   'grid size-14 place-items-center rounded-full border-[3px] shadow-badge transition-transform duration-[600ms] ease-[cubic-bezier(.05,.78,.18,1)] max-xs:size-11',
                   segment.category === selectedCategory && segment.percentage < MIN_LABEL_PERCENTAGE
-                    ? 'animate-[pie-badge-zoom-small_600ms_cubic-bezier(.05,.78,.18,1)_both]'
+                    ? 'pie-badge-zoom-small'
                     : segment.category === visualSelectedCategory && !selectedCategory
                       ? segment.percentage < MIN_LABEL_PERCENTAGE
-                        ? 'animate-[pie-badge-zoom-small-out_600ms_cubic-bezier(.05,.78,.18,1)_both]'
-                        : 'animate-[pie-badge-zoom-deselect_600ms_cubic-bezier(.05,.78,.18,1)_both]'
+                        ? 'pie-badge-zoom-small-out'
+                        : 'pie-badge-zoom-deselect'
                       : segment.category === selectedCategory
-                        ? 'animate-[pie-badge-zoom-selected_600ms_cubic-bezier(.05,.78,.18,1)_both]'
+                        ? 'pie-badge-zoom-selected'
                         : undefined,
                   categoryClass(segment.category),
                 )}>

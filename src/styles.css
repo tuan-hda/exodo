@@ -173,6 +173,22 @@
   .ui-page-enter-delay-260 {
     animation-delay: 260ms;
   }
+
+  .pie-badge-zoom-selected {
+    animation: pie-badge-zoom-selected 600ms cubic-bezier(0.05, 0.78, 0.18, 1) both;
+  }
+
+  .pie-badge-zoom-small {
+    animation: pie-badge-zoom-small 600ms cubic-bezier(0.05, 0.78, 0.18, 1) both;
+  }
+
+  .pie-badge-zoom-deselect {
+    animation: pie-badge-zoom-deselect 600ms cubic-bezier(0.05, 0.78, 0.18, 1) both;
+  }
+
+  .pie-badge-zoom-small-out {
+    animation: pie-badge-zoom-small-out 600ms cubic-bezier(0.05, 0.78, 0.18, 1) both;
+  }
 }
 
 @keyframes page-rise {
