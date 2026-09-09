@@ -123,6 +123,18 @@
     @apply font-mono text-[9px] uppercase tracking-[.04em];
   }
 
+  .ui-status-eyebrow {
+    @apply font-mono text-[10px] uppercase tracking-[.14em];
+  }
+
+  .ui-status-title {
+    @apply m-0 text-[clamp(42px,8vw,72px)] font-semibold leading-[.94] tracking-[-.08em];
+  }
+
+  .ui-status-description {
+    @apply m-0 max-w-[34ch] text-sm leading-[1.6] text-muted;
+  }
+
   .ui-page-title {
     @apply text-[clamp(38px,6vw,68px)] font-semibold leading-[.94] tracking-[-.085em];
   }
