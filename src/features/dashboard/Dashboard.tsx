@@ -46,7 +46,9 @@ function Dashboard() {
   const [composerType, setComposerType] = useState<EntryType>('expense')
   const [editingEntry, setEditingEntry] = useState<Entry | undefined>()
   const [viewMonth, setViewMonth] = useState(new Date(currentDay.getFullYear(), currentDay.getMonth(), 1, 12))
-  const [activeTab, setActiveTab] = useState<AppTab>('today')
+  const [activeTab, setActiveTab] = useState<AppTab>(() =>
+    typeof window === 'undefined' ? 'today' : getAppTabFromSearch(window.location.search),
+  )
   const { budgets, isLoading: budgetsLoading } = useBudgets(user?.id)
 
   useEffect(() => {
