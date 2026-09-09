@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { ArrowLeft } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
-import { Button } from '../../components/ui/button'
+import { Button } from '@/components/ui/button'
 
 const actionRowClassName =
   'relative z-10 mt-2 flex items-start gap-2.5 border-t border-line bg-surface pt-3 max-[700px]:sticky max-[700px]:bottom-0 max-[700px]:-mx-5 max-[700px]:mt-auto max-[700px]:px-5 max-[700px]:pt-4'

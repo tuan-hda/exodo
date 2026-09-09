@@ -3,13 +3,13 @@ import { clsx } from 'clsx'
 import { dailyIncome } from '../finance/allocation'
 import { entryDate, formatMoney } from '../entries/entry-utils'
 import type { Entry } from '../entries/types'
-import { CountUp } from '../../components/ui/count-up'
-import { FadeContent } from '../../components/ui/fade-content'
+import { CountUp } from '@/components/ui/count-up'
+import { FadeContent } from '@/components/ui/fade-content'
 import { DashboardPanel } from './DashboardPanel'
 import { BudgetProgress } from '../budgets/BudgetProgress'
 import type { CategoryBudget } from '../budgets/types'
 import { SavingsGoalsPanel } from '../savings/SavingsGoalsPanel'
-import { Skeleton } from '../../components/ui/skeleton'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export function SummaryPanels({
   entries,

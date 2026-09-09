@@ -1,7 +1,7 @@
 import { Plus } from '@phosphor-icons/react'
-import { Button } from '../../components/ui/button'
-import { Card } from '../../components/ui/card'
-import { Progress } from '../../components/ui/progress'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
 import { formatMoney } from '../entries/entry-utils'
 import type { SavingsDeposit, SavingsGoal } from './types'
 
@@ -21,7 +21,9 @@ export function SavingsGoalCard({
     <Card className="p-6 md:p-7">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="grid size-11 place-items-center rounded-[14px] bg-ink text-xl text-white" aria-hidden="true">
+          <span
+            className="grid size-11 place-items-center rounded-control bg-ink text-xl text-white"
+            aria-hidden="true">
             {goal.icon || '✈️'}
           </span>
           <div>

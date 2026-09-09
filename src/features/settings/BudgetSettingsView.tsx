@@ -4,14 +4,14 @@ import { useState } from 'react'
 import { clsx } from 'clsx'
 import { Trash } from '@phosphor-icons/react'
 import { useUser } from '@clerk/nextjs'
-import { Button } from '../../components/ui/button'
+import { Button } from '@/components/ui/button'
 import { categoryClass, categoryIcon, expenseCategories } from '../entries/CategoryPicker'
 import { formatMoney, formatMoneyInput } from '../entries/entry-utils'
 import { useBudgets } from '../budgets/use-budgets'
-import { Input } from '@/components/ui/input'
 import { PageHeader } from '@/components/PageHeader'
 import { StateMessage } from '@/components/StateMessage'
-import { Skeleton } from '../../components/ui/skeleton'
+import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
   const { user } = useUser()

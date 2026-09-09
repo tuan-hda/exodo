@@ -3,8 +3,8 @@ import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
 import { entryDate, formatMoney } from '../entries/entry-utils'
 import type { Entry } from '../entries/types'
 import type { CategoryBudget } from './types'
-import { Progress } from '../../components/ui/progress'
-import { Skeleton } from '../../components/ui/skeleton'
+import { Progress } from '@/components/ui/progress'
+import { Skeleton } from '@/components/ui/skeleton'
 import { DashboardPanel } from '../dashboard/DashboardPanel'
 import { dailyBudgetAllowance, remainingDaysInMonth } from './budget-utils'
 
@@ -82,7 +82,7 @@ export function BudgetProgress({
               <span className="flex items-center gap-2">
                 <span
                   className={clsx(
-                    'grid size-9 shrink-0 place-items-center rounded-[12px] border text-current',
+                    'grid size-9 shrink-0 place-items-center rounded-input border text-current',
                     categoryClass(row.category),
                   )}>
                   {categoryIcon(row.category, 15)}

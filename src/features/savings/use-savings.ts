@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useSupabase } from '../../hooks/use-supabase'
-import { readStorageJson, writeStorageJson } from '../../lib/storage'
+import { useSupabase } from '@/hooks/use-supabase'
+import { readStorageJson, writeStorageJson } from '@/lib/storage'
 import type { Entry } from '../entries/types'
 import { allocateRemainder, calculateMonthlyRemainder, monthKey } from './savings-utils'
 import type { SavingsDeposit, SavingsGoal, StoredSavingsDeposit, StoredSavingsGoal } from './types'

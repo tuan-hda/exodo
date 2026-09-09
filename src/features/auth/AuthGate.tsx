@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { ClerkLoaded, ClerkLoading, SignIn, useUser } from '@clerk/nextjs'
-import { Skeleton } from '../../components/ui/skeleton'
+import { Skeleton } from '@/components/ui/skeleton'
 import { clerkAppearance } from './clerk-appearance'
 
 export function AuthGate({ children }: { children: ReactNode }) {

@@ -1,6 +1,6 @@
 import type { Entry, StoredEntry } from './types'
 import type { Category } from './category'
-import { readStorageJson, writeStorageJson } from '../../lib/storage'
+import { readStorageJson, writeStorageJson } from '@/lib/storage'
 
 const whole = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
 const entriesCacheTtl = 24 * 60 * 60 * 1000

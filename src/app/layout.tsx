@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
-import { PwaRegistration } from '../features/pwa/PwaRegistration'
-import { getClerkAllowedRedirectOrigins } from '../lib/clerk-origins'
+import { PwaRegistration } from '@/features/pwa/PwaRegistration'
+import { getClerkAllowedRedirectOrigins } from '@/lib/clerk-origins'
 import '../styles.css'
 
 const clerkAllowedRedirectOrigins = getClerkAllowedRedirectOrigins()

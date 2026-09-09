@@ -2,7 +2,7 @@
 
 import { Backspace } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
-import { Button } from '../../components/ui/button'
+import { Button } from '@/components/ui/button'
 import { formatAmountExpression } from './entry-utils'
 
 export function CalculatorKeypad({
@@ -29,7 +29,7 @@ export function CalculatorKeypad({
 
   return (
     <div className="hidden max-[700px]:block" aria-label="Amount calculator">
-      <div className="rounded-[14px] border border-line-strong bg-soft px-3 py-3 text-right font-mono text-[20px] text-ink [overflow-wrap:anywhere]">
+      <div className="rounded-control border border-line-strong bg-soft px-3 py-3 text-right font-mono text-[20px] text-ink [overflow-wrap:anywhere]">
         {formatAmountExpression(amount || '0')}
       </div>
       <div className="mt-2 grid grid-cols-4 gap-1.5">

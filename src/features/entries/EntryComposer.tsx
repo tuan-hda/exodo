@@ -3,16 +3,16 @@
 import { useState, type FormEvent } from 'react'
 import { ArrowDown, ArrowUp, Check, Trash, X } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
-import { Sheet, SheetContent, SheetTitle } from '../../components/ui/sheet'
-import { Button } from '../../components/ui/button'
-import { FadeContent } from '../../components/ui/fade-content'
+import { Button } from '@/components/ui/button'
+import { FadeContent } from '@/components/ui/fade-content'
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { defaultCategory, type Category } from './CategoryPicker'
 import { ComposerAmountStep } from './ComposerAmountStep'
 import { ComposerCategoryStep } from './ComposerCategoryStep'
 import { ComposerReviewStep } from './ComposerReviewStep'
 import { evaluateExpression, formatAmountExpression, getCurrentTime, todayKey } from './entry-utils'
 import type { Entry, EntryType } from './types'
-import { useMediaQuery } from '../../hooks/use-media-query'
+import { useMediaQuery } from '@/hooks/use-media-query'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,7 +22,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '../../components/ui/alert-dialog'
+} from '@/components/ui/alert-dialog'
 
 type ComposerStep = 1 | 2 | 3
 
@@ -116,7 +116,7 @@ export function EntryComposer({
         side="bottom"
         showCloseButton={false}
         className={clsx(
-          'max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-[24px] border border-line-strong bg-surface p-6 text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)] [margin-inline:auto] [padding-top:max(16px,env(safe-area-inset-top))] [padding-bottom:max(16px,env(safe-area-inset-bottom))] max-[700px]:flex max-[700px]:min-h-0 max-[700px]:max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] max-[700px]:w-full max-[700px]:min-w-0 max-[700px]:overflow-x-hidden max-[700px]:rounded-t-[24px] max-[700px]:rounded-b-none max-[700px]:border-0 max-[700px]:p-5 max-[700px]:[margin-inline:0]',
+          'max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-panel border border-line-strong bg-surface p-6 text-ink shadow-sheet [margin-inline:auto] [padding-top:max(16px,env(safe-area-inset-top))] [padding-bottom:max(16px,env(safe-area-inset-bottom))] max-[700px]:flex max-[700px]:min-h-0 max-[700px]:max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] max-[700px]:w-full max-[700px]:min-w-0 max-[700px]:overflow-x-hidden max-[700px]:rounded-t-panel max-[700px]:rounded-b-none max-[700px]:border-0 max-[700px]:p-5 max-[700px]:[margin-inline:0]',
           type,
         )}
         aria-busy={isSaving}>

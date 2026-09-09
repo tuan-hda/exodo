@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { ArrowClockwise, House } from '@phosphor-icons/react'
-import { Button } from '../components/ui/button'
+import { Button } from '@/components/ui/button'
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   void error

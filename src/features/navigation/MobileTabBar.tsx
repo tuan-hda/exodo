@@ -1,5 +1,5 @@
 import { Bell, ChartLineUp, Gear, House, Plus } from '@phosphor-icons/react'
-import { Button } from '../../components/ui/button'
+import { Button } from '@/components/ui/button'
 
 export type AppTab = 'today' | 'overview' | 'analysis' | 'notifications' | 'settings'
 

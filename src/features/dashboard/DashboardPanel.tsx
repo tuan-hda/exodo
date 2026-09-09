@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { clsx } from 'clsx'
-import { Card, type cardVariants } from '../../components/ui/card'
+import { Card, type cardVariants } from '@/components/ui/card'
 import type { VariantProps } from 'class-variance-authority'
 
 export function DashboardPanel({

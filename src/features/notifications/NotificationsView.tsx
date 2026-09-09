@@ -2,11 +2,11 @@
 
 import { ArrowClockwise, Bell, EnvelopeSimple } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
-import { Button } from '../../components/ui/button'
-import { Card } from '../../components/ui/card'
-import { Skeleton } from '../../components/ui/skeleton'
-import { PageHeader } from '../../components/PageHeader'
-import { StateMessage } from '../../components/StateMessage'
+import { PageHeader } from '@/components/PageHeader'
+import { StateMessage } from '@/components/StateMessage'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export function NotificationsView() {
   const [status, setStatus] = useState<'loading' | 'connected' | 'disconnected' | 'error'>('loading')

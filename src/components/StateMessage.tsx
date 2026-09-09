@@ -13,7 +13,7 @@ export function StateMessage({
   return (
     <p
       className={cn(
-        'rounded-[14px] border px-3 py-3 text-xs leading-[1.55]',
+        'rounded-control border px-3 py-3 text-xs leading-[1.55]',
         tone === 'neutral' && 'border-line bg-soft text-muted',
         tone === 'danger' && 'border-danger/25 bg-danger-soft text-danger',
         tone === 'success' && 'border-success/25 bg-success-soft text-success',

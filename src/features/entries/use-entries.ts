@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useSupabase } from '../../hooks/use-supabase'
+import { useSupabase } from '@/hooks/use-supabase'
 import type { Entry, StoredEntry } from './types'
 import { calculateAccumulation, normalizeStoredEntry, readEntriesCache, writeEntriesCache } from './entry-utils'
 

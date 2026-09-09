@@ -3,13 +3,13 @@
 import { useState, type FormEvent } from 'react'
 import { Check, X } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
-import { Sheet, SheetContent, SheetTitle } from '../../components/ui/sheet'
-import { Button } from '../../components/ui/button'
-import { Input } from '../../components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { CalculatorKeypad } from '../entries/CalculatorKeypad'
 import { evaluateExpression, formatAmountExpression, formatMoney } from '../entries/entry-utils'
 import type { SavingsGoal } from './types'
-import { useMediaQuery } from '../../hooks/use-media-query'
+import { useMediaQuery } from '@/hooks/use-media-query'
 
 export function SavingsDepositComposer({
   goal,
@@ -46,7 +46,7 @@ export function SavingsDepositComposer({
         side="bottom"
         showCloseButton={false}
         className={clsx(
-          'max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-[24px] border border-line-strong bg-surface p-6 text-ink shadow-[0_20px_70px_rgb(21_21_21_/_0.12)] [margin-inline:auto] [padding-top:max(16px,env(safe-area-inset-top))] [padding-bottom:max(16px,env(safe-area-inset-bottom))] max-[700px]:flex max-[700px]:min-h-0 max-[700px]:max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] max-[700px]:w-full max-[700px]:min-w-0 max-[700px]:overflow-x-hidden max-[700px]:rounded-t-[24px] max-[700px]:rounded-b-none max-[700px]:border-0 max-[700px]:p-5 max-[700px]:[margin-inline:0]',
+          'max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-panel border border-line-strong bg-surface p-6 text-ink shadow-sheet [margin-inline:auto] [padding-top:max(16px,env(safe-area-inset-top))] [padding-bottom:max(16px,env(safe-area-inset-bottom))] max-[700px]:flex max-[700px]:min-h-0 max-[700px]:max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] max-[700px]:w-full max-[700px]:min-w-0 max-[700px]:overflow-x-hidden max-[700px]:rounded-t-panel max-[700px]:rounded-b-none max-[700px]:border-0 max-[700px]:p-5 max-[700px]:[margin-inline:0]',
         )}
         aria-busy={isSaving}>
         <SheetTitle className="sr-only">Add contribution to {goal.name}</SheetTitle>
@@ -65,7 +65,7 @@ export function SavingsDepositComposer({
           </Button>
         </div>
         <div className="mb-5 flex items-center gap-3 border-b border-line pb-4">
-          <span className="grid size-10 place-items-center rounded-[12px] bg-ink text-lg text-white" aria-hidden="true">
+          <span className="grid size-10 place-items-center rounded-input bg-ink text-lg text-white" aria-hidden="true">
             {goal.icon || '✈️'}
           </span>
           <div>
@@ -110,7 +110,7 @@ export function SavingsDepositComposer({
           </label>
           {error && (
             <p
-              className="m-0 rounded-[14px] border-danger/25 bg-danger-soft px-3 py-3 text-xs leading-[1.55] text-danger"
+              className="m-0 rounded-control border-danger/25 bg-danger-soft px-3 py-3 text-xs leading-[1.55] text-danger"
               role="alert">
               {error}
             </p>

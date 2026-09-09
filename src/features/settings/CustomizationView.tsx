@@ -1,9 +1,9 @@
 'use client'
 
 import { Check } from '@phosphor-icons/react'
-import { Button } from '../../components/ui/button'
-import { Card } from '../../components/ui/card'
-import { PageHeader } from '../../components/PageHeader'
+import { PageHeader } from '@/components/PageHeader'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { useBackgroundPreference } from './use-background-preference'
 
 export function CustomizationView({ onBack }: { onBack: () => void }) {

@@ -3,7 +3,7 @@
 import { useSession } from '@clerk/nextjs'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { useCallback } from 'react'
-import { createClerkSupabaseClient } from '../lib/supabase'
+import { createClerkSupabaseClient } from '@/lib/supabase'
 
 let cachedSessionId: string | null | undefined
 let cachedClient: SupabaseClient | null = null

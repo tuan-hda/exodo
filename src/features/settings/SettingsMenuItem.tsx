@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { ArrowRight } from '@phosphor-icons/react'
-import { Button } from '../../components/ui/button'
+import { Button } from '@/components/ui/button'
 
 export function SettingsMenuItem({
   icon,

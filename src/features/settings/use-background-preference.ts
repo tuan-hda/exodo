@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { readStorageValue, writeStorageValue } from '../../lib/storage'
+import { readStorageValue, writeStorageValue } from '@/lib/storage'
 
 const backgroundPreferenceKey = 'exodo.gradient-background-enabled'
 const backgroundPreferenceEvent = 'exodo:gradient-background-changed'

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { clsx } from 'clsx'
 import { useUser } from '@clerk/nextjs'
 import { ArrowClockwise, Plus } from '@phosphor-icons/react'
-import { Button } from '../../components/ui/button'
+import { Button } from '@/components/ui/button'
 import { fromKey } from '../finance/allocation'
 import { SettingsView } from '../settings/SettingsView'
 import { ActivityList } from '../activity/ActivityList'
@@ -14,13 +14,13 @@ import { NotificationsView } from '../notifications/NotificationsView'
 import { SummaryPanels } from './SummaryPanels'
 import { useEntries } from '../entries/use-entries'
 import { useDayBoundary } from './use-day-boundary'
-import { usePullToRefresh } from '../../hooks/use-pull-to-refresh'
+import { usePullToRefresh } from '@/hooks/use-pull-to-refresh'
 import type { Entry, EntryType } from '../entries/types'
 import { useBudgets } from '../budgets/use-budgets'
 import { AnalysisView } from '../analysis/AnalysisView'
 import { OverviewView } from '../overview/OverviewView'
 import { useBackgroundPreference } from '../settings/use-background-preference'
-import { StateMessage } from '../../components/StateMessage'
+import { StateMessage } from '@/components/StateMessage'
 
 const primaryTabs: Array<{ id: AppTab; label: string }> = [
   { id: 'today', label: 'Today' },
@@ -116,14 +116,14 @@ function Dashboard() {
   return (
     <div className={clsx('min-h-dvh', !gradientBackgroundEnabled && 'bg-surface')}>
       <a
-        className="sr-only fixed top-3 left-3 z-30 rounded-[10px] bg-ink px-3 py-2 font-mono text-[10px] uppercase tracking-[.08em] text-white focus:not-sr-only"
+        className="sr-only fixed top-3 left-3 z-30 rounded-chip bg-ink px-3 py-2 font-mono text-[10px] uppercase tracking-[.08em] text-white focus:not-sr-only"
         href="#main-content">
         Skip to content
       </a>
       {(pullDistance > 0 || isRefreshing) && (
         <div
           className={clsx(
-            'pointer-events-none fixed inset-x-0 top-3 z-30 mx-auto flex w-fit items-center gap-2 rounded-[12px] bg-ink px-3 py-2 font-mono text-[10px] uppercase tracking-[.08em] text-white opacity-95 shadow-[0_8px_24px_rgb(21_21_21_/_0.16)]',
+            'pointer-events-none fixed inset-x-0 top-3 z-30 mx-auto flex w-fit items-center gap-2 rounded-input bg-ink px-3 py-2 font-mono text-[10px] uppercase tracking-[.08em] text-white opacity-95 shadow-toast',
             isRefreshing && 'transition-transform duration-200',
           )}
           style={{ transform: `translateY(${pullDistance}px)` }}
@@ -139,7 +139,7 @@ function Dashboard() {
           <a
             className="flex shrink-0 items-center gap-2 font-mono text-[11px] tracking-[.04em] text-ink no-underline"
             href="#top">
-            <span className="grid size-7 place-items-center rounded-[9px] bg-ink font-sans text-xs font-semibold text-white">
+            <span className="grid size-7 place-items-center rounded-chip bg-ink font-sans text-xs font-semibold text-white">
               e
             </span>
             <span>exodo / έξοδο</span>

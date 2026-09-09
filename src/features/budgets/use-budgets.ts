@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useSupabase } from '../../hooks/use-supabase'
-import { readStorageJson, writeStorageJson } from '../../lib/storage'
+import { useSupabase } from '@/hooks/use-supabase'
+import { readStorageJson, writeStorageJson } from '@/lib/storage'
 import type { Category } from '../entries/category'
 import type { CategoryBudget, StoredCategoryBudget } from './types'
 

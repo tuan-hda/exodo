@@ -3,10 +3,10 @@
 import type { KeyboardEvent } from 'react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { clsx } from 'clsx'
-import { Button } from '../../components/ui/button'
+import { Button } from '@/components/ui/button'
 import { categoryChartColor, categoryClass, categoryIcon } from '../entries/CategoryPicker'
 import { formatMoney } from '../entries/entry-utils'
-import { CountUp } from '../../components/ui/count-up'
+import { CountUp } from '@/components/ui/count-up'
 import type { AnalysisSlice } from './analysis-utils'
 
 const MIN_LABEL_PERCENTAGE = 0.08
@@ -163,7 +163,7 @@ export function PieChart({
                 aria-label={`Select ${segment.category}`}
                 onClick={() => onSelect(segment.category)}
                 className={clsx(
-                  'grid size-14 place-items-center rounded-full border-[3px] shadow-[0_2px_8px_rgb(21_21_21_/_0.12)] transition-transform duration-[600ms] ease-[cubic-bezier(.05,.78,.18,1)] max-[430px]:size-11',
+                  'grid size-14 place-items-center rounded-full border-[3px] shadow-badge transition-transform duration-[600ms] ease-[cubic-bezier(.05,.78,.18,1)] max-[430px]:size-11',
                   segment.category === selectedCategory && segment.percentage < MIN_LABEL_PERCENTAGE
                     ? 'animate-[pie-badge-zoom-small_600ms_cubic-bezier(.05,.78,.18,1)_both]'
                     : segment.category === visualSelectedCategory && !selectedCategory

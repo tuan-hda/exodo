@@ -16,6 +16,21 @@
   --color-success-soft: #edf4ef;
   --color-danger: #99503e;
   --color-danger-soft: #f7ece8;
+  --radius-panel: 24px;
+  --radius-popover: 16px;
+  --radius-control: 14px;
+  --radius-input: 12px;
+  --radius-chip: 10px;
+  --shadow-panel: 0 12px 30px rgb(21 21 21 / 0.06);
+  --shadow-elevated: 0 18px 48px rgb(21 21 21 / 0.12);
+  --shadow-overlay: 0 20px 70px rgb(21 21 21 / 0.16);
+  --shadow-button: 0 5px 14px rgb(21 21 21 / 0.12);
+  --shadow-button-hover: 0 7px 18px rgb(21 21 21 / 0.16);
+  --shadow-option: 0 2px 8px rgb(21 21 21 / 0.06);
+  --shadow-badge: 0 2px 8px rgb(21 21 21 / 0.12);
+  --shadow-sheet: 0 20px 70px rgb(21 21 21 / 0.14);
+  --shadow-toast: 0 8px 24px rgb(21 21 21 / 0.16);
+  --shadow-input-inset: inset 0 1px 0 rgb(255 255 255 / 0.65);
   --font-sans: 'Mona Sans', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'DM Mono', ui-monospace, SFMono-Regular, monospace;
 }
@@ -105,7 +120,7 @@
   }
 
   .ui-icon-tile {
-    @apply grid shrink-0 place-items-center rounded-[14px] border border-line bg-soft text-ink;
+    @apply grid shrink-0 place-items-center rounded-control border border-line bg-soft text-ink;
   }
 
   .ui-divider-list > * + * {

@@ -13,7 +13,7 @@ import {
   Wallet,
 } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
-import { Button } from '../../components/ui/button'
+import { Button } from '@/components/ui/button'
 import { categoryBorderStyle, categoryStyles, type Category } from './category'
 
 export type { Category } from './category'

@@ -1,5 +1,5 @@
 import { AccumulatedPanel } from '../dashboard/AccumulatedPanel'
-import { PageHeader } from '../../components/PageHeader'
+import { PageHeader } from '@/components/PageHeader'
 
 export function OverviewView({
   accumulation,

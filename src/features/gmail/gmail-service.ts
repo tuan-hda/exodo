@@ -1,4 +1,4 @@
-import { createAdminSupabaseClient } from '../../lib/supabase-admin'
+import { createAdminSupabaseClient } from '@/lib/supabase-admin'
 
 export const gmailOAuthStateCookie = 'exodo_gmail_oauth_state'
 
