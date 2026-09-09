@@ -10,6 +10,7 @@ export function DashboardPanel({
   className = '',
   asideClassName = '',
   ariaLabel,
+  ariaBusy,
   tone,
 }: {
   children: ReactNode
@@ -18,10 +19,11 @@ export function DashboardPanel({
   className?: string
   asideClassName?: string
   ariaLabel?: string
+  ariaBusy?: boolean
   tone?: VariantProps<typeof cardVariants>['tone']
 }) {
   return (
-    <Card tone={tone} className={clsx(className)} aria-label={ariaLabel}>
+    <Card tone={tone} className={clsx(className)} aria-label={ariaLabel} aria-busy={ariaBusy || undefined}>
       {(label || aside) && (
         <div className="col-span-full flex w-full items-start justify-between gap-4">
           {label && <span className="ui-eyebrow">{label}</span>}

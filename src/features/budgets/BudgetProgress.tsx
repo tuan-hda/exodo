@@ -1,6 +1,6 @@
 import { clsx } from 'clsx'
 import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
-import { entryDate, formatShort } from '../entries/entry-utils'
+import { entryDate, formatMoney } from '../entries/entry-utils'
 import type { Entry } from '../entries/types'
 import type { CategoryBudget } from './types'
 import { Progress } from '../../components/ui/progress'
@@ -45,7 +45,8 @@ export function BudgetProgress({
         className="grid gap-6 p-7 md:p-9"
         label="monthly limits"
         aside="loading"
-        ariaLabel="Loading monthly limits">
+        ariaLabel="Loading monthly limits"
+        ariaBusy>
         <Skeleton className="h-10 w-48" />
         <div className="grid gap-5">
           {Array.from({ length: 2 }, (_, index) => (
@@ -67,7 +68,8 @@ export function BudgetProgress({
       className="p-7 md:p-9"
       label="monthly limits"
       aside={`${budgetRows.length} set`}
-      ariaLabel="Monthly limits">
+      ariaLabel="Monthly limits"
+      ariaBusy={isLoading}>
       <div className="flex items-end justify-between gap-4">
         <h3 id="budget-progress-title" className="ui-section-title m-0">
           By category
@@ -89,14 +91,18 @@ export function BudgetProgress({
               </span>
               <div className="grid justify-items-end gap-0.5 text-right">
                 <strong className={clsx('font-normal', row.percent > 100 ? 'text-danger' : 'text-ink')}>
-                  {formatShort(row.spent)} <small className="text-muted">/ {formatShort(row.amount)}</small>
+                  {formatMoney(row.spent)} <small className="text-muted">/ {formatMoney(row.amount)}</small>
                 </strong>
-                <small className="text-[10px] font-normal text-muted">{formatShort(row.dailyAllowance)} / day</small>
+                <small className="text-[10px] font-normal text-muted">{formatMoney(row.dailyAllowance)} / day</small>
               </div>
             </div>
-            <Progress value={Math.min(row.percent, 100)} tone={row.percent > 100 ? 'danger' : 'default'} />
+            <Progress
+              value={Math.min(row.percent, 100)}
+              tone={row.percent > 100 ? 'danger' : 'default'}
+              aria-label={`${row.category} monthly budget progress`}
+            />
             {row.percent > 100 && (
-              <small className="text-[10px] text-danger">{formatShort(row.spent - row.amount)} over</small>
+              <small className="text-[10px] text-danger">{formatMoney(row.spent - row.amount)} over</small>
             )}
           </div>
         ))}

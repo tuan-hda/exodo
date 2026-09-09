@@ -4,7 +4,7 @@ import type { KeyboardEvent } from 'react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { clsx } from 'clsx'
 import { categoryChartColor, categoryClass, categoryIcon } from '../entries/CategoryPicker'
-import { formatShort } from '../entries/entry-utils'
+import { formatMoney } from '../entries/entry-utils'
 import { CountUp } from '../../components/ui/count-up'
 import type { AnalysisSlice } from './analysis-utils'
 
@@ -113,7 +113,7 @@ export function PieChart({
           className="pie-reveal size-full overflow-visible"
           viewBox="0 0 100 100"
           role="img"
-          aria-label={segments.length ? `Distribution totaling ${formatShort(total)}` : 'No records for this month'}>
+          aria-label={segments.length ? `Distribution totaling ${formatMoney(total)}` : 'No records for this month'}>
           {segments.map((segment) => {
             const isSelected = segment.category === visualSelectedCategory
             const segmentOuterRadius = isSelected ? outerRadius : 48
@@ -127,7 +127,7 @@ export function PieChart({
               },
               role: 'button',
               tabIndex: 0,
-              'aria-label': `${segment.category}, ${formatShort(segment.amount)}`,
+              'aria-label': `${segment.category}, ${formatMoney(segment.amount)}`,
             }
             return segment.percentage > 0.999 ? (
               <circle {...shapeProps} key={segment.category} cx="50" cy="50" r={segmentOuterRadius} />
@@ -175,7 +175,7 @@ export function PieChart({
       </div>
       <div className="absolute inset-[25%] grid place-items-center rounded-full bg-surface text-center">
         <strong className="font-mono text-lg font-semibold tracking-[-.05em]">
-          <CountUp value={total} formatValue={formatShort} />
+          <CountUp value={total} formatValue={formatMoney} />
         </strong>
       </div>
     </div>

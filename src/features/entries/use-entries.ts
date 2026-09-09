@@ -3,15 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSupabase } from '../../hooks/use-supabase'
 import type { Entry, StoredEntry } from './types'
-import {
-  calculateAccumulation,
-  invalidateAccumulationCache,
-  normalizeStoredEntry,
-  readAccumulationCache,
-  readEntriesCache,
-  writeAccumulationCache,
-  writeEntriesCache,
-} from './entry-utils'
+import { calculateAccumulation, normalizeStoredEntry, readEntriesCache, writeEntriesCache } from './entry-utils'
 
 export function useEntries(userId?: string) {
   const { getSupabase } = useSupabase()
@@ -54,14 +46,7 @@ export function useEntries(userId?: string) {
         if (!cancelled) {
           setEntries(nextEntries)
           writeEntriesCache(userId, nextEntries)
-          const cachedAccumulation = readAccumulationCache(userId)
-          if (cachedAccumulation === null) {
-            const nextAccumulation = calculateAccumulation(nextEntries)
-            setAccumulation(nextAccumulation)
-            writeAccumulationCache(userId, nextAccumulation)
-          } else {
-            setAccumulation(cachedAccumulation)
-          }
+          setAccumulation(calculateAccumulation(nextEntries))
         }
       } catch (error) {
         console.error('Failed to load entries from Supabase', error)
@@ -108,12 +93,10 @@ export function useEntries(userId?: string) {
         const nextEntries = isEditing
           ? entries.map((item) => (item.id === entry.id ? entry : item))
           : [entry, ...entries]
-        invalidateAccumulationCache(userId)
         const nextAccumulation = calculateAccumulation(nextEntries)
         setEntries(nextEntries)
         setAccumulation(nextAccumulation)
         writeEntriesCache(userId, nextEntries)
-        writeAccumulationCache(userId, nextAccumulation)
         return true
       } catch (error) {
         console.error('Failed to save entry to Supabase', error)
@@ -135,12 +118,10 @@ export function useEntries(userId?: string) {
         const { error } = await supabase.from('entries').delete().eq('id', id).eq('user_id', userId)
         if (error) throw error
         const nextEntries = entries.filter((entry) => entry.id !== id)
-        invalidateAccumulationCache(userId)
         const nextAccumulation = calculateAccumulation(nextEntries)
         setEntries(nextEntries)
         setAccumulation(nextAccumulation)
         writeEntriesCache(userId, nextEntries)
-        writeAccumulationCache(userId, nextAccumulation)
       } catch (error) {
         console.error('Failed to delete entry from Supabase', error)
         setPersistenceError('Could not delete this record. Please try again.')
@@ -157,7 +138,6 @@ export function useEntries(userId?: string) {
       setEntries(nextEntries)
       setAccumulation(nextAccumulation)
       writeEntriesCache(userId, nextEntries)
-      writeAccumulationCache(userId, nextAccumulation)
       setPersistenceError('')
       return true
     } catch (error) {

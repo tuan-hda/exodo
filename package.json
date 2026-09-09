@@ -7,8 +7,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"*.{js,mjs,json,ts}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"*.{js,mjs,json,ts}\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"public/sw.js\" \"*.{js,mjs,json,ts}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"public/sw.js\" \"*.{js,mjs,json,ts}\"",
     "typecheck": "tsc --noEmit",
     "start": "next start",
     "test": "vitest run"

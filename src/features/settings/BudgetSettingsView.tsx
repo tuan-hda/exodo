@@ -6,11 +6,12 @@ import { Trash } from '@phosphor-icons/react'
 import { useUser } from '@clerk/nextjs'
 import { Button } from '../../components/ui/button'
 import { categoryClass, categoryIcon, expenseCategories } from '../entries/CategoryPicker'
-import { formatMoneyInput, formatShort } from '../entries/entry-utils'
+import { formatMoney, formatMoneyInput } from '../entries/entry-utils'
 import { useBudgets } from '../budgets/use-budgets'
 import { Input } from '@/components/ui/input'
 import { PageHeader } from '@/components/PageHeader'
 import { StateMessage } from '@/components/StateMessage'
+import { Skeleton } from '../../components/ui/skeleton'
 
 export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
   const { user } = useUser()
@@ -71,8 +72,16 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
           </Button>
         </div>
       </div>
-      {isLoading && (
-        <p className="m-0 mt-4 font-mono text-[10px] uppercase tracking-[.06em] text-muted">Loading budgets…</p>
+      {isLoading && budgets.length === 0 && (
+        <div className="grid gap-3" aria-label="Loading budgets">
+          {Array.from({ length: 2 }, (_, index) => (
+            <div className="flex min-h-14 items-center gap-3 border-b border-line" key={index}>
+              <Skeleton className="size-8 rounded-full" />
+              <Skeleton className="h-3 w-28" />
+              <Skeleton className="ml-auto h-3 w-24" />
+            </div>
+          ))}
+        </div>
       )}
       {error && <StateMessage tone="danger">{error}</StateMessage>}
       {budgets.length > 0 && (
@@ -88,7 +97,7 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
                 </span>
                 {budget.category}
               </span>
-              <strong className="font-normal text-ink">{formatShort(budget.amount)}</strong>
+              <strong className="font-normal text-ink">{formatMoney(budget.amount)}</strong>
               <Button
                 variant="ghost"
                 size="icon-xs"

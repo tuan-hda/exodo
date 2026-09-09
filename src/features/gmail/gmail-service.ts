@@ -32,7 +32,7 @@ export function createGmailAuthorizationUrl(state: string) {
   return url
 }
 
-async function exchangeCode(code: string) {
+async function exchangeCode(code: string): Promise<GmailTokens & { access_token: string }> {
   const config = getGmailOAuthConfig()
   if (!config?.clientSecret) throw new Error('Gmail OAuth is not configured.')
 
@@ -51,7 +51,7 @@ async function exchangeCode(code: string) {
 
   const tokens = (await response.json()) as GmailTokens
   if (!tokens.access_token) throw new Error('Gmail did not return an access token.')
-  return tokens
+  return { ...tokens, access_token: tokens.access_token }
 }
 
 async function getGmailEmail(accessToken: string) {
@@ -67,7 +67,7 @@ async function getGmailEmail(accessToken: string) {
 
 export async function connectGmail(userId: string, code: string) {
   const tokens = await exchangeCode(code)
-  const email = await getGmailEmail(tokens.access_token as string)
+  const email = await getGmailEmail(tokens.access_token)
   const supabase = createAdminSupabaseClient()
   const existing = await supabase.from('gmail_connections').select('refresh_token').eq('user_id', userId).maybeSingle()
   if (existing.error) throw existing.error

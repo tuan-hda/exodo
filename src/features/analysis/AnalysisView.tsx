@@ -7,9 +7,10 @@ import { Button } from '../../components/ui/button'
 import { Card } from '../../components/ui/card'
 import { PageHeader } from '../../components/PageHeader'
 import { AnimatedList } from '../../components/ui/animated-list'
+import { Skeleton } from '../../components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
 import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
-import { formatShort } from '../entries/entry-utils'
+import { formatMoney } from '../entries/entry-utils'
 import type { Entry } from '../entries/types'
 import { formatPercentage, getMonthEntries, groupByCategory } from './analysis-utils'
 import { PieChart } from './PieChart'
@@ -56,7 +57,7 @@ function CategoryDetail({
                   type === 'expense' ? 'text-danger' : 'text-success',
                 )}>
                 {type === 'expense' ? '-' : '+'}
-                {formatShort(entry.amount)}
+                {formatMoney(entry.amount)}
               </strong>
             </div>
           )}
@@ -71,12 +72,14 @@ function CategoryDetail({
 function DistributionCard({
   type,
   entries,
+  isLoading = false,
   selectedCategory,
   onSelectCategory,
   onCloseCategory,
 }: {
   type: Entry['type']
   entries: Entry[]
+  isLoading?: boolean
   selectedCategory: string | null
   onSelectCategory: (category: string) => void
   onCloseCategory: () => void
@@ -88,7 +91,12 @@ function DistributionCard({
   return (
     <div aria-label={`${type} distribution`}>
       <Card className="p-5 max-[700px]:p-4">
-        {slices.length ? (
+        {isLoading ? (
+          <div className="grid min-h-[360px] content-center gap-5 p-8">
+            <Skeleton className="mx-auto size-[240px] rounded-full max-[430px]:size-[190px]" />
+            <Skeleton className="mx-auto h-3 w-32" />
+          </div>
+        ) : slices.length ? (
           <>
             <div className="mb-7 flex items-start justify-between gap-3">
               <p className="ui-eyebrow m-0">{type}</p>
@@ -115,7 +123,17 @@ function DistributionCard({
           </div>
         )}
       </Card>
-      {selectedCategory ? (
+      {isLoading ? (
+        <div className="mt-8 grid gap-3 border-t border-line pt-5" aria-hidden="true">
+          {Array.from({ length: 3 }, (_, index) => (
+            <div className="flex min-h-16 items-center gap-3 border-b border-line py-3" key={index}>
+              <Skeleton className="size-8 rounded-full" />
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="ml-auto h-4 w-24" />
+            </div>
+          ))}
+        </div>
+      ) : selectedCategory ? (
         <CategoryDetail category={selectedCategory} type={type} entries={entries} onClose={onCloseCategory} />
       ) : slices.length > 0 ? (
         <AnimatedList className="mt-8 border-t border-line pt-2" items={slices} getKey={(slice) => slice.category}>
@@ -144,7 +162,7 @@ function DistributionCard({
                   type === 'expense' ? 'text-danger' : 'text-success',
                 )}>
                 {type === 'expense' ? '-' : '+'}
-                {formatShort(slice.amount)}
+                {formatMoney(slice.amount)}
               </strong>
             </button>
           )}
@@ -156,11 +174,13 @@ function DistributionCard({
 
 export function AnalysisView({
   entries,
+  isLoading = false,
   viewMonth,
   onMonthChange,
   onBack,
 }: {
   entries: Entry[]
+  isLoading?: boolean
   viewMonth: Date
   onMonthChange: (delta: number) => void
   onBack: () => void
@@ -181,7 +201,9 @@ export function AnalysisView({
   }
 
   return (
-    <section className="grid gap-8 pb-12 pt-16 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_120ms_both] max-[700px]:pt-10">
+    <section
+      className="grid gap-8 pb-12 pt-16 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_120ms_both] max-[700px]:pt-10"
+      aria-busy={isLoading}>
       <PageHeader
         eyebrow="the month analysis"
         title={monthLabel}
@@ -209,17 +231,25 @@ export function AnalysisView({
           </div>
         }
       />
-      <div className="flex gap-5 border-y border-line py-3 font-mono text-[10px] uppercase tracking-[.08em] text-muted max-[430px]:gap-3 max-[430px]:text-[9px]">
-        <span>
-          <b className="ui-number font-normal text-success">+{formatShort(income)}</b> income
-        </span>
-        <span>
-          <b className="ui-number font-normal text-danger">-{formatShort(expense)}</b> expense
-        </span>
-        <span>
-          <b className="ui-number font-normal text-ink">{monthEntries.length}</b> records
-        </span>
-      </div>
+      {isLoading ? (
+        <div className="flex gap-5 border-y border-line py-3" aria-hidden="true">
+          <Skeleton className="h-3 w-28" />
+          <Skeleton className="h-3 w-32" />
+          <Skeleton className="h-3 w-24" />
+        </div>
+      ) : (
+        <div className="flex gap-5 border-y border-line py-3 font-mono text-[10px] uppercase tracking-[.08em] text-muted max-[430px]:gap-3 max-[430px]:text-[9px]">
+          <span>
+            <b className="ui-number font-normal text-success">+{formatMoney(income)}</b> income
+          </span>
+          <span>
+            <b className="ui-number font-normal text-danger">-{formatMoney(expense)}</b> expense
+          </span>
+          <span>
+            <b className="ui-number font-normal text-ink">{monthEntries.length}</b> records
+          </span>
+        </div>
+      )}
       <Tabs value={activeType} onValueChange={(value) => setActiveType(value as Entry['type'])}>
         <TabsList aria-label="Analysis type">
           <TabsTrigger value="expense">Expense</TabsTrigger>
@@ -229,6 +259,7 @@ export function AnalysisView({
           <DistributionCard
             type="expense"
             entries={monthEntries}
+            isLoading={isLoading}
             selectedCategory={activeType === 'expense' ? selectedCategory : null}
             onSelectCategory={handleCategorySelect}
             onCloseCategory={() => setSelectedCategory(null)}
@@ -238,6 +269,7 @@ export function AnalysisView({
           <DistributionCard
             type="income"
             entries={monthEntries}
+            isLoading={isLoading}
             selectedCategory={activeType === 'income' ? selectedCategory : null}
             onSelectCategory={handleCategorySelect}
             onCloseCategory={() => setSelectedCategory(null)}

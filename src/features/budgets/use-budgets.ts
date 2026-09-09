@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useSupabase } from '../../hooks/use-supabase'
+import { readStorageJson, writeStorageJson } from '../../lib/storage'
 import type { Category } from '../entries/category'
 import type { CategoryBudget, StoredCategoryBudget } from './types'
 
@@ -12,20 +13,19 @@ function budgetCacheKey(userId: string) {
 }
 
 function readBudgetCache(userId: string) {
-  try {
-    const cached = JSON.parse(localStorage.getItem(budgetCacheKey(userId)) ?? 'null') as {
-      budgets?: CategoryBudget[]
-      cachedAt?: number
-    } | null
-    if (!cached?.budgets || !cached.cachedAt || Date.now() - cached.cachedAt > budgetCacheTtl) return null
-    return cached.budgets
-  } catch {
+  const cached = readStorageJson<{ budgets?: CategoryBudget[]; cachedAt?: number }>(budgetCacheKey(userId))
+  if (
+    !Array.isArray(cached?.budgets) ||
+    typeof cached.cachedAt !== 'number' ||
+    !Number.isFinite(cached.cachedAt) ||
+    Date.now() - cached.cachedAt > budgetCacheTtl
+  )
     return null
-  }
+  return cached.budgets
 }
 
 function writeBudgetCache(userId: string, budgets: CategoryBudget[]) {
-  localStorage.setItem(budgetCacheKey(userId), JSON.stringify({ budgets, cachedAt: Date.now() }))
+  writeStorageJson(budgetCacheKey(userId), { budgets, cachedAt: Date.now() })
 }
 
 function normalizeBudget(budget: StoredCategoryBudget): CategoryBudget {
@@ -55,30 +55,41 @@ export function useBudgets(userId: string | undefined) {
     return ((data ?? []) as StoredCategoryBudget[]).map(normalizeBudget)
   }, [getSupabase, userId])
 
-  const refreshBudgets = useCallback(async () => {
-    if (!userId) return false
-    setIsLoading(true)
-    setError('')
-    try {
-      const nextBudgets = await fetchBudgets()
-      setBudgets(nextBudgets)
-      writeBudgetCache(userId, nextBudgets)
-      return true
-    } catch (fetchError) {
-      console.error('Failed to load category budgets from Supabase', fetchError)
-      setError('Could not load category budgets. Run the budget migration first.')
-      return false
-    } finally {
-      setIsLoading(false)
-    }
-  }, [fetchBudgets, userId])
+  const refreshBudgets = useCallback(
+    async (signal?: AbortSignal) => {
+      if (!userId) {
+        setBudgets([])
+        setIsLoading(false)
+        return false
+      }
+      setIsLoading(true)
+      setError('')
+      try {
+        const nextBudgets = await fetchBudgets()
+        if (signal?.aborted) return false
+        setBudgets(nextBudgets)
+        writeBudgetCache(userId, nextBudgets)
+        return true
+      } catch (fetchError) {
+        if (signal?.aborted) return false
+        console.error('Failed to load category budgets from Supabase', fetchError)
+        setError('Could not load category budgets. Run the budget migration first.')
+        return false
+      } finally {
+        if (!signal?.aborted) setIsLoading(false)
+      }
+    },
+    [fetchBudgets, userId],
+  )
 
   useEffect(() => {
+    const controller = new AbortController()
     if (userId) {
       const cachedBudgets = readBudgetCache(userId)
       if (cachedBudgets) setBudgets(cachedBudgets)
     }
-    refreshBudgets()
+    void refreshBudgets(controller.signal)
+    return () => controller.abort()
   }, [refreshBudgets])
 
   const saveBudget = useCallback(

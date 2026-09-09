@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetTitle } from '../../components/ui/sheet'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { CalculatorKeypad } from '../entries/CalculatorKeypad'
-import { evaluateExpression, formatAmountExpression } from '../entries/entry-utils'
+import { evaluateExpression, formatAmountExpression, formatMoney } from '../entries/entry-utils'
 import type { SavingsGoal } from './types'
 import { useMediaQuery } from '../../hooks/use-media-query'
 
@@ -70,9 +70,7 @@ export function SavingsDepositComposer({
           </span>
           <div>
             <p className="text-sm font-semibold">{goal.name}</p>
-            <p className="text-xs text-muted">
-              Target {new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(goal.targetAmount)} ₫
-            </p>
+            <p className="text-xs text-muted">Target {formatMoney(goal.targetAmount)}</p>
           </div>
         </div>
         <form

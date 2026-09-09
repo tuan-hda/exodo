@@ -6,7 +6,7 @@ import { EmptyState } from '../../components/EmptyState'
 import { Skeleton } from '../../components/ui/skeleton'
 import { fromKey } from '../finance/allocation'
 import { categoryClass, categoryIcon } from '../entries/CategoryPicker'
-import { entryDate, formatShort } from '../entries/entry-utils'
+import { entryDate, formatMoney } from '../entries/entry-utils'
 import type { Entry } from '../entries/types'
 import { Input } from '@/components/ui/input'
 
@@ -86,7 +86,7 @@ export function ActivityList({
   }
 
   return (
-    <section className="animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_260ms_both]">
+    <section className="animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_260ms_both]" aria-busy={isLoading}>
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="ui-eyebrow mb-3">recent activity</p>
@@ -170,13 +170,13 @@ export function ActivityList({
               <span className="grid gap-1">
                 <b className="font-mono text-[9px] font-normal uppercase tracking-[.08em] text-muted">Income</b>
                 <strong className="ui-number text-xs font-normal text-success">
-                  +{formatShort(activeGroup.income)}
+                  +{formatMoney(activeGroup.income)}
                 </strong>
               </span>
               <span className="grid justify-items-center gap-1 text-center">
                 <b className="font-mono text-[9px] font-normal uppercase tracking-[.08em] text-muted">Expense</b>
                 <strong className="ui-number text-xs font-normal text-danger">
-                  -{formatShort(activeGroup.expense)}
+                  -{formatMoney(activeGroup.expense)}
                 </strong>
               </span>
               <span className="grid justify-items-end gap-1 text-right">
@@ -186,7 +186,7 @@ export function ActivityList({
                     'ui-number text-xs font-normal',
                     activeGroup.income - activeGroup.expense < 0 ? 'text-danger' : 'text-ink',
                   )}>
-                  {formatShort(activeGroup.income - activeGroup.expense)}
+                  {formatMoney(activeGroup.income - activeGroup.expense)}
                 </strong>
               </span>
             </button>
@@ -222,7 +222,7 @@ export function ActivityList({
                         entry.type === 'expense' ? 'text-danger' : 'text-success',
                       )}>
                       {entry.type === 'income' ? '+' : '-'}
-                      {formatShort(entry.amount)}
+                      {formatMoney(entry.amount)}
                     </b>
                   </button>
                 ))}

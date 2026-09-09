@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { readStorageValue, writeStorageValue } from '../../lib/storage'
 
 const backgroundPreferenceKey = 'exodo.gradient-background-enabled'
 const backgroundPreferenceEvent = 'exodo:gradient-background-changed'
 
 function readPreference() {
   if (typeof window === 'undefined') return true
-  return window.localStorage.getItem(backgroundPreferenceKey) !== 'false'
+  return readStorageValue(backgroundPreferenceKey) !== 'false'
 }
 
 export function useBackgroundPreference() {
@@ -25,7 +26,7 @@ export function useBackgroundPreference() {
   }, [])
 
   function updatePreference(nextEnabled: boolean) {
-    window.localStorage.setItem(backgroundPreferenceKey, String(nextEnabled))
+    writeStorageValue(backgroundPreferenceKey, String(nextEnabled))
     setEnabled(nextEnabled)
     window.dispatchEvent(new Event(backgroundPreferenceEvent))
   }

@@ -2,7 +2,7 @@ import { Plus } from '@phosphor-icons/react'
 import { Button } from '../../components/ui/button'
 import { Card } from '../../components/ui/card'
 import { Progress } from '../../components/ui/progress'
-import { formatShort } from '../entries/entry-utils'
+import { formatMoney } from '../entries/entry-utils'
 import type { SavingsDeposit, SavingsGoal } from './types'
 
 export function SavingsGoalCard({
@@ -16,6 +16,7 @@ export function SavingsGoalCard({
 }) {
   const percentage = goal.targetAmount ? Math.min(100, (goal.savedAmount / goal.targetAmount) * 100) : 0
   const recentDeposits = deposits.filter((deposit) => deposit.goalId === goal.id).slice(0, 4)
+  const statusLabel = goal.status === 'completed' ? 'Complete' : goal.status === 'paused' ? 'Paused' : null
   return (
     <Card className="p-6 md:p-7">
       <div className="flex items-start justify-between gap-4">
@@ -29,10 +30,11 @@ export function SavingsGoalCard({
               {goal.targetDate
                 ? `By ${new Date(`${goal.targetDate}T12:00:00`).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`
                 : 'No deadline'}
+              {statusLabel && <span> · {statusLabel}</span>}
             </p>
           </div>
         </div>
-        {onAdd && (
+        {onAdd && goal.status === 'active' && (
           <Button variant="outline" size="sm" type="button" onClick={() => onAdd(goal.id)}>
             <Plus size={15} /> Add
           </Button>
@@ -40,14 +42,19 @@ export function SavingsGoalCard({
       </div>
       <div className="mt-5 flex items-end justify-between text-sm">
         <span>
-          <strong className="ui-number text-xl font-semibold">{formatShort(goal.savedAmount)}</strong> saved
+          <strong className="ui-number text-xl font-semibold">{formatMoney(goal.savedAmount)}</strong> saved
         </span>
         <span className="ui-number text-xs text-muted">{Math.round(percentage)}%</span>
       </div>
-      <Progress className="mt-3" value={percentage} tone="success" />
+      <Progress
+        className="mt-3"
+        value={percentage}
+        tone={goal.status === 'paused' ? 'default' : 'success'}
+        aria-label={`${goal.name} savings progress`}
+      />
       <div className="mt-3 flex justify-between text-xs text-muted">
-        <span className="ui-number">{formatShort(Math.max(0, goal.targetAmount - goal.savedAmount))} remaining</span>
-        <span className="ui-number">Target {formatShort(goal.targetAmount)}</span>
+        <span className="ui-number">{formatMoney(Math.max(0, goal.targetAmount - goal.savedAmount))} remaining</span>
+        <span className="ui-number">Target {formatMoney(goal.targetAmount)}</span>
       </div>
       {recentDeposits.length > 0 && (
         <div className="mt-5 border-t border-line pt-3">
@@ -55,7 +62,7 @@ export function SavingsGoalCard({
           {recentDeposits.map((deposit) => (
             <div className="flex justify-between py-1 text-xs" key={deposit.id}>
               <span>{deposit.source === 'automatic' ? 'Monthly remainder' : 'Manual deposit'}</span>
-              <strong>+{formatShort(deposit.amount)}</strong>
+              <strong>+{formatMoney(deposit.amount)}</strong>
             </div>
           ))}
         </div>

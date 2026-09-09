@@ -1,9 +1,8 @@
 import type { Entry, StoredEntry } from './types'
 import type { Category } from './category'
+import { readStorageJson, writeStorageJson } from '../../lib/storage'
 
-const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 })
 const whole = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
-const accumulationCacheTtl = 60 * 60 * 1000
 const entriesCacheTtl = 24 * 60 * 60 * 1000
 
 export function getDayKey(date = new Date()) {
@@ -16,16 +15,7 @@ export function getCurrentTime(date = new Date()) {
 
 export const todayKey = getDayKey()
 
-type AccumulationCache = {
-  value: number
-  cachedAt: number
-}
-
 export function formatMoney(value: number) {
-  return money.format(Math.round(value))
-}
-
-export function formatShort(value: number) {
   return `${whole.format(Math.round(value))} ₫`
 }
 
@@ -64,53 +54,24 @@ export function calculateAccumulation(entries: Entry[]) {
   return entries.reduce((total, entry) => total + (entry.type === 'income' ? entry.amount : -entry.amount), 0)
 }
 
-function accumulationCacheKey(userId: string) {
-  return `exodo.accumulation.${userId}`
-}
-
 function entriesCacheKey(userId: string) {
   return `exodo.entries.${userId}`
 }
 
 export function readEntriesCache(userId: string) {
-  try {
-    const cached = JSON.parse(localStorage.getItem(entriesCacheKey(userId)) ?? 'null') as {
-      entries?: Entry[]
-      cachedAt?: number
-    } | null
-    if (!cached?.entries || !cached.cachedAt || Date.now() - cached.cachedAt > entriesCacheTtl) return null
-    return cached.entries
-  } catch {
+  const cached = readStorageJson<{ entries?: Entry[]; cachedAt?: number }>(entriesCacheKey(userId))
+  if (
+    !Array.isArray(cached?.entries) ||
+    typeof cached.cachedAt !== 'number' ||
+    !Number.isFinite(cached.cachedAt) ||
+    Date.now() - cached.cachedAt > entriesCacheTtl
+  )
     return null
-  }
+  return cached.entries
 }
 
 export function writeEntriesCache(userId: string, entries: Entry[]) {
-  localStorage.setItem(entriesCacheKey(userId), JSON.stringify({ entries, cachedAt: Date.now() }))
-}
-
-export function readAccumulationCache(userId: string) {
-  try {
-    const cached = JSON.parse(localStorage.getItem(accumulationCacheKey(userId)) ?? 'null') as AccumulationCache | null
-    if (!cached || typeof cached.value !== 'number' || Date.now() - cached.cachedAt > accumulationCacheTtl) {
-      localStorage.removeItem(accumulationCacheKey(userId))
-      return null
-    }
-    return cached.value
-  } catch {
-    return null
-  }
-}
-
-export function writeAccumulationCache(userId: string, value: number) {
-  localStorage.setItem(
-    accumulationCacheKey(userId),
-    JSON.stringify({ value, cachedAt: Date.now() } satisfies AccumulationCache),
-  )
-}
-
-export function invalidateAccumulationCache(userId: string) {
-  localStorage.removeItem(accumulationCacheKey(userId))
+  writeStorageJson(entriesCacheKey(userId), { entries, cachedAt: Date.now() })
 }
 
 export function evaluateExpression(value: string) {

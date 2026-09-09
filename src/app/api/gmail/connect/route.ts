@@ -13,7 +13,7 @@ export async function GET() {
   const url = createGmailAuthorizationUrl(state)
   if (!url) return new NextResponse('Gmail OAuth is not configured.', { status: 503 })
   const cookieStore = await cookies()
-  cookieStore.set(gmailOAuthStateCookie, state, {
+  cookieStore.set(gmailOAuthStateCookie, `${state}.${userId}`, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',

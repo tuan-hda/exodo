@@ -38,8 +38,11 @@ export function usePullToRefresh(onRefresh: () => Promise<boolean>) {
       setPullDistance(0)
       if (!shouldRefresh || isRefreshing) return
       setIsRefreshing(true)
-      await onRefresh()
-      setIsRefreshing(false)
+      try {
+        await onRefresh()
+      } finally {
+        setIsRefreshing(false)
+      }
     }
 
     window.addEventListener('touchstart', handleTouchStart, { passive: true })

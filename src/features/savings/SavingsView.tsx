@@ -11,9 +11,10 @@ import { StateMessage } from '../../components/StateMessage'
 import { Input } from '../../components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover'
 import type { Entry } from '../entries/types'
-import { formatShort } from '../entries/entry-utils'
+import { formatMoney } from '../entries/entry-utils'
 import { SavingsDepositComposer } from './SavingsDepositComposer'
 import { SavingsGoalCard } from './SavingsGoalCard'
+import { SavingsGoalsLoading } from './SavingsGoalsPanel'
 import { useSavings } from './use-savings'
 
 export function SavingsView({ userId, entries, onBack }: { userId?: string; entries: Entry[]; onBack?: () => void }) {
@@ -50,7 +51,9 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
     }
   }
   return (
-    <section className="mx-auto grid max-w-[760px] gap-8 pb-12 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both]">
+    <section
+      className="mx-auto grid max-w-[760px] gap-8 pb-12 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both]"
+      aria-busy={isLoading}>
       <PageHeader
         eyebrow="the goal tracker"
         title="Save for what matters."
@@ -67,11 +70,11 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
       <div className="grid grid-cols-2 gap-3 max-[560px]:grid-cols-1">
         <Card tone="soft" className="p-5">
           <p className="ui-eyebrow m-0">Saved</p>
-          <strong className="ui-number mt-2 block text-2xl font-semibold">{formatShort(summary.saved)}</strong>
+          <strong className="ui-number mt-2 block text-2xl font-semibold">{formatMoney(summary.saved)}</strong>
         </Card>
         <Card tone="soft" className="p-5">
           <p className="ui-eyebrow m-0">Target</p>
-          <strong className="ui-number mt-2 block text-2xl font-semibold">{formatShort(summary.target)}</strong>
+          <strong className="ui-number mt-2 block text-2xl font-semibold">{formatMoney(summary.target)}</strong>
         </Card>
       </div>
       {showForm && (
@@ -141,9 +144,7 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
           </form>
         </Card>
       )}
-      {isLoading && goals.length === 0 && (
-        <p className="py-8 text-center font-mono text-[11px] uppercase tracking-[.08em] text-muted">Loading goals…</p>
-      )}
+      {isLoading && goals.length === 0 && <SavingsGoalsLoading />}
       {!isLoading && goals.length === 0 && !showForm && (
         <EmptyState
           title="No savings goals yet"

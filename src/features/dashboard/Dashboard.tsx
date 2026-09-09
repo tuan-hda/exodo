@@ -116,6 +116,11 @@ function Dashboard() {
 
   return (
     <div className={clsx('min-h-dvh', !gradientBackgroundEnabled && 'bg-surface')}>
+      <a
+        className="sr-only fixed top-3 left-3 z-30 rounded-[10px] bg-ink px-3 py-2 font-mono text-[10px] uppercase tracking-[.08em] text-white focus:not-sr-only"
+        href="#main-content">
+        Skip to content
+      </a>
       {(pullDistance > 0 || isRefreshing) && (
         <div
           className={clsx(
@@ -158,73 +163,77 @@ function Dashboard() {
             ))}
           </nav>
         </header>
-        {persistenceError && (
-          <StateMessage tone="danger" className="mt-4">
-            {persistenceError}
-          </StateMessage>
-        )}
-        {activeTab === 'today' && (
-          <>
-            <section className="grid grid-cols-[minmax(0,1.3fr)_minmax(220px,.7fr)] items-end gap-12 pt-16 pb-14 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both] max-[700px]:grid-cols-1 max-[700px]:gap-7 max-[700px]:pt-10 max-[700px]:pb-10">
-              <div>
-                <p className="ui-eyebrow mb-4">
-                  {currentDay.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+        <div id="main-content" tabIndex={-1} className="outline-none">
+          {persistenceError && (
+            <StateMessage tone="danger" className="mt-4">
+              {persistenceError}
+            </StateMessage>
+          )}
+          {activeTab === 'today' && (
+            <>
+              <section className="grid grid-cols-[minmax(0,1.3fr)_minmax(220px,.7fr)] items-end gap-12 pt-16 pb-14 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both] max-[700px]:grid-cols-1 max-[700px]:gap-7 max-[700px]:pt-10 max-[700px]:pb-10">
+                <div>
+                  <p className="ui-eyebrow mb-4">
+                    {currentDay.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                  </p>
+                  <h1 className="m-0 max-w-[10ch] text-[clamp(48px,7vw,84px)] font-semibold leading-[.92] tracking-[-.095em] max-[430px]:text-[48px]">
+                    Spend what today
+                    <br />
+                    <em className="not-italic text-ink">makes possible.</em>
+                  </h1>
+                </div>
+                <p className="ui-page-description mb-1 max-[700px]:mb-0">
+                  Income becomes a daily allowance. Each expense makes the rest of today visible.
                 </p>
-                <h1 className="m-0 max-w-[10ch] text-[clamp(48px,7vw,84px)] font-semibold leading-[.92] tracking-[-.095em] max-[430px]:text-[48px]">
-                  Spend what today
-                  <br />
-                  <em className="not-italic text-ink">makes possible.</em>
-                </h1>
-              </div>
-              <p className="ui-page-description mb-1 max-[700px]:mb-0">
-                Income becomes a daily allowance. Each expense makes the rest of today visible.
-              </p>
-            </section>
-            <SummaryPanels
-              entries={entries}
-              dayKey={currentDayKey}
-              budgets={budgets}
-              budgetsLoading={budgetsLoading}
-              userId={user?.id}
-            />
-            <div className="pt-24 max-[700px]:pt-16">
-              <ActivityList
+              </section>
+              <SummaryPanels
                 entries={entries}
-                isLoading={entriesLoading}
-                todayKey={currentDayKey}
-                onEdit={(entry) => openComposer(entry.type, entry)}
-                onOpenAnalysis={(monthKey) => {
-                  const [year, month] = monthKey.split('-').map(Number)
-                  setViewMonth(new Date(year, month - 1, 1, 12))
-                  navigateTab('analysis')
-                }}
+                entriesLoading={entriesLoading}
+                dayKey={currentDayKey}
+                budgets={budgets}
+                budgetsLoading={budgetsLoading}
+                userId={user?.id}
               />
-            </div>
-          </>
-        )}
-        {activeTab === 'overview' && (
-          <section className="pt-16 max-[700px]:pt-10">
-            <OverviewView accumulation={accumulation} />
-          </section>
-        )}
-        {activeTab === 'notifications' && (
-          <section className="pt-16 max-[700px]:pt-10">
-            <NotificationsView />
-          </section>
-        )}
-        {activeTab === 'analysis' && (
-          <AnalysisView
-            entries={entries}
-            viewMonth={viewMonth}
-            onMonthChange={moveMonth}
-            onBack={() => navigateTab('today')}
-          />
-        )}
-        {activeTab === 'settings' && (
-          <section className="pt-16 max-[700px]:pt-10">
-            <SettingsView userId={user?.id} entries={entries} />
-          </section>
-        )}
+              <div className="pt-24 max-[700px]:pt-16">
+                <ActivityList
+                  entries={entries}
+                  isLoading={entriesLoading}
+                  todayKey={currentDayKey}
+                  onEdit={(entry) => openComposer(entry.type, entry)}
+                  onOpenAnalysis={(monthKey) => {
+                    const [year, month] = monthKey.split('-').map(Number)
+                    setViewMonth(new Date(year, month - 1, 1, 12))
+                    navigateTab('analysis')
+                  }}
+                />
+              </div>
+            </>
+          )}
+          {activeTab === 'overview' && (
+            <section className="pt-16 max-[700px]:pt-10">
+              <OverviewView accumulation={accumulation} isLoading={entriesLoading} />
+            </section>
+          )}
+          {activeTab === 'notifications' && (
+            <section className="pt-16 max-[700px]:pt-10">
+              <NotificationsView />
+            </section>
+          )}
+          {activeTab === 'analysis' && (
+            <AnalysisView
+              entries={entries}
+              isLoading={entriesLoading}
+              viewMonth={viewMonth}
+              onMonthChange={moveMonth}
+              onBack={() => navigateTab('today')}
+            />
+          )}
+          {activeTab === 'settings' && (
+            <section className="pt-16 max-[700px]:pt-10">
+              <SettingsView userId={user?.id} entries={entries} />
+            </section>
+          )}
+        </div>
       </main>
       <footer className="mx-auto flex w-[min(1120px,calc(100%-40px))] justify-between border-t border-line py-5 font-mono text-[10px] tracking-[.06em] text-muted max-[700px]:w-[calc(100%-32px)] max-[700px]:pb-28">
         <span>exodo / έξοδο</span>

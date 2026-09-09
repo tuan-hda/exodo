@@ -15,6 +15,8 @@ function Progress({
     <ProgressPrimitive.Root
       data-slot="progress"
       data-tone={tone}
+      value={normalizedValue}
+      max={100}
       className={cn('relative h-2.5 w-full overflow-hidden rounded-full bg-soft', className)}
       {...props}>
       <ProgressPrimitive.Indicator
