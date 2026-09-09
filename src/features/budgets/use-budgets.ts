@@ -41,6 +41,7 @@ export function useBudgets(userId: string | undefined) {
   const [budgets, setBudgets] = useState<CategoryBudget[]>([])
   const [isLoading, setIsLoading] = useState(Boolean(userId))
   const [isSaving, setIsSaving] = useState(false)
+  const [isRemoving, setIsRemoving] = useState(false)
   const [error, setError] = useState('')
   const budgetsRef = useRef<CategoryBudget[]>([])
   const previousUserIdRef = useRef<string | undefined>(userId)
@@ -145,6 +146,7 @@ export function useBudgets(userId: string | undefined) {
   const removeBudget = useCallback(
     async (budget: CategoryBudget) => {
       if (!userId) return false
+      setIsRemoving(true)
       setError('')
       try {
         const supabase = await getSupabase()
@@ -163,10 +165,12 @@ export function useBudgets(userId: string | undefined) {
         console.error('Failed to remove category budget from Supabase', removeError)
         setError('Could not remove this budget.')
         return false
+      } finally {
+        setIsRemoving(false)
       }
     },
     [getSupabase, userId],
   )
 
-  return { budgets, isLoading, isSaving, error, saveBudget, removeBudget, refreshBudgets }
+  return { budgets, isLoading, isSaving, isRemoving, error, saveBudget, removeBudget, refreshBudgets }
 }

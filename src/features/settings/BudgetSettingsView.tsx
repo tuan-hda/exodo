@@ -4,9 +4,20 @@ import { useState } from 'react'
 import { clsx } from 'clsx'
 import { Trash } from '@phosphor-icons/react'
 import { useUser } from '@clerk/nextjs'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { categoryClass, categoryIcon, expenseCategories } from '@/features/entries/CategoryPicker'
 import { formatMoney, formatMoneyInput } from '@/features/entries/entry-utils'
+import type { CategoryBudget } from '@/features/budgets/types'
 import { useBudgets } from '@/features/budgets/use-budgets'
 import { PageHeader } from '@/components/PageHeader'
 import { StateMessage } from '@/components/StateMessage'
@@ -17,12 +28,18 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
   const { user } = useUser()
   const [category, setCategory] = useState(expenseCategories[0])
   const [amount, setAmount] = useState('')
-  const { budgets, isLoading, isSaving, error, saveBudget, removeBudget } = useBudgets(user?.id)
+  const [budgetToRemove, setBudgetToRemove] = useState<CategoryBudget | null>(null)
+  const { budgets, isLoading, isSaving, isRemoving, error, saveBudget, removeBudget } = useBudgets(user?.id)
   const currentBudget = budgets.find((budget) => budget.category === category)
 
   async function handleSave() {
     const value = Number(amount.replace(/,/g, ''))
     if (await saveBudget(category, value)) setAmount('')
+  }
+
+  async function handleRemove() {
+    if (!budgetToRemove) return
+    if (await removeBudget(budgetToRemove)) setBudgetToRemove(null)
   }
 
   return (
@@ -104,13 +121,29 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
                 className="text-muted hover:text-danger"
                 type="button"
                 aria-label={`Remove ${budget.category} budget`}
-                onClick={() => removeBudget(budget)}>
+                onClick={() => setBudgetToRemove(budget)}>
                 <Trash size={16} />
               </Button>
             </div>
           ))}
         </section>
       )}
+      <AlertDialog open={Boolean(budgetToRemove)} onOpenChange={(open) => !open && setBudgetToRemove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove this budget?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {budgetToRemove?.category} will no longer have a recurring monthly limit.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isRemoving}>Cancel</AlertDialogCancel>
+            <AlertDialogAction disabled={isRemoving} onClick={() => void handleRemove()}>
+              {isRemoving ? 'Removing…' : 'Remove budget'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   )
 }
