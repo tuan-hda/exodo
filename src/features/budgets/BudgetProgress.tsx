@@ -1,5 +1,5 @@
 import { clsx } from 'clsx'
-import { categoryClass, categoryIcon } from '@/features/finance/category'
+import { CategoryIcon } from '@/features/finance/CategoryIcon'
 import { entryDate } from '@/lib/date'
 import type { Entry } from '@/features/entries/types'
 import type { CategoryBudget } from './types'
@@ -112,13 +112,7 @@ export function BudgetProgress({
           <div className="grid gap-2.5" key={row.id}>
             <div className="flex items-center justify-between gap-3 font-mono text-xs">
               <span className="flex min-w-0 items-center gap-2">
-                <span
-                  className={clsx(
-                    'grid size-9 shrink-0 place-items-center rounded-input border text-current',
-                    categoryClass(row.category),
-                  )}>
-                  {categoryIcon(row.category, 15)}
-                </span>
+                <CategoryIcon category={row.category} size="md" shape="control" />
                 <span className="truncate">{row.category}</span>
               </span>
               <div className="grid justify-items-end gap-0.5 text-right">

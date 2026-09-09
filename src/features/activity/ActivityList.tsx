@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { categoryClass, categoryIcon } from '@/features/finance/category'
+import { CategoryIcon } from '@/features/finance/CategoryIcon'
 import { entryDate } from '@/lib/date'
 import type { Entry } from '@/features/entries/types'
 import { Input } from '@/components/ui/input'
@@ -200,13 +200,7 @@ export function ActivityList({
                 <h4 className="ui-label m-0 border-b border-line px-2 py-3">{day.label}</h4>
                 {day.entries.map((entry) => (
                   <Button variant="list" size="list" key={entry.id} onClick={() => onEdit(entry)} type="button">
-                    <span
-                      className={clsx(
-                        'grid size-[29px] place-items-center rounded-full border text-current',
-                        categoryClass(entry.category ?? 'Other'),
-                      )}>
-                      {categoryIcon(entry.category ?? 'Other', 16)}
-                    </span>
+                    <CategoryIcon category={entry.category ?? 'Other'} size="xs" />
                     <span className="min-w-0">
                       <strong className="block truncate text-[13px] font-medium text-ink">
                         {entry.title || entry.category || (entry.type === 'income' ? 'Income' : 'Expense')}

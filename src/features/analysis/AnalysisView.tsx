@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { categoryClass, categoryIcon } from '@/features/finance/category'
+import { CategoryIcon } from '@/features/finance/CategoryIcon'
 import { formatMoney } from '@/lib/money'
 import type { Entry } from '@/features/entries/types'
 import { formatPercentage, getMonthEntries, groupByCategory } from './analysis-utils'
@@ -140,13 +140,7 @@ function DistributionCard({
         <AnimatedList className="mt-8 border-t border-line pt-2" items={slices} getKey={(slice) => slice.category}>
           {(slice) => (
             <Button variant="list" size="row" type="button" onClick={() => onSelectCategory(slice.category)}>
-              <span
-                className={clsx(
-                  'grid size-8 shrink-0 place-items-center rounded-full border',
-                  categoryClass(slice.category),
-                )}>
-                {categoryIcon(slice.category, 16)}
-              </span>
+              <CategoryIcon category={slice.category} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-ink">
                 <span className="block truncate">{slice.category}</span>
                 <small className="ui-meta mt-1 block">

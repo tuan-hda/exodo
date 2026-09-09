@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { categoryClass, categoryIcon, expenseCategories } from '@/features/finance/category'
+import { CategoryIcon } from '@/features/finance/CategoryIcon'
 import type { CategoryBudget } from '@/features/budgets/types'
 import { useBudgets } from '@/features/budgets/use-budgets'
 import { PageHeader } from '@/components/PageHeader'
@@ -119,9 +120,7 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
               className="flex min-h-14 items-center gap-3 border-b border-line font-mono text-xs last:border-b-0"
               key={budget.id}>
               <span className="flex min-w-0 flex-1 items-center gap-2">
-                <span className={clsx('ui-icon-tile size-8 rounded-full', categoryClass(budget.category))}>
-                  {categoryIcon(budget.category, 16)}
-                </span>
+                <CategoryIcon category={budget.category} />
                 {budget.category}
               </span>
               <strong className="ui-number font-normal text-ink">{formatMoney(budget.amount)}</strong>
