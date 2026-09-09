@@ -32,12 +32,18 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
   const [amount, setAmount] = useState('')
   const [budgetToRemove, setBudgetToRemove] = useState<CategoryBudget | null>(null)
   const [notice, setNotice] = useState('')
+  const [validationError, setValidationError] = useState('')
   const { budgets, isLoading, isSaving, isRemoving, error, saveBudget, removeBudget } = useBudgets(user?.id)
   const currentBudget = budgets.find((budget) => budget.category === category)
 
   async function handleSave() {
     setNotice('')
+    setValidationError('')
     const value = Number(amount.replace(/,/g, ''))
+    if (!Number.isFinite(value) || value <= 0) {
+      setValidationError('Enter a monthly limit greater than zero.')
+      return
+    }
     if (await saveBudget(category, value)) {
       setAmount('')
       setNotice(`${category} budget saved.`)
@@ -74,6 +80,7 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
             aria-pressed={category === item}
             onClick={() => {
               setNotice('')
+              setValidationError('')
               setCategory(item)
             }}>
             <span className={categoryClass(item)}>{categoryIcon(item, 18)}</span>
@@ -88,9 +95,14 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
         <div className="grid gap-2">
           <Input
             id="budget-amount"
+            aria-describedby={validationError ? 'budget-amount-error' : undefined}
+            aria-invalid={Boolean(validationError)}
             inputMode="numeric"
             value={amount}
-            onChange={(event) => setAmount(formatMoneyInput(event.target.value))}
+            onChange={(event) => {
+              setValidationError('')
+              setAmount(formatMoneyInput(event.target.value))
+            }}
             className="w-full"
             placeholder={currentBudget ? Number(currentBudget.amount).toLocaleString('en-US') : '0'}
           />
@@ -110,8 +122,12 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
           ))}
         </div>
       )}
-      {error && <StateMessage tone="danger">{error}</StateMessage>}
-      {notice && !error && <StateMessage tone="success">{notice}</StateMessage>}
+      {(validationError || error) && (
+        <StateMessage id={validationError ? 'budget-amount-error' : undefined} tone="danger">
+          {validationError || error}
+        </StateMessage>
+      )}
+      {notice && !validationError && !error && <StateMessage tone="success">{notice}</StateMessage>}
       {budgets.length > 0 && (
         <section className="grid gap-3 border-t border-line pt-5" aria-label="Recurring budgets">
           <p className="ui-eyebrow m-0">Recurring budgets</p>

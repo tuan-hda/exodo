@@ -5,13 +5,16 @@ export function StateMessage({
   children,
   tone = 'neutral',
   className,
+  id,
 }: {
   children: ReactNode
   tone?: 'neutral' | 'danger' | 'success'
   className?: string
+  id?: string
 }) {
   return (
     <p
+      id={id}
       className={cn(
         'rounded-control border px-3 py-3 text-xs leading-[1.55]',
         tone === 'neutral' && 'border-line bg-soft text-muted',

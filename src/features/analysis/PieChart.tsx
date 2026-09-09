@@ -95,7 +95,6 @@ export function PieChart({
     if (!chart) return
 
     const updateBadgePositions = () => {
-      const center = chart.clientWidth / 2
       const selectedRadius = chart.clientWidth * (outerRadius / 100)
       const defaultRadius = chart.clientWidth * 0.48
 
@@ -104,8 +103,8 @@ export function PieChart({
         if (!badge) return
 
         const radius = segment.category === visualSelectedCategory ? selectedRadius : defaultRadius
-        badge.style.left = `${center + Math.cos(segment.midpoint) * radius}px`
-        badge.style.top = `${center + Math.sin(segment.midpoint) * radius}px`
+        badge.style.setProperty('--pie-badge-x', `${Math.cos(segment.midpoint) * radius}px`)
+        badge.style.setProperty('--pie-badge-y', `${Math.sin(segment.midpoint) * radius}px`)
       })
     }
 
@@ -162,7 +161,7 @@ export function PieChart({
               ref={(node) => {
                 badgeRefs.current[segment.category] = node
               }}
-              className="absolute -translate-x-1/2 -translate-y-1/2"
+              className="pie-chart-badge-position absolute top-1/2 left-1/2"
               key={segment.category}>
               <Button
                 variant="outline"

@@ -28,6 +28,7 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
   const [iconPickerOpen, setIconPickerOpen] = useState(false)
   const [depositGoal, setDepositGoal] = useState<string | null>(null)
   const [notice, setNotice] = useState('')
+  const [validationError, setValidationError] = useState('')
   const selectedGoal = goals.find((goal) => goal.id === depositGoal)
 
   const summary = {
@@ -38,9 +39,19 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
     event.preventDefault()
     setNotice('')
     const goalName = name.trim()
+    const targetAmount = Number(target)
+    if (!goalName) {
+      setValidationError('Give this goal a name.')
+      return
+    }
+    if (!Number.isFinite(targetAmount) || targetAmount <= 0) {
+      setValidationError('Enter a target amount greater than zero.')
+      return
+    }
+    setValidationError('')
     const saved = await saveGoal({
-      name,
-      targetAmount: Number(target),
+      name: goalName,
+      targetAmount,
       targetDate: date || null,
       icon,
       status: 'active',
@@ -69,15 +80,19 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
           </Button>
         }
       />
-      {error && <StateMessage tone="danger">{error}</StateMessage>}
-      {notice && !error && <StateMessage tone="success">{notice}</StateMessage>}
+      {(validationError || error) && (
+        <StateMessage id={validationError ? 'goal-form-error' : undefined} tone="danger">
+          {validationError || error}
+        </StateMessage>
+      )}
+      {notice && !validationError && !error && <StateMessage tone="success">{notice}</StateMessage>}
       <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
         <MetricCard label="saved" value={formatMoney(summary.saved)} detail="across goals" isLoading={isLoading} />
         <MetricCard label="target" value={formatMoney(summary.target)} detail="across goals" isLoading={isLoading} />
       </div>
       {showForm && (
         <Card className="p-5">
-          <form className="grid gap-4" onSubmit={submitGoal}>
+          <form className="grid gap-4" noValidate onSubmit={submitGoal}>
             <div className="ui-field">
               <label className="ui-field-label" htmlFor="goal-name">
                 Goal name
@@ -85,9 +100,14 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
               <Input
                 id="goal-name"
                 value={name}
-                onChange={(event) => setName(event.target.value)}
+                onChange={(event) => {
+                  setValidationError('')
+                  setName(event.target.value)
+                }}
                 placeholder="Japan trip"
                 required
+                aria-describedby={validationError ? 'goal-form-error' : undefined}
+                aria-invalid={validationError === 'Give this goal a name.'}
               />
             </div>
             <div className="ui-field">
@@ -101,9 +121,14 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
                 min="0.01"
                 step="0.01"
                 value={target}
-                onChange={(event) => setTarget(event.target.value)}
+                onChange={(event) => {
+                  setValidationError('')
+                  setTarget(event.target.value)
+                }}
                 placeholder="3000"
                 required
+                aria-describedby={validationError ? 'goal-form-error' : undefined}
+                aria-invalid={validationError === 'Enter a target amount greater than zero.'}
               />
             </div>
             <div className="ui-field">

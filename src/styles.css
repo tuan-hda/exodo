@@ -198,6 +198,10 @@
     @apply border-t border-line;
   }
 
+  .pie-chart-badge-position {
+    transform: translate(calc(-50% + var(--pie-badge-x, 0px)), calc(-50% + var(--pie-badge-y, 0px)));
+  }
+
   .ui-page-enter {
     animation: page-rise var(--motion-page-duration) cubic-bezier(0.16, 1, 0.3, 1) both;
   }

@@ -38,7 +38,7 @@ export function BudgetProgress({
       percent: budget.amount ? (spent / budget.amount) * 100 : 0,
     }
   })
-  const dailyPace = budgetRows.reduce((sum, row) => sum + Math.floor(row.dailyAllowance), 0)
+  const dailyPace = Math.floor(budgetRows.reduce((sum, row) => sum + row.dailyAllowance, 0))
 
   if (!budgetRows.length && !isLoading) {
     return (
