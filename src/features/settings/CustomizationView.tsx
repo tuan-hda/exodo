@@ -10,7 +10,7 @@ export function CustomizationView({ onBack }: { onBack: () => void }) {
   const { enabled, setEnabled } = useBackgroundPreference()
 
   return (
-    <section className="mx-auto grid max-w-[620px] gap-8 pb-8 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both]">
+    <section className="ui-page-enter mx-auto grid max-w-[620px] gap-8 pb-8">
       <PageHeader
         eyebrow="appearance"
         title="Customization"

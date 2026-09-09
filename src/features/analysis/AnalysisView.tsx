@@ -199,7 +199,7 @@ export function AnalysisView({
 
   return (
     <section
-      className="grid gap-8 pb-12 pt-16 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_120ms_both] max-md:pt-10"
+      className="ui-page-enter ui-page-enter-delay-120 grid gap-8 pb-12 pt-16 max-md:pt-10"
       aria-busy={isLoading}>
       <PageHeader
         eyebrow="the month analysis"

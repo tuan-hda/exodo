@@ -157,6 +157,22 @@
   .ui-divider-list > * + * {
     @apply border-t border-line;
   }
+
+  .ui-page-enter {
+    animation: page-rise 550ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .ui-page-enter-delay-80 {
+    animation-delay: 80ms;
+  }
+
+  .ui-page-enter-delay-120 {
+    animation-delay: 120ms;
+  }
+
+  .ui-page-enter-delay-260 {
+    animation-delay: 260ms;
+  }
 }
 
 @keyframes page-rise {

@@ -179,7 +179,7 @@ function Dashboard() {
           )}
           {activeTab === 'today' && (
             <>
-              <section className="grid grid-cols-[minmax(0,1.3fr)_minmax(220px,.7fr)] items-end gap-12 pt-16 pb-14 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both] max-md:grid-cols-1 max-md:gap-7 max-md:pt-10 max-md:pb-10">
+              <section className="ui-page-enter grid grid-cols-[minmax(0,1.3fr)_minmax(220px,.7fr)] items-end gap-12 pt-16 pb-14 max-md:grid-cols-1 max-md:gap-7 max-md:pt-10 max-md:pb-10">
                 <div>
                   <p className="ui-eyebrow mb-4">
                     {currentDay.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}

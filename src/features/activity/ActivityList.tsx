@@ -89,7 +89,7 @@ export function ActivityList({
   }
 
   return (
-    <section className="animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_260ms_both]" aria-busy={isLoading}>
+    <section className="ui-page-enter ui-page-enter-delay-260" aria-busy={isLoading}>
       <div className="flex items-end justify-between gap-4">
         <div>
           <p className="ui-eyebrow mb-3">recent activity</p>

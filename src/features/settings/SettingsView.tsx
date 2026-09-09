@@ -42,7 +42,7 @@ export function SettingsView({ userId, entries }: { userId?: string; entries: En
   if (page === 'customization') return <CustomizationView onBack={() => changePage('menu')} />
 
   return (
-    <section className="mx-auto grid max-w-[620px] gap-8 pb-8 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both]">
+    <section className="ui-page-enter mx-auto grid max-w-[620px] gap-8 pb-8">
       <div className="grid justify-items-center gap-4 py-4 text-center">
         <div className="grid size-16 place-items-center rounded-full bg-ink text-xl font-semibold tracking-[-.06em] text-white">
           {initials}

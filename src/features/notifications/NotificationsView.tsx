@@ -55,9 +55,7 @@ export function NotificationsView() {
   const connected = status === 'connected'
   const isLoading = status === 'loading'
   return (
-    <section
-      className="mx-auto grid max-w-[560px] gap-8 pb-12 text-center animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both]"
-      aria-busy={isLoading}>
+    <section className="ui-page-enter mx-auto grid max-w-[560px] gap-8 pb-12 text-center" aria-busy={isLoading}>
       <div className="grid justify-items-center gap-5">
         <span className="ui-icon-tile size-14 rounded-full">
           <Bell size={24} weight="regular" />

@@ -34,9 +34,7 @@ export function SummaryPanels({
   const availableToday = todayIncome - todaySpent
 
   return (
-    <section
-      className="grid grid-cols-1 gap-4 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_80ms_both]"
-      aria-label="Money summary">
+    <section className="ui-page-enter ui-page-enter-delay-80 grid grid-cols-1 gap-4" aria-label="Money summary">
       <FadeContent>
         <DashboardPanel
           className={clsx(

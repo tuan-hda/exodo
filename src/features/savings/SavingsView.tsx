@@ -52,9 +52,7 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
     }
   }
   return (
-    <section
-      className="mx-auto grid max-w-[760px] gap-8 pb-12 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both]"
-      aria-busy={isLoading}>
+    <section className="ui-page-enter mx-auto grid max-w-[760px] gap-8 pb-12" aria-busy={isLoading}>
       <PageHeader
         eyebrow="the goal tracker"
         title="Save for what matters."
