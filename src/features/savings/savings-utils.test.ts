@@ -9,7 +9,7 @@ const goal = (id: string, priority: number, targetAmount = 1_000) =>
     targetAmount,
     savedAmount: 0,
     targetDate: null,
-    icon: 'travel',
+    icon: 'airplane',
     priority,
     status: 'active' as const,
   }) satisfies SavingsGoal

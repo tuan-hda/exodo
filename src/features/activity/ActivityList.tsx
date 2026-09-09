@@ -114,7 +114,7 @@ export function ActivityList({
               placeholder="Search activity"
             />
           </label>
-          <span className="shrink-0 font-mono text-[10px] text-muted">
+          <span className="ui-meta shrink-0">
             {filteredEntries.length} {filteredEntries.length === 1 ? 'record' : 'records'}
           </span>
         </div>
@@ -126,7 +126,7 @@ export function ActivityList({
           <Button
             variant="ghost"
             size="sm"
-            className="min-w-0 justify-start gap-1 px-2 text-left font-mono text-[10px] text-muted hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
+            className="ui-meta min-w-0 justify-start gap-1 px-2 text-left hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
             disabled={!previousMonth}
             type="button"
             onClick={() => previousMonth && setSelectedMonth(previousMonth)}
@@ -135,13 +135,13 @@ export function ActivityList({
             <span>{previousMonth ? monthChip(previousMonth) : '—'}</span>
           </Button>
           <div className="grid justify-items-center gap-0.5 px-3 text-center">
-            <span className="font-mono text-[9px] uppercase tracking-[.1em] text-muted">Viewing</span>
+            <span className="ui-label tracking-[.1em]">Viewing</span>
             <strong className="text-sm font-semibold text-ink">{activeMonth ? monthChip(activeMonth) : '—'}</strong>
           </div>
           <Button
             variant="ghost"
             size="sm"
-            className="min-w-0 justify-end gap-1 px-2 text-right font-mono text-[10px] text-muted hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
+            className="ui-meta min-w-0 justify-end gap-1 px-2 text-right hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
             disabled={!nextMonth}
             type="button"
             onClick={() => nextMonth && setSelectedMonth(nextMonth)}
@@ -159,7 +159,7 @@ export function ActivityList({
               <Button
                 variant="outline"
                 size="sm"
-                className="font-mono text-[10px]"
+                className="ui-meta"
                 type="button"
                 onClick={() => onOpenAnalysis(activeGroup.key)}>
                 Analysis
@@ -172,19 +172,19 @@ export function ActivityList({
               onClick={() => onOpenAnalysis(activeGroup.key)}
               aria-label={`Analyze ${activeGroup.label}`}>
               <span className="grid gap-1">
-                <b className="font-mono text-[9px] font-normal uppercase tracking-[.08em] text-muted">Income</b>
+                <b className="ui-label">Income</b>
                 <strong className="ui-number text-xs font-normal text-success">
                   +{formatMoney(activeGroup.income)}
                 </strong>
               </span>
               <span className="grid justify-items-center gap-1 text-center">
-                <b className="font-mono text-[9px] font-normal uppercase tracking-[.08em] text-muted">Expense</b>
+                <b className="ui-label">Expense</b>
                 <strong className="ui-number text-xs font-normal text-danger">
                   -{formatMoney(activeGroup.expense)}
                 </strong>
               </span>
               <span className="grid justify-items-end gap-1 text-right">
-                <b className="font-mono text-[9px] font-normal uppercase tracking-[.08em] text-muted">Leftover</b>
+                <b className="ui-label">Leftover</b>
                 <strong
                   className={clsx(
                     'ui-number text-xs font-normal',
@@ -196,9 +196,7 @@ export function ActivityList({
             </Button>
             {groupByDate(activeGroup.entries).map((day) => (
               <section key={day.key}>
-                <h4 className="m-0 border-b border-line px-2 py-3 font-mono text-[10px] font-normal uppercase tracking-[.08em] text-muted">
-                  {day.label}
-                </h4>
+                <h4 className="ui-label m-0 border-b border-line px-2 py-3">{day.label}</h4>
                 {day.entries.map((entry) => (
                   <Button variant="list" size="list" key={entry.id} onClick={() => onEdit(entry)} type="button">
                     <span
@@ -212,7 +210,7 @@ export function ActivityList({
                       <strong className="block text-[13px] font-medium text-ink">
                         {entry.title || entry.category || (entry.type === 'income' ? 'Income' : 'Expense')}
                       </strong>
-                      <small className="mt-1 block font-mono text-[10px] text-muted">
+                      <small className="ui-meta mt-1 block">
                         {entry.category ?? 'Other'} · {entry.occurredAt.slice(11, 16)}
                       </small>
                     </span>
@@ -228,9 +226,7 @@ export function ActivityList({
                 ))}
               </section>
             ))}
-            <p className="m-0 border-t border-line px-2 py-4 text-center font-mono text-[10px] uppercase tracking-[.08em] text-muted">
-              End of transactions
-            </p>
+            <p className="ui-label m-0 border-t border-line px-2 py-4 text-center">End of transactions</p>
           </section>
         ) : isLoading ? (
           <div className="mt-4 grid gap-3" aria-label="Loading activity">

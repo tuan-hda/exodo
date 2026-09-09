@@ -141,10 +141,7 @@ export function EntryComposer({
             <Button
               variant={type === 'income' ? 'secondary' : 'outline'}
               size="sm"
-              className={clsx(
-                'font-mono text-[10px] uppercase tracking-[.06em] max-md:text-[11px]',
-                type === 'income' && 'text-success',
-              )}
+              className={clsx('ui-label tracking-[.06em] max-md:text-[11px]', type === 'income' && 'text-success')}
               type="button"
               disabled={isSaving}
               onClick={toggleType}
@@ -168,7 +165,7 @@ export function EntryComposer({
           {stepLabels.map((label, index) => (
             <span
               className={clsx(
-                'inline-flex items-center gap-1.5 font-mono text-[10px] text-muted max-md:text-[9px]',
+                'ui-meta inline-flex items-center gap-1.5 max-md:text-[9px]',
                 step === index + 1 && 'text-ink',
               )}
               key={label}>

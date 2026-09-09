@@ -97,7 +97,7 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
                 </span>
                 {budget.category}
               </span>
-              <strong className="font-normal text-ink">{formatMoney(budget.amount)}</strong>
+              <strong className="ui-number font-normal text-ink">{formatMoney(budget.amount)}</strong>
               <Button
                 variant="ghost"
                 size="icon-xs"

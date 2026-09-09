@@ -106,6 +106,18 @@
     @apply font-mono text-[10px] font-normal uppercase tracking-[.14em] text-muted;
   }
 
+  .ui-label {
+    @apply font-mono text-[10px] font-normal uppercase tracking-[.08em] text-muted;
+  }
+
+  .ui-meta {
+    @apply font-mono text-[10px] leading-[1.5] text-muted;
+  }
+
+  .ui-nav-label {
+    @apply font-mono text-[9px] uppercase tracking-[.04em];
+  }
+
   .ui-page-title {
     @apply text-[clamp(38px,6vw,68px)] font-semibold leading-[.94] tracking-[-.085em];
   }

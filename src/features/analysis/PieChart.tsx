@@ -181,7 +181,7 @@ export function PieChart({
           ))}
       </div>
       <div className="absolute inset-[25%] grid place-items-center rounded-full bg-surface text-center">
-        <strong className="font-mono text-lg font-semibold tracking-[-.05em]">
+        <strong className="ui-number text-lg font-semibold tracking-[-.05em]">
           <CountUp value={total} formatValue={formatMoney} />
         </strong>
       </div>

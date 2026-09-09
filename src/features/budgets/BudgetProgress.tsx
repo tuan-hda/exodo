@@ -90,10 +90,10 @@ export function BudgetProgress({
                 {row.category}
               </span>
               <div className="grid justify-items-end gap-0.5 text-right">
-                <strong className={clsx('font-normal', row.percent > 100 ? 'text-danger' : 'text-ink')}>
+                <strong className={clsx('ui-number font-normal', row.percent > 100 ? 'text-danger' : 'text-ink')}>
                   {formatMoney(row.spent)} <small className="text-muted">/ {formatMoney(row.amount)}</small>
                 </strong>
-                <small className="text-[10px] font-normal text-muted">{formatMoney(row.dailyAllowance)} / day</small>
+                <small className="ui-meta ui-number">{formatMoney(row.dailyAllowance)} / day</small>
               </div>
             </div>
             <Progress
@@ -102,7 +102,7 @@ export function BudgetProgress({
               aria-label={`${row.category} monthly budget progress`}
             />
             {row.percent > 100 && (
-              <small className="text-[10px] text-danger">{formatMoney(row.spent - row.amount)} over</small>
+              <small className="ui-meta text-danger">{formatMoney(row.spent - row.amount)} over</small>
             )}
           </div>
         ))}

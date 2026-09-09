@@ -94,7 +94,7 @@ export function CategoryPicker({
         <span>Category</span>
         <span
           className={clsx(
-            'inline-flex items-center gap-1 rounded-chip bg-soft px-2 py-1 font-mono text-[10px] font-normal text-ink max-md:px-3 max-md:py-2 max-md:text-xs',
+            'ui-meta inline-flex items-center gap-1 rounded-chip bg-soft px-2 py-1 text-ink max-md:px-3 max-md:py-2 max-md:text-xs',
             categoryClass(value),
           )}>
           {categoryIcon(value, 14)} {value}

@@ -25,7 +25,7 @@ export function MobileTabBar({
         type="button"
         onClick={() => onChange('today')}>
         <House size={20} weight={activeTab === 'today' ? 'fill' : 'regular'} />
-        <span className="font-mono text-[9px] uppercase tracking-[.04em]">Today</span>
+        <span className="ui-nav-label">Today</span>
       </Button>
       <Button
         variant="nav"
@@ -35,7 +35,7 @@ export function MobileTabBar({
         type="button"
         onClick={() => onChange('overview')}>
         <ChartLineUp size={20} weight={activeTab === 'overview' ? 'fill' : 'regular'} />
-        <span className="font-mono text-[9px] uppercase tracking-[.04em]">Overview</span>
+        <span className="ui-nav-label">Overview</span>
       </Button>
       <Button
         size="fab"
@@ -53,7 +53,7 @@ export function MobileTabBar({
         type="button"
         onClick={() => onChange('notifications')}>
         <Bell size={20} weight={activeTab === 'notifications' ? 'fill' : 'regular'} />
-        <span className="font-mono text-[9px] uppercase tracking-[.04em]">Notifications</span>
+        <span className="ui-nav-label">Notifications</span>
       </Button>
       <Button
         variant="nav"
@@ -63,7 +63,7 @@ export function MobileTabBar({
         type="button"
         onClick={() => onChange('settings')}>
         <Gear size={20} weight={activeTab === 'settings' ? 'fill' : 'regular'} />
-        <span className="font-mono text-[9px] uppercase tracking-[.04em]">Settings</span>
+        <span className="ui-nav-label">Settings</span>
       </Button>
     </nav>
   )

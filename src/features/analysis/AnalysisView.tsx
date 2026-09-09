@@ -34,7 +34,7 @@ function CategoryDetail({
     <div className="mt-8 border-t border-line pt-4">
       <div className="mb-2 flex items-center justify-between gap-3">
         <div>
-          <p className="mb-1 font-mono text-[10px] uppercase tracking-[.1em] text-muted">selected category</p>
+          <p className="ui-label mb-1 tracking-[.1em]">selected category</p>
           <h3 className="m-0 text-xl font-semibold tracking-[-.05em]">{category}</h3>
         </div>
         <Button variant="outline" size="icon-sm" type="button" onClick={onClose} aria-label="Close category details">
@@ -47,7 +47,7 @@ function CategoryDetail({
             <div className="analysis-detail-item flex min-h-16 items-center gap-3 border-b border-line py-3">
               <div className="min-w-0 flex-1">
                 <strong className="block truncate text-sm font-medium text-ink">{entry.title || category}</strong>
-                <small className="mt-1 block font-mono text-[10px] text-muted">
+                <small className="ui-meta mt-1 block">
                   {entry.occurredAt.slice(0, 10)} · {entry.occurredAt.slice(11, 16)}
                 </small>
               </div>
@@ -148,7 +148,7 @@ function DistributionCard({
               </span>
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-ink">
                 <span className="block truncate">{slice.category}</span>
-                <small className="mt-1 block font-mono text-[10px] font-normal text-muted">
+                <small className="ui-meta mt-1 block">
                   {formatPercentage(slice.percentage)} · {slice.transactionCount}{' '}
                   {slice.transactionCount === 1 ? 'transaction' : 'transactions'}
                 </small>
@@ -235,7 +235,7 @@ export function AnalysisView({
           <Skeleton className="h-3 w-24" />
         </div>
       ) : (
-        <div className="flex gap-5 border-y border-line py-3 font-mono text-[10px] uppercase tracking-[.08em] text-muted max-xs:gap-3 max-xs:text-[9px]">
+        <div className="ui-label flex gap-5 border-y border-line py-3 max-xs:gap-3 max-xs:text-[9px]">
           <span>
             <b className="ui-number font-normal text-success">+{formatMoney(income)}</b> income
           </span>

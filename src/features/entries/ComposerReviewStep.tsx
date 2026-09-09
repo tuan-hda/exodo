@@ -38,15 +38,13 @@ export function ComposerReviewStep({
     <section className="grid content-start gap-4" aria-label="Review record">
       <Card tone="soft" className="grid gap-3 p-4">
         <div className="flex items-end justify-between border-b border-line-strong pb-3">
-          <span className="font-mono text-[10px] uppercase tracking-[.08em] text-muted">
-            {type === 'income' ? 'Income' : 'Expense'}
-          </span>
+          <span className="ui-label">{type === 'income' ? 'Income' : 'Expense'}</span>
           <strong className="text-[25px] font-semibold tracking-[-.06em]">
             {formatMoney(evaluateExpression(amount))}
           </strong>
         </div>
         <div className="flex items-center justify-between">
-          <span className="font-mono text-[10px] uppercase tracking-[.08em] text-muted">Category</span>
+          <span className="ui-label">Category</span>
           <strong className="text-sm font-medium">{category}</strong>
         </div>
       </Card>
