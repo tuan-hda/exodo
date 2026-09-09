@@ -1,6 +1,6 @@
 import { CalendarDots, CaretLeft, CaretRight, ClockCounterClockwise, MagnifyingGlass } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '../../components/ui/button'
 import { EmptyState } from '../../components/EmptyState'
 import { Skeleton } from '../../components/ui/skeleton'
@@ -46,6 +46,9 @@ export function ActivityList({
 }) {
   const [query, setQuery] = useState('')
   const [selectedMonth, setSelectedMonth] = useState(todayKey.slice(0, 7))
+  useEffect(() => {
+    setSelectedMonth(todayKey.slice(0, 7))
+  }, [todayKey])
   const normalizedQuery = query.trim().toLocaleLowerCase()
   const sortedEntries = [...entries].sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
   const filteredEntries = normalizedQuery
@@ -131,7 +134,7 @@ export function ActivityList({
             <CaretLeft size={17} />
             <span>{previousMonth ? monthChip(previousMonth) : '—'}</span>
           </Button>
-          <div className="grid justify-items-center gap-0.5 px-3 text-center" aria-current="date">
+          <div className="grid justify-items-center gap-0.5 px-3 text-center">
             <span className="font-mono text-[9px] uppercase tracking-[.1em] text-muted">Viewing</span>
             <strong className="text-sm font-semibold text-ink">{activeMonth ? monthChip(activeMonth) : '—'}</strong>
           </div>
@@ -196,11 +199,7 @@ export function ActivityList({
                   {day.label}
                 </h4>
                 {day.entries.map((entry) => (
-                  <button
-                    className="grid min-h-[67px] w-full cursor-pointer grid-cols-[34px_1fr_auto] items-center gap-[13px] border-b border-line bg-transparent text-left transition-colors hover:bg-soft focus-visible:bg-soft max-[430px]:grid-cols-[30px_1fr_auto] max-[430px]:gap-[9px]"
-                    key={entry.id}
-                    onClick={() => onEdit(entry)}
-                    type="button">
+                  <Button variant="list" size="list" key={entry.id} onClick={() => onEdit(entry)} type="button">
                     <span
                       className={clsx(
                         'grid size-[29px] place-items-center rounded-full border text-current',
@@ -224,7 +223,7 @@ export function ActivityList({
                       {entry.type === 'income' ? '+' : '-'}
                       {formatMoney(entry.amount)}
                     </b>
-                  </button>
+                  </Button>
                 ))}
               </section>
             ))}

@@ -3,6 +3,7 @@
 import type { KeyboardEvent } from 'react'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { clsx } from 'clsx'
+import { Button } from '../../components/ui/button'
 import { categoryChartColor, categoryClass, categoryIcon } from '../entries/CategoryPicker'
 import { formatMoney } from '../entries/entry-utils'
 import { CountUp } from '../../components/ui/count-up'
@@ -155,7 +156,9 @@ export function PieChart({
               }}
               className="absolute -translate-x-1/2 -translate-y-1/2"
               key={segment.category}>
-              <button
+              <Button
+                variant="outline"
+                size="icon-lg"
                 type="button"
                 aria-label={`Select ${segment.category}`}
                 onClick={() => onSelect(segment.category)}
@@ -173,7 +176,7 @@ export function PieChart({
                   categoryClass(segment.category),
                 )}>
                 {categoryIcon(segment.category, 24)}
-              </button>
+              </Button>
             </span>
           ))}
       </div>

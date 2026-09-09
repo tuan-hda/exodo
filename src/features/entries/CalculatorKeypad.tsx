@@ -2,7 +2,7 @@
 
 import { Backspace } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
-import { triggerHaptic } from '@/lib/haptics'
+import { Button } from '../../components/ui/button'
 import { formatAmountExpression } from './entry-utils'
 
 export function CalculatorKeypad({
@@ -23,7 +23,6 @@ export function CalculatorKeypad({
   }
 
   function pressKey(key: string) {
-    triggerHaptic()
     if (key === '⌫') backspace()
     else append(key === '−' ? '-' : key)
   }
@@ -35,19 +34,20 @@ export function CalculatorKeypad({
       </div>
       <div className="mt-2 grid grid-cols-4 gap-1.5">
         {['1', '2', '3', '÷', '4', '5', '6', '×', '7', '8', '9', '−', '0', '000', '⌫', '+'].map((key) => (
-          <button
+          <Button
             key={key}
             disabled={disabled}
             type="button"
+            variant="keypad"
+            size="keypad"
             aria-label={key === '⌫' ? 'Delete last character' : key}
             className={clsx(
-              'inline-flex min-h-[52px] w-full items-center justify-center rounded-[12px] border font-mono text-base transition-colors active:scale-[.97] disabled:cursor-wait disabled:opacity-50 max-[700px]:min-h-[58px]',
-              ['÷', '×', '−', '+'].includes(key) ? 'border-line-strong' : 'border-line',
+              ['÷', '×', '−', '+'].includes(key) && 'border-line-strong',
               key === '⌫' ? 'bg-surface text-muted hover:bg-soft' : 'bg-soft text-ink hover:bg-line',
             )}
             onClick={() => pressKey(key)}>
             {key === '⌫' ? <Backspace size={21} weight="regular" /> : key}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

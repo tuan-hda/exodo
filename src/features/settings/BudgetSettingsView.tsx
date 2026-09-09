@@ -36,18 +36,18 @@ export function BudgetSettingsView({ onBack }: { onBack: () => void }) {
       />
       <div className="grid grid-cols-2 gap-2">
         {expenseCategories.map((item) => (
-          <button
+          <Button
             key={item}
             type="button"
-            className={clsx(
-              'inline-flex min-h-14 items-center gap-2.5 rounded-[14px] border px-4 text-left text-sm text-muted transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ink',
-              categoryClass(item),
-              category === item && 'border-ink bg-surface text-ink shadow-[0_2px_8px_rgb(21_21_21_/_0.06)]',
-            )}
+            variant="option"
+            size="option"
+            className={clsx(categoryClass(item))}
+            data-selected={category === item}
+            aria-pressed={category === item}
             onClick={() => setCategory(item)}>
             <span className={categoryClass(item)}>{categoryIcon(item, 18)}</span>
             {item}
-          </button>
+          </Button>
         ))}
       </div>
       <div className="grid gap-2">

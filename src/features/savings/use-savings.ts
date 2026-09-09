@@ -70,11 +70,15 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
   const [isLoading, setIsLoading] = useState(Boolean(userId))
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
+  const goalsRef = useRef<SavingsGoal[]>([])
+  const depositsRef = useRef<SavingsDeposit[]>([])
   const previousUserIdRef = useRef<string | undefined>(userId)
 
   const refresh = useCallback(
     async (signal?: AbortSignal) => {
       if (!userId) {
+        goalsRef.current = []
+        depositsRef.current = []
         setGoals([])
         setDeposits([])
         setError('')
@@ -102,6 +106,8 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
         if (signal?.aborted) return
         const nextGoals = ((goalResult.data ?? []) as StoredSavingsGoal[]).map(normalizeGoal)
         const nextDeposits = ((depositResult.data ?? []) as StoredSavingsDeposit[]).map(normalizeDeposit)
+        goalsRef.current = nextGoals
+        depositsRef.current = nextDeposits
         setGoals(nextGoals)
         setDeposits(nextDeposits)
         writeSavingsCache(userId, nextGoals, nextDeposits)
@@ -121,6 +127,8 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
     const userChanged = previousUserIdRef.current !== userId
     previousUserIdRef.current = userId
     if (userChanged) {
+      goalsRef.current = []
+      depositsRef.current = []
       setGoals([])
       setDeposits([])
       setError('')
@@ -128,6 +136,8 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
     if (userId) {
       const cachedSavings = readSavingsCache(userId)
       if (cachedSavings) {
+        goalsRef.current = cachedSavings.goals
+        depositsRef.current = cachedSavings.deposits
         setGoals(cachedSavings.goals)
         setDeposits(cachedSavings.deposits)
       }
@@ -143,6 +153,7 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
       setError('')
       try {
         const supabase = await getSupabase()
+        const currentGoals = goalsRef.current
         const payload = {
           ...(goal.id ? { id: goal.id } : {}),
           user_id: userId,
@@ -151,7 +162,9 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
           target_date: goal.targetDate || null,
           icon: goal.icon,
           status: goal.status,
-          priority: goal.id ? (goals.find((item) => item.id === goal.id)?.priority ?? goals.length) : goals.length,
+          priority: goal.id
+            ? (currentGoals.find((item) => item.id === goal.id)?.priority ?? currentGoals.length)
+            : currentGoals.length,
         }
         const { error: saveError } = await supabase.from('savings_goals').upsert(payload)
         if (saveError) throw saveError
@@ -165,13 +178,15 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
         setIsSaving(false)
       }
     },
-    [getSupabase, goals, refresh, userId],
+    [getSupabase, refresh, userId],
   )
 
   const addDeposit = useCallback(
     async (goalId: string, amount: number, note = '') => {
       if (!userId || !Number.isFinite(amount) || amount <= 0) return false
-      const goal = goals.find((item) => item.id === goalId)
+      const currentGoals = goalsRef.current
+      const currentDeposits = depositsRef.current
+      const goal = currentGoals.find((item) => item.id === goalId)
       if (!goal) return false
       setIsSaving(true)
       setError('')
@@ -192,7 +207,7 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
           .eq('id', goalId)
           .eq('user_id', userId)
         if (goalError) throw goalError
-        const nextGoals = goals.map((item) =>
+        const nextGoals = currentGoals.map((item) =>
           item.id === goalId ? { ...item, savedAmount: item.savedAmount + amount } : item,
         )
         const nextDeposits = [
@@ -205,8 +220,12 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
             monthKey: null,
             note: note || null,
           },
-          ...deposits,
+          ...currentDeposits,
         ]
+        goalsRef.current = nextGoals
+        depositsRef.current = nextDeposits
+        setGoals(nextGoals)
+        setDeposits(nextDeposits)
         writeSavingsCache(userId, nextGoals, nextDeposits)
         await refresh()
         return true
@@ -218,23 +237,25 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
         setIsSaving(false)
       }
     },
-    [getSupabase, goals, refresh, userId],
+    [getSupabase, refresh, userId],
   )
 
   const syncAutomaticRemainder = useCallback(async () => {
-    if (!userId || !goals.length) return
+    const currentGoals = goalsRef.current
+    const currentDeposits = depositsRef.current
+    if (!userId || !currentGoals.length) return
     const remainder = calculateMonthlyRemainder(entries)
-    const allocations = allocateRemainder(goals, remainder)
+    const allocations = allocateRemainder(currentGoals, remainder)
     if (!allocations.length) return
     const currentMonth = monthKey()
     const supabase = await getSupabase()
     let changed = false
     for (const allocation of allocations) {
-      const existing = deposits.find(
+      const existing = currentDeposits.find(
         (deposit) =>
           deposit.goalId === allocation.goalId && deposit.monthKey === currentMonth && deposit.source === 'automatic',
       )
-      const goal = goals.find((item) => item.id === allocation.goalId)
+      const goal = currentGoals.find((item) => item.id === allocation.goalId)
       if (!goal) continue
       const amount = Math.round(allocation.amount * 100) / 100
       if (existing) {
@@ -274,7 +295,7 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
       }
     }
     if (changed) await refresh()
-  }, [deposits, entries, getSupabase, goals, refresh, userId])
+  }, [entries, getSupabase, refresh, userId])
 
   useEffect(() => {
     syncAutomaticRemainder().catch((syncError) => {

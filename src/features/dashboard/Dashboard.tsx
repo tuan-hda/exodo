@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { clsx } from 'clsx'
 import { useUser } from '@clerk/nextjs'
-import { ArrowClockwise } from '@phosphor-icons/react'
+import { ArrowClockwise, Plus } from '@phosphor-icons/react'
 import { Button } from '../../components/ui/button'
 import { fromKey } from '../finance/allocation'
 import { SettingsView } from '../settings/SettingsView'
@@ -27,7 +27,6 @@ const primaryTabs: Array<{ id: AppTab; label: string }> = [
   { id: 'overview', label: 'Overview' },
   { id: 'notifications', label: 'Notifications' },
   { id: 'settings', label: 'Settings' },
-  { id: 'analysis', label: 'Analysis' },
 ]
 
 function Dashboard() {
@@ -148,20 +147,25 @@ function Dashboard() {
           <span className="hidden font-mono text-[10px] uppercase tracking-[.1em] text-muted max-[700px]:block">
             {activeTab}
           </span>
-          <nav className="flex items-center gap-1 max-[700px]:hidden" aria-label="Primary navigation">
-            {primaryTabs.map((tab) => (
-              <Button
-                key={tab.id}
-                variant="nav"
-                size="nav"
-                data-active={activeTab === tab.id}
-                aria-current={activeTab === tab.id ? 'page' : undefined}
-                type="button"
-                onClick={() => navigateTab(tab.id)}>
-                {tab.label}
-              </Button>
-            ))}
-          </nav>
+          <div className="flex items-center gap-2 max-[700px]:hidden">
+            <nav className="flex items-center gap-1" aria-label="Primary navigation">
+              {primaryTabs.map((tab) => (
+                <Button
+                  key={tab.id}
+                  variant="nav"
+                  size="nav"
+                  data-active={activeTab === tab.id}
+                  aria-current={activeTab === tab.id ? 'page' : undefined}
+                  type="button"
+                  onClick={() => navigateTab(tab.id)}>
+                  {tab.label}
+                </Button>
+              ))}
+            </nav>
+            <Button size="sm" type="button" onClick={() => openComposer('expense')} aria-label="Record an expense">
+              <Plus size={15} weight="bold" /> Record
+            </Button>
+          </div>
         </header>
         <div id="main-content" tabIndex={-1} className="outline-none">
           {persistenceError && (

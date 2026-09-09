@@ -18,6 +18,10 @@ const buttonVariants = cva(
         destructive: 'border-danger/20 bg-danger-soft text-danger hover:border-danger/35 hover:bg-danger/15',
         link: 'border-transparent text-ink underline-offset-4 hover:underline',
         'outline-muted': 'border-line-strong bg-surface text-muted hover:border-ink hover:bg-soft hover:text-ink',
+        option:
+          'border-line-strong bg-soft text-muted hover:border-ink hover:bg-surface hover:text-ink data-[selected=true]:border-ink data-[selected=true]:bg-surface data-[selected=true]:text-ink data-[selected=true]:shadow-[0_2px_8px_rgb(21_21_21_/_0.06)]',
+        keypad: 'border-line bg-soft text-ink hover:border-line-strong hover:bg-line',
+        list: 'bg-transparent text-ink hover:bg-soft',
         nav: 'border-transparent text-muted hover:bg-soft hover:text-ink data-[active=true]:bg-ink data-[active=true]:text-white data-[active=true]:shadow-[0_4px_12px_rgb(21_21_21_/_0.12)]',
       },
       size: {
@@ -30,6 +34,9 @@ const buttonVariants = cva(
         'icon-xs': "size-8 rounded-[10px] [&_svg:not([class*='size-'])]:size-3.5",
         'icon-sm': 'size-9 rounded-[12px]',
         'icon-lg': 'size-11 rounded-[14px]',
+        option: 'min-h-14 w-full justify-start gap-2.5 rounded-[14px] px-4 py-3 text-left text-sm font-medium',
+        keypad: 'min-h-[52px] w-full rounded-[12px] font-mono text-base max-[700px]:min-h-[58px]',
+        list: 'grid min-h-[67px] w-full grid-cols-[34px_1fr_auto] items-center gap-[13px] rounded-none border-0 border-b border-line px-2 py-3 text-left max-[430px]:grid-cols-[30px_1fr_auto] max-[430px]:gap-[9px]',
         nav: 'min-h-10 rounded-[12px] px-3 py-2',
         'nav-item': 'h-12 min-h-12 min-w-0 rounded-[12px] px-2 py-2',
         fab: 'size-12 rounded-full',

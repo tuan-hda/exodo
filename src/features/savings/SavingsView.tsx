@@ -9,6 +9,7 @@ import { EmptyState } from '../../components/EmptyState'
 import { PageHeader } from '../../components/PageHeader'
 import { StateMessage } from '../../components/StateMessage'
 import { Input } from '../../components/ui/input'
+import { Skeleton } from '../../components/ui/skeleton'
 import { Popover, PopoverContent, PopoverTrigger } from '../../components/ui/popover'
 import type { Entry } from '../entries/types'
 import { formatMoney } from '../entries/entry-utils'
@@ -87,11 +88,19 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
       <div className="grid grid-cols-2 gap-3 max-[560px]:grid-cols-1">
         <Card tone="soft" className="p-5">
           <p className="ui-eyebrow m-0">Saved</p>
-          <strong className="ui-number mt-2 block text-2xl font-semibold">{formatMoney(summary.saved)}</strong>
+          {isLoading ? (
+            <Skeleton className="mt-2 h-7 w-32" />
+          ) : (
+            <strong className="ui-number mt-2 block text-2xl font-semibold">{formatMoney(summary.saved)}</strong>
+          )}
         </Card>
         <Card tone="soft" className="p-5">
           <p className="ui-eyebrow m-0">Target</p>
-          <strong className="ui-number mt-2 block text-2xl font-semibold">{formatMoney(summary.target)}</strong>
+          {isLoading ? (
+            <Skeleton className="mt-2 h-7 w-32" />
+          ) : (
+            <strong className="ui-number mt-2 block text-2xl font-semibold">{formatMoney(summary.target)}</strong>
+          )}
         </Card>
       </div>
       {showForm && (

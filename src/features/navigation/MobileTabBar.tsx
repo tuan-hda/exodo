@@ -53,7 +53,7 @@ export function MobileTabBar({
         type="button"
         onClick={() => onChange('notifications')}>
         <Bell size={20} weight={activeTab === 'notifications' ? 'fill' : 'regular'} />
-        <span className="font-mono text-[9px] uppercase tracking-[.04em]">Alerts</span>
+        <span className="font-mono text-[9px] uppercase tracking-[.04em]">Notifications</span>
       </Button>
       <Button
         variant="nav"

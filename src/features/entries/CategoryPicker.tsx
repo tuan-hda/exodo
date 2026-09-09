@@ -13,6 +13,7 @@ import {
   Wallet,
 } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
+import { Button } from '../../components/ui/button'
 import { categoryBorderStyle, categoryStyles, type Category } from './category'
 
 export type { Category } from './category'
@@ -101,23 +102,22 @@ export function CategoryPicker({
       </div>
       <div className="grid w-full grid-cols-2 gap-2 max-[700px]:gap-2.5 max-[430px]:gap-1.5">
         {options.map((item) => (
-          <button
+          <Button
             key={item}
             disabled={disabled}
             type="button"
-            className={clsx(
-              'inline-flex min-h-14 w-full items-center justify-start gap-2.5 rounded-[14px] border px-4 py-3 text-left text-sm font-medium transition-colors hover:text-ink active:scale-[.98] disabled:cursor-wait disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ink',
-              categoryClass(item),
-              value === item && 'border-ink bg-surface shadow-[0_2px_8px_rgb(21_21_21_/_0.06)]',
-            )}
+            variant="option"
+            size="option"
+            className={clsx(categoryClass(item))}
             style={categoryBorderStyle(item)}
+            data-selected={value === item}
             aria-label={item}
             title={item}
             aria-pressed={value === item}
             onClick={() => onChange(item)}>
             {categoryIcon(item, 18)}
             <span>{item}</span>
-          </button>
+          </Button>
         ))}
       </div>
     </div>
