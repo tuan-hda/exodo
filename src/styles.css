@@ -203,7 +203,7 @@
   }
 
   .ui-page-enter {
-    animation: page-rise var(--motion-page-duration) cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: page-rise var(--motion-page-duration) var(--motion-ease) both;
   }
 
   .ui-page-enter-delay-80 {
