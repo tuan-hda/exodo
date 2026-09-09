@@ -9,6 +9,7 @@ import type { Entry } from '@/features/entries/types'
 import { Input } from '@/components/ui/input'
 import { filterActivityEntries, formatActivityMonth, groupActivityByDate, groupActivityByMonth } from './activity-utils'
 import { formatMoney } from '@/lib/money'
+import { formatEntryTime } from '@/lib/date-format'
 
 export function ActivityList({
   entries,
@@ -161,7 +162,7 @@ export function ActivityList({
                         {entry.title || entry.category || (entry.type === 'income' ? 'Income' : 'Expense')}
                       </strong>
                       <small className="ui-meta mt-1 block">
-                        {entry.category ?? 'Other'} · {entry.occurredAt.slice(11, 16)}
+                        {entry.category ?? 'Other'} · {formatEntryTime(entry.occurredAt)}
                       </small>
                     </span>
                     <b

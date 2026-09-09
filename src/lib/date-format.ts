@@ -23,3 +23,11 @@ export function formatMonthLabel(value: Date | string) {
 export function formatMonthChip(value: Date | string) {
   return monthChipFormatter.format(toDate(value))
 }
+
+export function formatEntryDateTime(value: string) {
+  return value.slice(0, 16).replace('T', ' · ')
+}
+
+export function formatEntryTime(value: string) {
+  return value.slice(11, 16)
+}

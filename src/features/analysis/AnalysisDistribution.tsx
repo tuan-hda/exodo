@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatMoney } from '@/lib/money'
+import { formatEntryDateTime } from '@/lib/date-format'
 import type { Entry } from '@/features/entries/types'
 import { formatPercentage, groupByCategory } from './analysis-utils'
 import { PieChart } from './PieChart'
@@ -44,9 +45,7 @@ function CategoryDetail({
             <div className="flex min-h-16 items-center gap-3 border-b border-line py-3">
               <div className="min-w-0 flex-1">
                 <strong className="block truncate text-sm font-medium text-ink">{entry.title || category}</strong>
-                <small className="ui-meta mt-1 block">
-                  {entry.occurredAt.slice(0, 10)} · {entry.occurredAt.slice(11, 16)}
-                </small>
+                <small className="ui-meta mt-1 block">{formatEntryDateTime(entry.occurredAt)}</small>
               </div>
               <strong
                 className={clsx(
