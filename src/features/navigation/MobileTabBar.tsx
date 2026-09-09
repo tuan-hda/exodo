@@ -14,7 +14,7 @@ export function MobileTabBar({
 }) {
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-20 hidden grid-cols-5 items-center gap-1 border-t border-line bg-surface/95 px-3 pt-2 backdrop-blur-[16px] max-[700px]:grid"
+      className="fixed inset-x-0 bottom-0 z-20 hidden grid-cols-5 items-center gap-1 border-t border-line bg-surface/95 px-3 pt-2 backdrop-blur-[16px] max-md:grid"
       style={{ height: 'calc(68px + env(safe-area-inset-bottom))', paddingBottom: 'env(safe-area-inset-bottom)' }}
       aria-label="Primary navigation">
       <Button

@@ -46,12 +46,12 @@ export function SavingsDepositComposer({
         side="bottom"
         showCloseButton={false}
         className={clsx(
-          'max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-panel border border-line-strong bg-surface p-6 text-ink shadow-sheet [margin-inline:auto] [padding-top:max(16px,env(safe-area-inset-top))] [padding-bottom:max(16px,env(safe-area-inset-bottom))] max-[700px]:flex max-[700px]:min-h-0 max-[700px]:max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] max-[700px]:w-full max-[700px]:min-w-0 max-[700px]:overflow-x-hidden max-[700px]:rounded-t-panel max-[700px]:rounded-b-none max-[700px]:border-0 max-[700px]:p-5 max-[700px]:[margin-inline:0]',
+          'max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-panel border border-line-strong bg-surface p-6 text-ink shadow-sheet [margin-inline:auto] [padding-top:max(16px,env(safe-area-inset-top))] [padding-bottom:max(16px,env(safe-area-inset-bottom))] max-md:flex max-md:min-h-0 max-md:max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] max-md:w-full max-md:min-w-0 max-md:overflow-x-hidden max-md:rounded-t-panel max-md:rounded-b-none max-md:border-0 max-md:p-5 max-md:[margin-inline:0]',
         )}
         aria-busy={isSaving}>
         <SheetTitle className="sr-only">Add contribution to {goal.name}</SheetTitle>
         <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-line-strong" aria-hidden="true" />
-        <div className="mb-7 flex justify-between max-[700px]:mb-5">
+        <div className="mb-7 flex justify-between max-md:mb-5">
           <h2>Add contribution</h2>
           <Button
             variant="outline"
@@ -73,14 +73,12 @@ export function SavingsDepositComposer({
             <p className="text-xs text-muted">Target {formatMoney(goal.targetAmount)}</p>
           </div>
         </div>
-        <form
-          className="grid gap-4 max-[700px]:flex max-[700px]:min-w-0 max-[700px]:flex-1 max-[700px]:flex-col"
-          onSubmit={submit}>
-          <label className="grid min-w-0 gap-1.5 text-[11px] font-bold text-muted max-[700px]:text-xs">
+        <form className="grid gap-4 max-md:flex max-md:min-w-0 max-md:flex-1 max-md:flex-col" onSubmit={submit}>
+          <label className="grid min-w-0 gap-1.5 text-[11px] font-bold text-muted max-md:text-xs">
             Amount
             <Input
               autoFocus={!isMobile}
-              className="w-full max-[700px]:hidden"
+              className="w-full max-md:hidden"
               disabled={isSaving}
               inputMode="decimal"
               value={amount}
@@ -99,7 +97,7 @@ export function SavingsDepositComposer({
               setAmount(value)
             }}
           />
-          <label className="grid min-w-0 gap-1.5 text-[11px] font-bold text-muted max-[700px]:text-xs">
+          <label className="grid min-w-0 gap-1.5 text-[11px] font-bold text-muted max-md:text-xs">
             Note{' '}
             <Input
               value={note}
@@ -115,7 +113,7 @@ export function SavingsDepositComposer({
               {error}
             </p>
           )}
-          <div className="relative z-10 mt-2 flex items-start border-t border-line bg-surface pt-3 max-[700px]:sticky max-[700px]:bottom-0 max-[700px]:-mx-5 max-[700px]:mt-auto max-[700px]:px-5 max-[700px]:pt-4">
+          <div className="relative z-10 mt-2 flex items-start border-t border-line bg-surface pt-3 max-md:sticky max-md:bottom-0 max-md:-mx-5 max-md:mt-auto max-md:px-5 max-md:pt-4">
             <Button className="w-full gap-2 text-sm font-semibold" disabled={isSaving} type="submit">
               {isSaving ? 'Saving…' : 'Save'} <Check size={17} />
             </Button>

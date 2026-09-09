@@ -27,13 +27,13 @@ export function PageHeader({
           <ArrowLeft size={15} /> {backLabel ?? 'Back'}
         </Button>
       )}
-      <div className="flex items-end justify-between gap-6 max-[700px]:flex-col max-[700px]:items-start max-[700px]:gap-4">
+      <div className="flex items-end justify-between gap-6 max-md:flex-col max-md:items-start max-md:gap-4">
         <div className="min-w-0">
           {eyebrow && <p className="ui-eyebrow mb-3">{eyebrow}</p>}
           <h1 className="ui-page-title m-0">{title}</h1>
           {description && <p className="ui-page-description mt-4 mb-0">{description}</p>}
         </div>
-        {actions && <div className="shrink-0 max-[700px]:w-full">{actions}</div>}
+        {actions && <div className="shrink-0 max-md:w-full">{actions}</div>}
       </div>
     </header>
   )

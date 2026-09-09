@@ -108,7 +108,7 @@ export function PieChart({
   }, [outerRadius, slices, visualSelectedCategory])
 
   return (
-    <div ref={chartRef} className="relative mx-auto size-[300px] max-[430px]:size-[240px]">
+    <div ref={chartRef} className="relative mx-auto size-[300px] max-xs:size-[240px]">
       <div className="relative size-full">
         <svg
           className="pie-reveal size-full overflow-visible"
@@ -163,7 +163,7 @@ export function PieChart({
                 aria-label={`Select ${segment.category}`}
                 onClick={() => onSelect(segment.category)}
                 className={clsx(
-                  'grid size-14 place-items-center rounded-full border-[3px] shadow-badge transition-transform duration-[600ms] ease-[cubic-bezier(.05,.78,.18,1)] max-[430px]:size-11',
+                  'grid size-14 place-items-center rounded-full border-[3px] shadow-badge transition-transform duration-[600ms] ease-[cubic-bezier(.05,.78,.18,1)] max-xs:size-11',
                   segment.category === selectedCategory && segment.percentage < MIN_LABEL_PERCENTAGE
                     ? 'animate-[pie-badge-zoom-small_600ms_cubic-bezier(.05,.78,.18,1)_both]'
                     : segment.category === visualSelectedCategory && !selectedCategory

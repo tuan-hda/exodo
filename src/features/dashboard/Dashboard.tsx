@@ -132,10 +132,8 @@ function Dashboard() {
           <span>{isRefreshing ? 'Refreshing' : pullDistance >= 56 ? 'Release to refresh' : 'Pull to refresh'}</span>
         </div>
       )}
-      <main
-        id="top"
-        className="mx-auto w-[min(1120px,calc(100%-40px))] pb-20 max-[700px]:w-[calc(100%-32px)] max-[700px]:pb-32">
-        <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between gap-6 border-b border-line bg-page/85 pt-[max(10px,env(safe-area-inset-top))] backdrop-blur-xl max-[700px]:-mx-4 max-[700px]:px-4">
+      <main id="top" className="mx-auto w-[min(1120px,calc(100%-40px))] pb-20 max-md:w-[calc(100%-32px)] max-md:pb-32">
+        <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between gap-6 border-b border-line bg-page/85 pt-[max(10px,env(safe-area-inset-top))] backdrop-blur-xl max-md:-mx-4 max-md:px-4">
           <a
             className="flex shrink-0 items-center gap-2 font-mono text-[11px] tracking-[.04em] text-ink no-underline"
             href="#top">
@@ -144,10 +142,10 @@ function Dashboard() {
             </span>
             <span>exodo / έξοδο</span>
           </a>
-          <span className="hidden font-mono text-[10px] uppercase tracking-[.1em] text-muted max-[700px]:block">
+          <span className="hidden font-mono text-[10px] uppercase tracking-[.1em] text-muted max-md:block">
             {activeTab}
           </span>
-          <div className="flex items-center gap-2 max-[700px]:hidden">
+          <div className="flex items-center gap-2 max-md:hidden">
             <nav className="flex items-center gap-1" aria-label="Primary navigation">
               {primaryTabs.map((tab) => (
                 <Button
@@ -175,18 +173,18 @@ function Dashboard() {
           )}
           {activeTab === 'today' && (
             <>
-              <section className="grid grid-cols-[minmax(0,1.3fr)_minmax(220px,.7fr)] items-end gap-12 pt-16 pb-14 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both] max-[700px]:grid-cols-1 max-[700px]:gap-7 max-[700px]:pt-10 max-[700px]:pb-10">
+              <section className="grid grid-cols-[minmax(0,1.3fr)_minmax(220px,.7fr)] items-end gap-12 pt-16 pb-14 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both] max-md:grid-cols-1 max-md:gap-7 max-md:pt-10 max-md:pb-10">
                 <div>
                   <p className="ui-eyebrow mb-4">
                     {currentDay.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                   </p>
-                  <h1 className="m-0 max-w-[10ch] text-[clamp(48px,7vw,84px)] font-semibold leading-[.92] tracking-[-.095em] max-[430px]:text-[48px]">
+                  <h1 className="m-0 max-w-[10ch] text-[clamp(48px,7vw,84px)] font-semibold leading-[.92] tracking-[-.095em] max-xs:text-[48px]">
                     Spend what today
                     <br />
                     <em className="not-italic text-ink">makes possible.</em>
                   </h1>
                 </div>
-                <p className="ui-page-description mb-1 max-[700px]:mb-0">
+                <p className="ui-page-description mb-1 max-md:mb-0">
                   Income becomes a daily allowance. Each expense makes the rest of today visible.
                 </p>
               </section>
@@ -198,7 +196,7 @@ function Dashboard() {
                 budgetsLoading={budgetsLoading}
                 userId={user?.id}
               />
-              <div className="pt-24 max-[700px]:pt-16">
+              <div className="pt-24 max-md:pt-16">
                 <ActivityList
                   entries={entries}
                   isLoading={entriesLoading}
@@ -214,12 +212,12 @@ function Dashboard() {
             </>
           )}
           {activeTab === 'overview' && (
-            <section className="pt-16 max-[700px]:pt-10">
+            <section className="pt-16 max-md:pt-10">
               <OverviewView accumulation={accumulation} isLoading={entriesLoading} />
             </section>
           )}
           {activeTab === 'notifications' && (
-            <section className="pt-16 max-[700px]:pt-10">
+            <section className="pt-16 max-md:pt-10">
               <NotificationsView />
             </section>
           )}
@@ -233,13 +231,13 @@ function Dashboard() {
             />
           )}
           {activeTab === 'settings' && (
-            <section className="pt-16 max-[700px]:pt-10">
+            <section className="pt-16 max-md:pt-10">
               <SettingsView userId={user?.id} entries={entries} />
             </section>
           )}
         </div>
       </main>
-      <footer className="mx-auto flex w-[min(1120px,calc(100%-40px))] justify-between border-t border-line py-5 font-mono text-[10px] tracking-[.06em] text-muted max-[700px]:w-[calc(100%-32px)] max-[700px]:pb-28">
+      <footer className="mx-auto flex w-[min(1120px,calc(100%-40px))] justify-between border-t border-line py-5 font-mono text-[10px] tracking-[.06em] text-muted max-md:w-[calc(100%-32px)] max-md:pb-28">
         <span>exodo / έξοδο</span>
         <span>money / a daily practice</span>
       </footer>

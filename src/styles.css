@@ -21,6 +21,9 @@
   --radius-control: 14px;
   --radius-input: 12px;
   --radius-chip: 10px;
+  --breakpoint-xs: 430px;
+  --breakpoint-sm: 560px;
+  --breakpoint-md: 700px;
   --shadow-panel: 0 12px 30px rgb(21 21 21 / 0.06);
   --shadow-elevated: 0 18px 48px rgb(21 21 21 / 0.12);
   --shadow-overlay: 0 20px 70px rgb(21 21 21 / 0.16);

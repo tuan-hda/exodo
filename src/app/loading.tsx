@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export default function Loading() {
   return (
-    <main className="mx-auto grid min-h-dvh w-[min(1120px,calc(100%-40px))] content-start gap-6 bg-page pt-6 pb-12 max-[700px]:w-[calc(100%-32px)]">
+    <main className="mx-auto grid min-h-dvh w-[min(1120px,calc(100%-40px))] content-start gap-6 bg-page pt-6 pb-12 max-md:w-[calc(100%-32px)]">
       <div className="flex items-center justify-between border-b border-line pb-4">
         <Skeleton className="h-7 w-28" />
         <Skeleton className="h-9 w-56" />

@@ -90,10 +90,10 @@ function DistributionCard({
 
   return (
     <div aria-label={`${type} distribution`}>
-      <Card className="p-5 max-[700px]:p-4">
+      <Card className="p-5 max-md:p-4">
         {isLoading ? (
           <div className="grid min-h-[360px] content-center gap-5 p-8">
-            <Skeleton className="mx-auto size-[240px] rounded-full max-[430px]:size-[190px]" />
+            <Skeleton className="mx-auto size-[240px] rounded-full max-xs:size-[190px]" />
             <Skeleton className="mx-auto h-3 w-32" />
           </div>
         ) : slices.length ? (
@@ -202,7 +202,7 @@ export function AnalysisView({
 
   return (
     <section
-      className="grid gap-8 pb-12 pt-16 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_120ms_both] max-[700px]:pt-10"
+      className="grid gap-8 pb-12 pt-16 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_120ms_both] max-md:pt-10"
       aria-busy={isLoading}>
       <PageHeader
         eyebrow="the month analysis"
@@ -238,7 +238,7 @@ export function AnalysisView({
           <Skeleton className="h-3 w-24" />
         </div>
       ) : (
-        <div className="flex gap-5 border-y border-line py-3 font-mono text-[10px] uppercase tracking-[.08em] text-muted max-[430px]:gap-3 max-[430px]:text-[9px]">
+        <div className="flex gap-5 border-y border-line py-3 font-mono text-[10px] uppercase tracking-[.08em] text-muted max-xs:gap-3 max-xs:text-[9px]">
           <span>
             <b className="ui-number font-normal text-success">+{formatMoney(income)}</b> income
           </span>

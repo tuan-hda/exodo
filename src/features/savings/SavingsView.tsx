@@ -85,7 +85,7 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
         }
       />
       {error && <StateMessage tone="danger">{error}</StateMessage>}
-      <div className="grid grid-cols-2 gap-3 max-[560px]:grid-cols-1">
+      <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
         <Card tone="soft" className="p-5">
           <p className="ui-eyebrow m-0">Saved</p>
           {isLoading ? (

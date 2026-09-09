@@ -116,13 +116,13 @@ export function EntryComposer({
         side="bottom"
         showCloseButton={false}
         className={clsx(
-          'max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-panel border border-line-strong bg-surface p-6 text-ink shadow-sheet [margin-inline:auto] [padding-top:max(16px,env(safe-area-inset-top))] [padding-bottom:max(16px,env(safe-area-inset-bottom))] max-[700px]:flex max-[700px]:min-h-0 max-[700px]:max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] max-[700px]:w-full max-[700px]:min-w-0 max-[700px]:overflow-x-hidden max-[700px]:rounded-t-panel max-[700px]:rounded-b-none max-[700px]:border-0 max-[700px]:p-5 max-[700px]:[margin-inline:0]',
+          'max-h-[calc(100dvh-24px)] w-[min(560px,100%)] overflow-y-auto overscroll-contain rounded-t-panel border border-line-strong bg-surface p-6 text-ink shadow-sheet [margin-inline:auto] [padding-top:max(16px,env(safe-area-inset-top))] [padding-bottom:max(16px,env(safe-area-inset-bottom))] max-md:flex max-md:min-h-0 max-md:max-h-[calc(100dvh-env(safe-area-inset-top)-12px)] max-md:w-full max-md:min-w-0 max-md:overflow-x-hidden max-md:rounded-t-panel max-md:rounded-b-none max-md:border-0 max-md:p-5 max-md:[margin-inline:0]',
           type,
         )}
         aria-busy={isSaving}>
         <SheetTitle className="sr-only">{entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}</SheetTitle>
         <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-line-strong" aria-hidden="true" />
-        <div className="mb-7 flex justify-between max-[700px]:mb-5">
+        <div className="mb-7 flex justify-between max-md:mb-5">
           <h2 id="composer-title">{entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}</h2>
           <div className="flex items-center gap-2">
             {entry && onDelete && (
@@ -141,7 +141,7 @@ export function EntryComposer({
               variant={type === 'income' ? 'secondary' : 'outline'}
               size="sm"
               className={clsx(
-                'font-mono text-[10px] uppercase tracking-[.06em] max-[700px]:text-[11px]',
+                'font-mono text-[10px] uppercase tracking-[.06em] max-md:text-[11px]',
                 type === 'income' && 'text-success',
               )}
               type="button"
@@ -163,13 +163,11 @@ export function EntryComposer({
             </Button>
           </div>
         </div>
-        <div
-          className="mb-5 grid grid-cols-3 gap-2 border-b border-line pb-4 max-[700px]:mb-2"
-          aria-label="Record steps">
+        <div className="mb-5 grid grid-cols-3 gap-2 border-b border-line pb-4 max-md:mb-2" aria-label="Record steps">
           {stepLabels.map((label, index) => (
             <span
               className={clsx(
-                'inline-flex items-center gap-1.5 font-mono text-[10px] text-muted max-[700px]:text-[9px]',
+                'inline-flex items-center gap-1.5 font-mono text-[10px] text-muted max-md:text-[9px]',
                 step === index + 1 && 'text-ink',
               )}
               key={label}>
@@ -186,7 +184,7 @@ export function EntryComposer({
           ))}
         </div>
         <form
-          className="grid gap-3 max-[700px]:flex max-[700px]:min-w-0 max-[700px]:flex-1 max-[700px]:flex-col max-[700px]:gap-4"
+          className="grid gap-3 max-md:flex max-md:min-w-0 max-md:flex-1 max-md:flex-col max-md:gap-4"
           onSubmit={submit}>
           {step === 1 && (
             <FadeContent>
