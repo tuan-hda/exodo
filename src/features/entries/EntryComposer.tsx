@@ -4,8 +4,9 @@ import { useState, type FormEvent } from 'react'
 import { ArrowDown, ArrowUp, Check, Trash, X } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { Button } from '@/components/ui/button'
+import { ComposerHeader } from '@/components/ComposerHeader'
 import { FadeContent } from '@/components/ui/fade-content'
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { defaultCategory, type Category } from '@/features/finance/category'
 import { ComposerAmountStep } from './ComposerAmountStep'
 import { ComposerCategoryStep } from './ComposerCategoryStep'
@@ -115,46 +116,39 @@ export function EntryComposer({
         if (!open && !isSaving) onClose()
       }}>
       <SheetContent side="bottom" variant="composer" showCloseButton={false} aria-busy={isSaving}>
-        <SheetTitle className="sr-only">{entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}</SheetTitle>
-        <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-line-strong" aria-hidden="true" />
-        <div className="mb-7 flex justify-between max-md:mb-5">
-          <h2 id="composer-title" className="ui-dialog-title m-0">
-            {entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}
-          </h2>
-          <div className="flex items-center gap-2">
-            {entry && onDelete && (
-              <Button
-                variant="outline-danger"
-                size="icon-lg"
-                type="button"
-                disabled={isSaving}
-                onClick={() => setDeleteOpen(true)}
-                aria-label="Delete transaction">
-                <Trash size={18} />
-              </Button>
-            )}
+        <ComposerHeader title={entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}>
+          {entry && onDelete && (
             <Button
-              variant={type === 'income' ? 'secondary' : 'outline'}
-              size="sm"
-              className={clsx('ui-label tracking-[.06em] max-md:text-[11px]', type === 'income' && 'text-success')}
-              type="button"
-              disabled={isSaving}
-              onClick={toggleType}
-              aria-label={`Switch to ${type === 'income' ? 'expense' : 'income'}`}>
-              {type === 'income' ? <ArrowDown size={14} weight="bold" /> : <ArrowUp size={14} weight="bold" />}
-              {type === 'income' ? 'Income' : 'Expense'}
-            </Button>
-            <Button
-              variant="outline"
+              variant="outline-danger"
               size="icon-lg"
               type="button"
               disabled={isSaving}
-              onClick={onClose}
-              aria-label="Close">
-              <X size={19} />
+              onClick={() => setDeleteOpen(true)}
+              aria-label="Delete transaction">
+              <Trash size={18} />
             </Button>
-          </div>
-        </div>
+          )}
+          <Button
+            variant={type === 'income' ? 'secondary' : 'outline'}
+            size="sm"
+            className={clsx('ui-label tracking-[.06em] max-md:text-[11px]', type === 'income' && 'text-success')}
+            type="button"
+            disabled={isSaving}
+            onClick={toggleType}
+            aria-label={`Switch to ${type === 'income' ? 'expense' : 'income'}`}>
+            {type === 'income' ? <ArrowDown size={14} weight="bold" /> : <ArrowUp size={14} weight="bold" />}
+            {type === 'income' ? 'Income' : 'Expense'}
+          </Button>
+          <Button
+            variant="outline"
+            size="icon-lg"
+            type="button"
+            disabled={isSaving}
+            onClick={onClose}
+            aria-label="Close">
+            <X size={19} />
+          </Button>
+        </ComposerHeader>
         <div className="mb-5 grid grid-cols-3 gap-2 border-b border-line pb-4 max-md:mb-2" aria-label="Record steps">
           {stepLabels.map((label, index) => (
             <span

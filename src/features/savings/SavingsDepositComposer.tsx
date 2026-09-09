@@ -2,12 +2,13 @@
 
 import { useState, type FormEvent } from 'react'
 import { Check, X } from '@phosphor-icons/react'
+import { ComposerHeader } from '@/components/ComposerHeader'
 import { ComposerFooter } from '@/components/ComposerFooter'
 import { CalculatorKeypad } from '@/components/CalculatorKeypad'
 import { StateMessage } from '@/components/StateMessage'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { evaluateExpression, formatAmountExpression } from '@/lib/amount'
 import { SavingsIcon } from './savings-icons'
 import type { SavingsGoal } from './types'
@@ -47,10 +48,7 @@ export function SavingsDepositComposer({
         if (!open && !isSaving) onClose()
       }}>
       <SheetContent side="bottom" variant="composer" showCloseButton={false} aria-busy={isSaving}>
-        <SheetTitle className="sr-only">Add contribution to {goal.name}</SheetTitle>
-        <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-line-strong" aria-hidden="true" />
-        <div className="mb-7 flex justify-between max-md:mb-5">
-          <h2 className="ui-dialog-title m-0">Add contribution</h2>
+        <ComposerHeader title="Add contribution" accessibleTitle={`Add contribution to ${goal.name}`}>
           <Button
             variant="outline"
             size="icon-lg"
@@ -60,7 +58,7 @@ export function SavingsDepositComposer({
             aria-label="Close">
             <X size={19} />
           </Button>
-        </div>
+        </ComposerHeader>
         <div className="mb-5 flex items-center gap-3 border-b border-line pb-4">
           <span className="ui-icon-tile-inverse size-10 rounded-input text-lg" aria-hidden="true">
             <SavingsIcon name={goal.icon} size={20} />
