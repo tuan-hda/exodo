@@ -1,6 +1,6 @@
 import type { Entry, StoredEntry } from './types'
 import type { Category } from './category'
-import { readStorageJson, writeStorageJson } from '@/lib/storage'
+import { readStorageCache, writeStorageCache } from '@/lib/storage'
 
 const entriesCacheTtl = 24 * 60 * 60 * 1000
 
@@ -54,19 +54,13 @@ function entriesCacheKey(userId: string) {
 }
 
 export function readEntriesCache(userId: string) {
-  const cached = readStorageJson<{ entries?: Entry[]; cachedAt?: number }>(entriesCacheKey(userId))
-  if (
-    !Array.isArray(cached?.entries) ||
-    typeof cached.cachedAt !== 'number' ||
-    !Number.isFinite(cached.cachedAt) ||
-    Date.now() - cached.cachedAt > entriesCacheTtl
-  )
-    return null
+  const cached = readStorageCache<{ entries?: Entry[] }>(entriesCacheKey(userId), entriesCacheTtl)
+  if (!Array.isArray(cached?.entries)) return null
   return cached.entries
 }
 
 export function writeEntriesCache(userId: string, entries: Entry[]) {
-  writeStorageJson(entriesCacheKey(userId), { entries, cachedAt: Date.now() })
+  writeStorageCache(entriesCacheKey(userId), { entries })
 }
 
 export function evaluateExpression(value: string) {

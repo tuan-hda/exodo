@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupabase } from '@/hooks/use-supabase'
-import { readStorageJson, writeStorageJson } from '@/lib/storage'
+import { readStorageCache, writeStorageCache } from '@/lib/storage'
 import type { Entry } from '@/features/entries/types'
 import { allocateRemainder, calculateMonthlyRemainder, monthKey } from './savings-utils'
 import { normalizeSavingsIcon } from './savings-icons'
@@ -15,19 +15,11 @@ function savingsCacheKey(userId: string) {
 }
 
 function readSavingsCache(userId: string) {
-  const cached = readStorageJson<{
+  const cached = readStorageCache<{
     goals?: SavingsGoal[]
     deposits?: SavingsDeposit[]
-    cachedAt?: number
-  }>(savingsCacheKey(userId))
-  if (
-    !Array.isArray(cached?.goals) ||
-    !Array.isArray(cached.deposits) ||
-    typeof cached.cachedAt !== 'number' ||
-    !Number.isFinite(cached.cachedAt) ||
-    Date.now() - cached.cachedAt > savingsCacheTtl
-  )
-    return null
+  }>(savingsCacheKey(userId), savingsCacheTtl)
+  if (!Array.isArray(cached?.goals) || !Array.isArray(cached.deposits)) return null
   return {
     goals: cached.goals.map((goal) => ({ ...goal, icon: normalizeSavingsIcon(goal.icon) })),
     deposits: cached.deposits,
@@ -35,7 +27,7 @@ function readSavingsCache(userId: string) {
 }
 
 function writeSavingsCache(userId: string, goals: SavingsGoal[], deposits: SavingsDeposit[]) {
-  writeStorageJson(savingsCacheKey(userId), { goals, deposits, cachedAt: Date.now() })
+  writeStorageCache(savingsCacheKey(userId), { goals, deposits })
 }
 
 function normalizeGoalStatus(status: string): SavingsGoal['status'] {

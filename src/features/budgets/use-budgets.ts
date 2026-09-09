@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupabase } from '@/hooks/use-supabase'
-import { readStorageJson, writeStorageJson } from '@/lib/storage'
+import { readStorageCache, writeStorageCache } from '@/lib/storage'
 import type { Category } from '@/features/entries/category'
 import type { CategoryBudget, StoredCategoryBudget } from './types'
 
@@ -13,19 +13,13 @@ function budgetCacheKey(userId: string) {
 }
 
 function readBudgetCache(userId: string) {
-  const cached = readStorageJson<{ budgets?: CategoryBudget[]; cachedAt?: number }>(budgetCacheKey(userId))
-  if (
-    !Array.isArray(cached?.budgets) ||
-    typeof cached.cachedAt !== 'number' ||
-    !Number.isFinite(cached.cachedAt) ||
-    Date.now() - cached.cachedAt > budgetCacheTtl
-  )
-    return null
+  const cached = readStorageCache<{ budgets?: CategoryBudget[] }>(budgetCacheKey(userId), budgetCacheTtl)
+  if (!Array.isArray(cached?.budgets)) return null
   return cached.budgets
 }
 
 function writeBudgetCache(userId: string, budgets: CategoryBudget[]) {
-  writeStorageJson(budgetCacheKey(userId), { budgets, cachedAt: Date.now() })
+  writeStorageCache(budgetCacheKey(userId), { budgets })
 }
 
 function normalizeBudget(budget: StoredCategoryBudget): CategoryBudget {

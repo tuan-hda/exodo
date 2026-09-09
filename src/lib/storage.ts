@@ -36,3 +36,19 @@ export function writeStorageJson<T>(key: string, value: T) {
     return
   }
 }
+
+export function readStorageCache<T extends object>(key: string, maxAgeMs: number) {
+  const cached = readStorageJson<T & { cachedAt?: number }>(key)
+  if (
+    !cached ||
+    typeof cached.cachedAt !== 'number' ||
+    !Number.isFinite(cached.cachedAt) ||
+    Date.now() - cached.cachedAt > maxAgeMs
+  )
+    return null
+  return cached as T
+}
+
+export function writeStorageCache<T extends object>(key: string, value: T) {
+  writeStorageJson(key, { ...value, cachedAt: Date.now() })
+}
