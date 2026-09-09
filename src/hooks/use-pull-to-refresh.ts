@@ -4,6 +4,12 @@ export function usePullToRefresh(onRefresh: () => Promise<boolean>) {
   const [pullDistance, setPullDistance] = useState(0)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const pullDistanceRef = useRef(0)
+  const isRefreshingRef = useRef(false)
+  const refreshRef = useRef(onRefresh)
+
+  useEffect(() => {
+    refreshRef.current = onRefresh
+  }, [onRefresh])
 
   useEffect(() => {
     let startY = 0
@@ -36,11 +42,13 @@ export function usePullToRefresh(onRefresh: () => Promise<boolean>) {
       const shouldRefresh = pullDistanceRef.current >= 56
       pullDistanceRef.current = 0
       setPullDistance(0)
-      if (!shouldRefresh || isRefreshing) return
+      if (!shouldRefresh || isRefreshingRef.current) return
+      isRefreshingRef.current = true
       setIsRefreshing(true)
       try {
-        await onRefresh()
+        await refreshRef.current()
       } finally {
+        isRefreshingRef.current = false
         setIsRefreshing(false)
       }
     }
@@ -53,7 +61,7 @@ export function usePullToRefresh(onRefresh: () => Promise<boolean>) {
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchend', handleTouchEnd)
     }
-  }, [isRefreshing, onRefresh])
+  }, [])
 
   return { pullDistance, isRefreshing }
 }

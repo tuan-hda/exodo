@@ -19,7 +19,8 @@ export function StateMessage({
         tone === 'success' && 'border-success/25 bg-success-soft text-success',
         className,
       )}
-      role={tone === 'danger' ? 'alert' : undefined}>
+      role={tone === 'danger' ? 'alert' : undefined}
+      aria-live={tone === 'danger' ? 'assertive' : 'polite'}>
       {children}
     </p>
   )

@@ -123,10 +123,14 @@ export function PieChart({
               fill: segment.color,
               onClick: () => onSelect(segment.category),
               onKeyDown: (event: KeyboardEvent<SVGElement>) => {
-                if (event.key === 'Enter' || event.key === ' ') onSelect(segment.category)
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  onSelect(segment.category)
+                }
               },
               role: 'button',
               tabIndex: 0,
+              'aria-pressed': segment.category === selectedCategory,
               'aria-label': `${segment.category}, ${formatMoney(segment.amount)}`,
             }
             return segment.percentage > 0.999 ? (

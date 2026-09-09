@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupabase } from '../../hooks/use-supabase'
 import { readStorageJson, writeStorageJson } from '../../lib/storage'
 import type { Category } from '../entries/category'
@@ -42,6 +42,8 @@ export function useBudgets(userId: string | undefined) {
   const [isLoading, setIsLoading] = useState(Boolean(userId))
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
+  const budgetsRef = useRef<CategoryBudget[]>([])
+  const previousUserIdRef = useRef<string | undefined>(userId)
 
   const fetchBudgets = useCallback(async () => {
     const supabase = await getSupabase()
@@ -58,7 +60,9 @@ export function useBudgets(userId: string | undefined) {
   const refreshBudgets = useCallback(
     async (signal?: AbortSignal) => {
       if (!userId) {
+        budgetsRef.current = []
         setBudgets([])
+        setError('')
         setIsLoading(false)
         return false
       }
@@ -67,6 +71,7 @@ export function useBudgets(userId: string | undefined) {
       try {
         const nextBudgets = await fetchBudgets()
         if (signal?.aborted) return false
+        budgetsRef.current = nextBudgets
         setBudgets(nextBudgets)
         writeBudgetCache(userId, nextBudgets)
         return true
@@ -84,9 +89,19 @@ export function useBudgets(userId: string | undefined) {
 
   useEffect(() => {
     const controller = new AbortController()
+    const userChanged = previousUserIdRef.current !== userId
+    previousUserIdRef.current = userId
+    if (userChanged) {
+      budgetsRef.current = []
+      setBudgets([])
+      setError('')
+    }
     if (userId) {
       const cachedBudgets = readBudgetCache(userId)
-      if (cachedBudgets) setBudgets(cachedBudgets)
+      if (cachedBudgets) {
+        budgetsRef.current = cachedBudgets
+        setBudgets(cachedBudgets)
+      }
     }
     void refreshBudgets(controller.signal)
     return () => controller.abort()
@@ -109,17 +124,12 @@ export function useBudgets(userId: string | undefined) {
           .single()
         if (saveError) throw saveError
         const nextBudget = normalizeBudget(data as StoredCategoryBudget)
-        setBudgets((current) =>
-          [...current.filter((budget) => budget.category !== category), nextBudget].sort((a, b) =>
-            a.category.localeCompare(b.category),
-          ),
+        const nextBudgets = [...budgetsRef.current.filter((budget) => budget.category !== category), nextBudget].sort(
+          (a, b) => a.category.localeCompare(b.category),
         )
-        writeBudgetCache(
-          userId,
-          [...budgets.filter((budget) => budget.category !== category), nextBudget].sort((a, b) =>
-            a.category.localeCompare(b.category),
-          ),
-        )
+        budgetsRef.current = nextBudgets
+        setBudgets(nextBudgets)
+        writeBudgetCache(userId, nextBudgets)
         return true
       } catch (saveError) {
         console.error('Failed to save category budget to Supabase', saveError)
@@ -129,7 +139,7 @@ export function useBudgets(userId: string | undefined) {
         setIsSaving(false)
       }
     },
-    [budgets, getSupabase, userId],
+    [getSupabase, userId],
   )
 
   const removeBudget = useCallback(
@@ -144,11 +154,10 @@ export function useBudgets(userId: string | undefined) {
           .eq('id', budget.id)
           .eq('user_id', userId)
         if (removeError) throw removeError
-        setBudgets((current) => current.filter((item) => item.id !== budget.id))
-        writeBudgetCache(
-          userId,
-          budgets.filter((item) => item.id !== budget.id),
-        )
+        const nextBudgets = budgetsRef.current.filter((item) => item.id !== budget.id)
+        budgetsRef.current = nextBudgets
+        setBudgets(nextBudgets)
+        writeBudgetCache(userId, nextBudgets)
         return true
       } catch (removeError) {
         console.error('Failed to remove category budget from Supabase', removeError)
@@ -156,7 +165,7 @@ export function useBudgets(userId: string | undefined) {
         return false
       }
     },
-    [budgets, getSupabase, userId],
+    [getSupabase, userId],
   )
 
   return { budgets, isLoading, isSaving, error, saveBudget, removeBudget, refreshBudgets }

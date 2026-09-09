@@ -30,5 +30,9 @@ export function readStorageJson<T>(key: string) {
 }
 
 export function writeStorageJson<T>(key: string, value: T) {
-  writeStorageValue(key, JSON.stringify(value))
+  try {
+    writeStorageValue(key, JSON.stringify(value))
+  } catch {
+    return
+  }
 }

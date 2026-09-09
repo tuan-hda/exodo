@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useState, type CSSProperties, type FormEvent } from 'react'
 import { Plus, X } from '@phosphor-icons/react'
-import EmojiPicker from 'emoji-picker-react'
+import EmojiPicker, { Theme } from 'emoji-picker-react'
 import { Button } from '../../components/ui/button'
 import { Card } from '../../components/ui/card'
 import { EmptyState } from '../../components/EmptyState'
@@ -16,6 +16,23 @@ import { SavingsDepositComposer } from './SavingsDepositComposer'
 import { SavingsGoalCard } from './SavingsGoalCard'
 import { SavingsGoalsLoading } from './SavingsGoalsPanel'
 import { useSavings } from './use-savings'
+
+const emojiPickerStyle = {
+  '--epr-bg-color': 'var(--color-surface)',
+  '--epr-picker-border-color': 'var(--color-line)',
+  '--epr-picker-border-radius': '14px',
+  '--epr-text-color': 'var(--color-muted)',
+  '--epr-highlight-color': 'var(--color-ink)',
+  '--epr-category-icon-active-color': 'var(--color-ink)',
+  '--epr-hover-bg-color': 'var(--color-soft)',
+  '--epr-hover-bg-color-reduced-opacity': 'var(--color-soft)',
+  '--epr-focus-bg-color': 'var(--color-line)',
+  '--epr-search-input-bg-color': 'var(--color-page)',
+  '--epr-search-input-bg-color-active': 'var(--color-surface)',
+  '--epr-search-border-color': 'var(--color-line)',
+  '--epr-search-border-color-active': 'var(--color-ink)',
+  '--epr-category-label-bg-color': 'var(--color-surface)',
+} as CSSProperties
 
 export function SavingsView({ userId, entries, onBack }: { userId?: string; entries: Entry[]; onBack?: () => void }) {
   const { goals, deposits, isLoading, isSaving, error, saveGoal, addDeposit } = useSavings(userId, entries)
@@ -130,6 +147,9 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
                       setIcon(emojiData.emoji)
                       setEmojiPickerOpen(false)
                     }}
+                    className="exodo-emoji-picker"
+                    theme={Theme.LIGHT}
+                    style={emojiPickerStyle}
                     width="100%"
                     height={350}
                     skinTonesDisabled

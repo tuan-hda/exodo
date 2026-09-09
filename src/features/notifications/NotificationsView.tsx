@@ -85,7 +85,7 @@ export function NotificationsView() {
               <ArrowClockwise size={17} /> Try again
             </Button>
           ) : (
-            <Button asChild variant="outline" className="text-xs font-semibold text-muted">
+            <Button asChild variant="outline-muted">
               <a href="/api/gmail/connect">
                 <EnvelopeSimple size={17} /> {connected ? 'Reconnect Gmail' : 'Connect Gmail'}
               </a>

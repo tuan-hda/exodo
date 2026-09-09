@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupabase } from '../../hooks/use-supabase'
 import { readStorageJson, writeStorageJson } from '../../lib/storage'
 import type { Entry } from '../entries/types'
@@ -70,10 +70,14 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
   const [isLoading, setIsLoading] = useState(Boolean(userId))
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
+  const previousUserIdRef = useRef<string | undefined>(userId)
 
   const refresh = useCallback(
     async (signal?: AbortSignal) => {
       if (!userId) {
+        setGoals([])
+        setDeposits([])
+        setError('')
         setIsLoading(false)
         return
       }
@@ -114,6 +118,13 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
 
   useEffect(() => {
     const controller = new AbortController()
+    const userChanged = previousUserIdRef.current !== userId
+    previousUserIdRef.current = userId
+    if (userChanged) {
+      setGoals([])
+      setDeposits([])
+      setError('')
+    }
     if (userId) {
       const cachedSavings = readSavingsCache(userId)
       if (cachedSavings) {

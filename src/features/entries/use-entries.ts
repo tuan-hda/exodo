@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupabase } from '../../hooks/use-supabase'
 import type { Entry, StoredEntry } from './types'
 import { calculateAccumulation, normalizeStoredEntry, readEntriesCache, writeEntriesCache } from './entry-utils'
@@ -12,6 +12,8 @@ export function useEntries(userId?: string) {
   const [persistenceError, setPersistenceError] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(Boolean(userId))
+  const entriesRef = useRef<Entry[]>([])
+  const previousUserIdRef = useRef<string | undefined>(userId)
 
   const fetchEntries = useCallback(async () => {
     const supabase = await getSupabase()
@@ -27,15 +29,25 @@ export function useEntries(userId?: string) {
 
   useEffect(() => {
     let cancelled = false
+    const userChanged = previousUserIdRef.current !== userId
+    previousUserIdRef.current = userId
+
+    if (userChanged) {
+      entriesRef.current = []
+      setEntries([])
+      setAccumulation(null)
+    }
 
     async function loadEntries() {
       if (!userId) {
+        setPersistenceError('')
         setIsLoading(false)
         return
       }
       setIsLoading(true)
       const cachedEntries = readEntriesCache(userId)
       if (cachedEntries) {
+        entriesRef.current = cachedEntries
         setEntries(cachedEntries)
         setAccumulation(calculateAccumulation(cachedEntries))
       }
@@ -44,6 +56,7 @@ export function useEntries(userId?: string) {
       try {
         const nextEntries = await fetchEntries()
         if (!cancelled) {
+          entriesRef.current = nextEntries
           setEntries(nextEntries)
           writeEntriesCache(userId, nextEntries)
           setAccumulation(calculateAccumulation(nextEntries))
@@ -91,9 +104,10 @@ export function useEntries(userId?: string) {
         if (result.error) throw result.error
 
         const nextEntries = isEditing
-          ? entries.map((item) => (item.id === entry.id ? entry : item))
-          : [entry, ...entries]
+          ? entriesRef.current.map((item) => (item.id === entry.id ? entry : item))
+          : [entry, ...entriesRef.current]
         const nextAccumulation = calculateAccumulation(nextEntries)
+        entriesRef.current = nextEntries
         setEntries(nextEntries)
         setAccumulation(nextAccumulation)
         writeEntriesCache(userId, nextEntries)
@@ -106,7 +120,7 @@ export function useEntries(userId?: string) {
         setIsSaving(false)
       }
     },
-    [entries, getSupabase, userId],
+    [getSupabase, userId],
   )
 
   const removeEntry = useCallback(
@@ -117,8 +131,9 @@ export function useEntries(userId?: string) {
         const supabase = await getSupabase()
         const { error } = await supabase.from('entries').delete().eq('id', id).eq('user_id', userId)
         if (error) throw error
-        const nextEntries = entries.filter((entry) => entry.id !== id)
+        const nextEntries = entriesRef.current.filter((entry) => entry.id !== id)
         const nextAccumulation = calculateAccumulation(nextEntries)
+        entriesRef.current = nextEntries
         setEntries(nextEntries)
         setAccumulation(nextAccumulation)
         writeEntriesCache(userId, nextEntries)
@@ -127,7 +142,7 @@ export function useEntries(userId?: string) {
         setPersistenceError('Could not delete this record. Please try again.')
       }
     },
-    [entries, getSupabase, userId],
+    [getSupabase, userId],
   )
 
   const refreshEntries = useCallback(async () => {
@@ -135,6 +150,7 @@ export function useEntries(userId?: string) {
     try {
       const nextEntries = await fetchEntries()
       const nextAccumulation = calculateAccumulation(nextEntries)
+      entriesRef.current = nextEntries
       setEntries(nextEntries)
       setAccumulation(nextAccumulation)
       writeEntriesCache(userId, nextEntries)

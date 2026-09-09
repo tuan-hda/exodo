@@ -63,11 +63,7 @@ export function SettingsView({ userId, entries }: { userId?: string; entries: En
           onClick={() => setPage('customization')}
         />
       </nav>
-      <Button
-        variant="outline"
-        className="w-full text-xs font-semibold text-muted"
-        type="button"
-        onClick={() => signOut()}>
+      <Button variant="outline-muted" className="w-full" type="button" onClick={() => signOut()}>
         <SignOut size={17} /> Sign out
       </Button>
     </section>
