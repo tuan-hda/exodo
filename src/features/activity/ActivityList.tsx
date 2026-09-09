@@ -5,32 +5,10 @@ import { EmptyState } from '@/components/EmptyState'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CategoryIcon } from '@/features/finance/CategoryIcon'
-import { entryDate } from '@/lib/date'
 import type { Entry } from '@/features/entries/types'
 import { Input } from '@/components/ui/input'
-import { formatLongDate, formatMonthChip, formatMonthLabel } from '@/lib/date-format'
+import { filterActivityEntries, formatActivityMonth, groupActivityByDate, groupActivityByMonth } from './activity-utils'
 import { formatMoney } from '@/lib/money'
-
-type ActivityDay = { key: string; label: string; entries: Entry[] }
-type ActivityMonth = { key: string; label: string; entries: Entry[]; income: number; expense: number }
-
-function monthChip(key: string) {
-  return formatMonthChip(`${key}-01`)
-}
-
-function dateLabel(key: string) {
-  return formatLongDate(key)
-}
-
-function groupByDate(entries: Entry[]) {
-  return entries.reduce<ActivityDay[]>((groups, entry) => {
-    const key = entryDate(entry)
-    const group = groups.find((item) => item.key === key)
-    if (group) group.entries.push(entry)
-    else groups.push({ key, label: dateLabel(key), entries: [entry] })
-    return groups
-  }, [])
-}
 
 export function ActivityList({
   entries,
@@ -50,33 +28,8 @@ export function ActivityList({
   useEffect(() => {
     setSelectedMonth(todayKey.slice(0, 7))
   }, [todayKey])
-  const normalizedQuery = query.trim().toLocaleLowerCase()
-  const sortedEntries = [...entries].sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
-  const filteredEntries = normalizedQuery
-    ? sortedEntries.filter((entry) =>
-        [entry.title, entry.category ?? '', entry.type].some((value) =>
-          value.toLocaleLowerCase().includes(normalizedQuery),
-        ),
-      )
-    : sortedEntries
-  const groupedEntries = filteredEntries.reduce<ActivityMonth[]>((groups, entry) => {
-    const key = entryDate(entry).slice(0, 7)
-    const group = groups.find((item) => item.key === key)
-    if (group) {
-      group.entries.push(entry)
-      if (entry.type === 'income') group.income += entry.amount
-      else group.expense += entry.amount
-    } else {
-      groups.push({
-        key,
-        label: formatMonthLabel(`${key}-01`),
-        entries: [entry],
-        income: entry.type === 'income' ? entry.amount : 0,
-        expense: entry.type === 'expense' ? entry.amount : 0,
-      })
-    }
-    return groups
-  }, [])
+  const filteredEntries = filterActivityEntries(entries, query)
+  const groupedEntries = groupActivityByMonth(filteredEntries)
   const monthKeys = groupedEntries.map((group) => group.key)
   const activeMonth = monthKeys.includes(selectedMonth) ? selectedMonth : (monthKeys[0] ?? null)
   const activeGroup = groupedEntries.find((group) => group.key === activeMonth)
@@ -131,13 +84,15 @@ export function ActivityList({
             disabled={!previousMonth}
             type="button"
             onClick={() => previousMonth && setSelectedMonth(previousMonth)}
-            aria-label={previousMonth ? `Previous month, ${monthChip(previousMonth)}` : 'No previous month'}>
+            aria-label={previousMonth ? `Previous month, ${formatActivityMonth(previousMonth)}` : 'No previous month'}>
             <CaretLeft size={17} />
-            <span>{previousMonth ? monthChip(previousMonth) : '—'}</span>
+            <span>{previousMonth ? formatActivityMonth(previousMonth) : '—'}</span>
           </Button>
           <div className="grid justify-items-center gap-0.5 px-3 text-center">
             <span className="ui-label tracking-[.1em]">Viewing</span>
-            <strong className="text-sm font-semibold text-ink">{activeMonth ? monthChip(activeMonth) : '—'}</strong>
+            <strong className="text-sm font-semibold text-ink">
+              {activeMonth ? formatActivityMonth(activeMonth) : '—'}
+            </strong>
           </div>
           <Button
             variant="subtle-nav"
@@ -146,8 +101,8 @@ export function ActivityList({
             disabled={!nextMonth}
             type="button"
             onClick={() => nextMonth && setSelectedMonth(nextMonth)}
-            aria-label={nextMonth ? `Next month, ${monthChip(nextMonth)}` : 'No next month'}>
-            <span>{nextMonth ? monthChip(nextMonth) : '—'}</span>
+            aria-label={nextMonth ? `Next month, ${formatActivityMonth(nextMonth)}` : 'No next month'}>
+            <span>{nextMonth ? formatActivityMonth(nextMonth) : '—'}</span>
             <CaretRight size={17} />
           </Button>
         </nav>
@@ -195,7 +150,7 @@ export function ActivityList({
                 </strong>
               </span>
             </Button>
-            {groupByDate(activeGroup.entries).map((day) => (
+            {groupActivityByDate(activeGroup.entries).map((day) => (
               <section key={day.key}>
                 <h4 className="ui-label m-0 border-b border-line px-2 py-3">{day.label}</h4>
                 {day.entries.map((entry) => (
