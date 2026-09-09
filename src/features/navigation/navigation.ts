@@ -7,6 +7,14 @@ const settingsNavigationItem = { id: 'settings', label: 'Settings', Icon: Gear }
 
 export type AppTab = 'today' | 'overview' | 'analysis' | 'notifications' | 'settings'
 
+export const appTabLabels: Record<AppTab, string> = {
+  today: 'Today',
+  overview: 'Overview',
+  analysis: 'Analysis',
+  notifications: 'Notifications',
+  settings: 'Settings',
+}
+
 export const navigationItems = [
   todayNavigationItem,
   overviewNavigationItem,

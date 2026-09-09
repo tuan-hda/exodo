@@ -1,6 +1,6 @@
 import { Plus } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
-import { navigationItems, type AppTab } from '@/features/navigation/navigation'
+import { appTabLabels, navigationItems, type AppTab } from '@/features/navigation/navigation'
 
 export function DashboardHeader({
   activeTab,
@@ -22,7 +22,7 @@ export function DashboardHeader({
         <span>exodo / έξοδο</span>
       </a>
       <span className="hidden font-mono text-[10px] uppercase tracking-[.1em] text-muted max-md:block">
-        {activeTab}
+        {appTabLabels[activeTab]}
       </span>
       <div className="flex items-center gap-2 max-md:hidden">
         <nav className="flex items-center gap-1" aria-label="Primary navigation">
