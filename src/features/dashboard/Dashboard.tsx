@@ -10,7 +10,7 @@ import { SettingsView } from '@/features/settings/SettingsView'
 import { ActivityList } from '@/features/activity/ActivityList'
 import { EntryComposer } from '@/features/entries/EntryComposer'
 import { MobileTabBar } from '@/features/navigation/MobileTabBar'
-import { isAppTab, navigationItems, type AppTab } from '@/features/navigation/navigation'
+import { getAppTabFromSearch, navigationItems, type AppTab } from '@/features/navigation/navigation'
 import { NotificationsView } from '@/features/notifications/NotificationsView'
 import { SummaryPanels } from './SummaryPanels'
 import { useEntries } from '@/features/entries/use-entries'
@@ -56,8 +56,10 @@ function Dashboard() {
   }, [currentDayKey])
 
   useEffect(() => {
-    const requestedTab = new URLSearchParams(window.location.search).get('tab')
-    if (isAppTab(requestedTab)) setActiveTab(requestedTab)
+    const syncTab = () => setActiveTab(getAppTabFromSearch(window.location.search))
+    syncTab()
+    window.addEventListener('popstate', syncTab)
+    return () => window.removeEventListener('popstate', syncTab)
   }, [])
 
   useEffect(() => {
@@ -100,6 +102,11 @@ function Dashboard() {
 
   function navigateTab(tab: AppTab) {
     setActiveTab(tab)
+    const url = new URL(window.location.href)
+    if (tab === 'today') url.searchParams.delete('tab')
+    else url.searchParams.set('tab', tab)
+    if (tab !== 'settings') url.searchParams.delete('section')
+    window.history.pushState(null, '', `${url.pathname}${url.search}${url.hash}`)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 

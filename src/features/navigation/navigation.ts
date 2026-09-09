@@ -12,3 +12,8 @@ export const navigationItems = [
 export function isAppTab(value: string | null): value is AppTab {
   return value === 'analysis' || navigationItems.some((item) => item.id === value)
 }
+
+export function getAppTabFromSearch(search: string): AppTab {
+  const requestedTab = new URLSearchParams(search).get('tab')
+  return isAppTab(requestedTab) ? requestedTab : 'today'
+}

@@ -29,9 +29,17 @@ export function SettingsView({ userId, entries }: { userId?: string; entries: En
   const initials = (user?.firstName?.[0] ?? user?.lastName?.[0] ?? email[0] ?? 'E').toUpperCase()
   const name = user?.fullName ?? user?.firstName ?? 'Your account'
 
-  if (page === 'budgets') return <BudgetSettingsView onBack={() => setPage('menu')} />
-  if (page === 'savings') return <SavingsView userId={userId} entries={entries} onBack={() => setPage('menu')} />
-  if (page === 'customization') return <CustomizationView onBack={() => setPage('menu')} />
+  function changePage(nextPage: SettingsPage) {
+    setPage(nextPage)
+    const url = new URL(window.location.href)
+    if (nextPage === 'menu') url.searchParams.delete('section')
+    else url.searchParams.set('section', nextPage)
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`)
+  }
+
+  if (page === 'budgets') return <BudgetSettingsView onBack={() => changePage('menu')} />
+  if (page === 'savings') return <SavingsView userId={userId} entries={entries} onBack={() => changePage('menu')} />
+  if (page === 'customization') return <CustomizationView onBack={() => changePage('menu')} />
 
   return (
     <section className="mx-auto grid max-w-[620px] gap-8 pb-8 animate-[page-rise_.55s_cubic-bezier(.16,1,.3,1)_both]">
@@ -57,19 +65,19 @@ export function SettingsView({ userId, entries }: { userId?: string; entries: En
           icon={<Wallet size={20} />}
           title="Budget settings"
           description="Set a recurring limit for each expense category"
-          onClick={() => setPage('budgets')}
+          onClick={() => changePage('budgets')}
         />
         <SettingsMenuItem
           icon={<PiggyBank size={20} />}
           title="Savings goals"
           description="Track money you are saving for a target"
-          onClick={() => setPage('savings')}
+          onClick={() => changePage('savings')}
         />
         <SettingsMenuItem
           icon={<PaintBrush size={20} />}
           title="Customization"
           description="Choose how Exodo looks"
-          onClick={() => setPage('customization')}
+          onClick={() => changePage('customization')}
         />
       </nav>
       <Button variant="outline-muted" className="w-full" type="button" onClick={() => signOut()}>
