@@ -6,8 +6,8 @@ import { StateMessage } from '@/components/StateMessage'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Entry } from '@/features/entries/types'
-import { SavingsGoalCard } from './SavingsGoalCard'
 import { SavingsDepositComposer } from './SavingsDepositComposer'
+import { SavingsGoalList } from './SavingsGoalList'
 import { useSavings } from './use-savings'
 
 export function SavingsGoalsLoading() {
@@ -45,11 +45,7 @@ export function SavingsGoalsPanel({ userId, entries }: { userId?: string; entrie
       {!isLoading && goals.length === 0 && (
         <EmptyState title="No savings goals yet" description="Create one in Settings to start tracking a target." />
       )}
-      <div className="grid gap-4">
-        {goals.map((goal) => (
-          <SavingsGoalCard key={goal.id} goal={goal} deposits={deposits} onAdd={setDepositGoal} />
-        ))}
-      </div>
+      <SavingsGoalList goals={goals} deposits={deposits} onAdd={setDepositGoal} />
       {selectedGoal && (
         <SavingsDepositComposer
           goal={selectedGoal}

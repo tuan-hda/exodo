@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import type { Entry } from '@/features/entries/types'
 import { formatMoney } from '@/features/entries/entry-utils'
 import { SavingsDepositComposer } from './SavingsDepositComposer'
-import { SavingsGoalCard } from './SavingsGoalCard'
+import { SavingsGoalList } from './SavingsGoalList'
 import { SavingsGoalsLoading } from './SavingsGoalsPanel'
 import { SavingsIcon, defaultSavingsIcon, savingsIconOptions, type SavingsIconName } from './savings-icons'
 import { useSavings } from './use-savings'
@@ -171,11 +171,7 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
           }
         />
       )}
-      <div className="grid gap-4">
-        {goals.map((goal) => (
-          <SavingsGoalCard key={goal.id} goal={goal} deposits={deposits} onAdd={setDepositGoal} />
-        ))}
-      </div>
+      <SavingsGoalList goals={goals} deposits={deposits} onAdd={setDepositGoal} />
       {selectedGoal && (
         <SavingsDepositComposer
           goal={selectedGoal}
