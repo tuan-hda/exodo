@@ -10,7 +10,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
           <p className="ui-eyebrow m-0">personal money, practiced daily</p>
         </div>
         {children}
-        <p className="ui-meta">private by default / money as a daily practice</p>
+        <p className="ui-meta">money / a daily practice</p>
       </div>
     </main>
   )
