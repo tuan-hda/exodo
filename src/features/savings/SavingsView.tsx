@@ -69,18 +69,8 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
       />
       {error && <StateMessage tone="danger">{error}</StateMessage>}
       <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
-        <MetricCard
-          label="saved"
-          value={formatMoney(summary.saved)}
-          detail="across active goals"
-          isLoading={isLoading}
-        />
-        <MetricCard
-          label="target"
-          value={formatMoney(summary.target)}
-          detail="across active goals"
-          isLoading={isLoading}
-        />
+        <MetricCard label="saved" value={formatMoney(summary.saved)} detail="across goals" isLoading={isLoading} />
+        <MetricCard label="target" value={formatMoney(summary.target)} detail="across goals" isLoading={isLoading} />
       </div>
       {showForm && (
         <Card className="p-5">
