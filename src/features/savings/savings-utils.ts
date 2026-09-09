@@ -1,15 +1,13 @@
+import { monthKey } from '@/lib/date'
 import type { Entry } from '@/features/entries/types'
 import type { SavingsGoal } from './types'
-export function monthKey(date = new Date()) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-}
 
 export function calculateMonthlyRemainder(entries: Entry[], date = new Date()) {
   const key = monthKey(date)
   return Math.max(
     0,
     entries
-      .filter((entry) => entry.occurredAt.slice(0, 7) === key)
+      .filter((entry) => monthKey(entry.occurredAt) === key)
       .reduce((sum, entry) => sum + (entry.type === 'income' ? entry.amount : -entry.amount), 0),
   )
 }

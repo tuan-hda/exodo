@@ -10,6 +10,7 @@ import { BudgetProgress } from '@/features/budgets/BudgetProgress'
 import type { CategoryBudget } from '@/features/budgets/types'
 import { SavingsGoalsPanel } from '@/features/savings/SavingsGoalsPanel'
 import { formatMoney } from '@/lib/money'
+import { monthKey } from '@/lib/date'
 
 export function SummaryPanels({
   entries,
@@ -62,7 +63,7 @@ export function SummaryPanels({
         budgets={budgets}
         isLoading={budgetsLoading}
         entries={entries}
-        monthStart={`${dayKey.slice(0, 7)}-`}
+        monthStart={`${monthKey(dayKey)}-`}
         dayKey={dayKey}
       />
       <SavingsGoalsPanel userId={userId} entries={entries} />

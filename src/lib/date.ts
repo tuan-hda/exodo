@@ -6,6 +6,10 @@ export function getDayKey(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
+export function monthKey(value: Date | string = new Date()) {
+  return (typeof value === 'string' ? value : getDayKey(value)).slice(0, 7)
+}
+
 export function getCurrentTime(date = new Date()) {
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
 }

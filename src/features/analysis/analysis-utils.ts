@@ -1,4 +1,4 @@
-import { entryDate } from '@/lib/date'
+import { entryDate, monthKey } from '@/lib/date'
 import type { Entry } from '@/features/entries/types'
 
 export type AnalysisSlice = {
@@ -6,10 +6,6 @@ export type AnalysisSlice = {
   amount: number
   percentage: number
   transactionCount: number
-}
-
-export function monthKey(date: Date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
 }
 
 export function getMonthEntries(entries: Entry[], month: Date) {

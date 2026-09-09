@@ -1,4 +1,4 @@
-import { entryDate } from '@/lib/date'
+import { entryDate, monthKey } from '@/lib/date'
 import { formatLongDate, formatMonthChip, formatMonthLabel } from '@/lib/date-format'
 import type { Entry } from '@/features/entries/types'
 
@@ -33,7 +33,7 @@ export function groupActivityByDate(entries: Entry[]) {
 
 export function groupActivityByMonth(entries: Entry[]) {
   return entries.reduce<ActivityMonth[]>((groups, entry) => {
-    const key = entryDate(entry).slice(0, 7)
+    const key = monthKey(entryDate(entry))
     const group = groups.find((item) => item.key === key)
     if (group) {
       group.entries.push(entry)

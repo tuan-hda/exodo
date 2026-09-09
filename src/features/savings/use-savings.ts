@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupabase } from '@/hooks/use-supabase'
 import { readStorageCache, storageCacheTtl, writeStorageCache } from '@/lib/storage'
+import { monthKey } from '@/lib/date'
 import type { Entry } from '@/features/entries/types'
-import { allocateRemainder, calculateMonthlyRemainder, monthKey } from './savings-utils'
+import { allocateRemainder, calculateMonthlyRemainder } from './savings-utils'
 import { normalizeSavingsIcon } from './savings-icons'
 import type { SavingsDeposit, SavingsGoal, StoredSavingsDeposit, StoredSavingsGoal } from './types'
 

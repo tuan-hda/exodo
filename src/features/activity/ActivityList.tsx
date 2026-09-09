@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { filterActivityEntries, formatActivityMonth, groupActivityByDate, groupActivityByMonth } from './activity-utils'
 import { formatMoney } from '@/lib/money'
 import { formatEntryTime } from '@/lib/date-format'
+import { monthKey } from '@/lib/date'
 
 export function ActivityList({
   entries,
@@ -25,9 +26,9 @@ export function ActivityList({
   onOpenAnalysis: (monthKey: string) => void
 }) {
   const [query, setQuery] = useState('')
-  const [selectedMonth, setSelectedMonth] = useState(todayKey.slice(0, 7))
+  const [selectedMonth, setSelectedMonth] = useState(monthKey(todayKey))
   useEffect(() => {
-    setSelectedMonth(todayKey.slice(0, 7))
+    setSelectedMonth(monthKey(todayKey))
   }, [todayKey])
   const filteredEntries = filterActivityEntries(entries, query)
   const groupedEntries = groupActivityByMonth(filteredEntries)
@@ -40,7 +41,7 @@ export function ActivityList({
 
   function updateQuery(value: string) {
     setQuery(value)
-    setSelectedMonth(todayKey.slice(0, 7))
+    setSelectedMonth(monthKey(todayKey))
   }
 
   return (

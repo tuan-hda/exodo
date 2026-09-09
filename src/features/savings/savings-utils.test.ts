@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { allocateRemainder, calculateMonthlyRemainder, monthKey } from './savings-utils'
+import { monthKey } from '@/lib/date'
+import { allocateRemainder, calculateMonthlyRemainder } from './savings-utils'
 import type { SavingsGoal } from './types'
 
 const goal = (id: string, priority: number, targetAmount = 1_000) =>

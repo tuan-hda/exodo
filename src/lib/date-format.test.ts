@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { monthKey } from './date'
 import { formatEntryDateTime, formatEntryTime, formatLongDate, formatMonthChip, formatMonthLabel } from './date-format'
 
 describe('shared date formatting', () => {
@@ -15,5 +16,10 @@ describe('shared date formatting', () => {
     const timestamp = '2026-09-10T08:30'
     expect(formatEntryDateTime(timestamp)).toBe('2026-09-10 · 08:30')
     expect(formatEntryTime(timestamp)).toBe('08:30')
+  })
+
+  it('derives a stable month key from dates and date keys', () => {
+    expect(monthKey(new Date('2026-09-10T12:00:00'))).toBe('2026-09')
+    expect(monthKey('2026-09-10T08:30')).toBe('2026-09')
   })
 })
