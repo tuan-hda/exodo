@@ -80,21 +80,18 @@ export function SettingsView({
       <nav className="ui-divider-list border-y border-line" aria-label="Settings menu">
         <SettingsMenuItem
           icon={<Wallet size={20} />}
-          accent="blue"
           title="Budget settings"
           description="Set a recurring limit for each expense category"
           onClick={() => changePage('budgets')}
         />
         <SettingsMenuItem
           icon={<PiggyBank size={20} />}
-          accent="sage"
           title="Savings goals"
           description="Track money you are saving for a target"
           onClick={() => changePage('savings')}
         />
         <SettingsMenuItem
           icon={<PaintBrush size={20} />}
-          accent="amber"
           title="Customization"
           description="Choose how Exodo looks"
           onClick={() => changePage('customization')}
