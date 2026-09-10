@@ -28,7 +28,7 @@ const buttonVariants = cva(
         option:
           'border-line-strong bg-soft text-muted hover:border-ink hover:bg-surface hover:text-ink data-[selected=true]:border-ink data-[selected=true]:bg-surface data-[selected=true]:text-ink data-[selected=true]:shadow-option',
         category:
-          'border-line-strong bg-soft text-muted hover:border-ink hover:bg-surface hover:text-ink data-[selected=true]:border-ink data-[selected=true]:shadow-option',
+          'border-line-strong bg-soft text-muted hover:border-ink hover:bg-surface hover:text-ink data-[selected=true]:border-current data-[selected=true]:shadow-option',
         keypad: 'border-line bg-soft text-ink hover:border-line-strong hover:bg-line',
         'keypad-operator': 'border-line-strong bg-soft text-ink hover:bg-line',
         'keypad-action': 'border-line-strong bg-surface text-muted hover:bg-soft',

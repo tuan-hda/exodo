@@ -3,7 +3,7 @@ import { BrandLockup } from '@/components/BrandLockup'
 
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
-    <main className="grid min-h-dvh place-items-center bg-page px-6 py-12 text-center text-sm text-muted">
+    <main className="ui-color-wash grid min-h-dvh place-items-center px-6 py-12 text-center text-sm text-muted">
       <div className="grid w-full max-w-[480px] justify-items-center gap-7">
         <div className="grid justify-items-center gap-4">
           <BrandLockup />
