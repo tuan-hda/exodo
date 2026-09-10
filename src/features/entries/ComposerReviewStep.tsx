@@ -41,7 +41,7 @@ export function ComposerReviewStep({
 }) {
   return (
     <section className="grid content-start gap-4" aria-label="Review record">
-      <Card accent={type === 'income' ? 'success' : 'coral'} className="grid gap-3 p-4">
+      <Card className="grid gap-3 p-4">
         <div className="flex items-end justify-between border-b border-line-strong pb-3">
           <span className={clsx('ui-label', type === 'income' ? 'text-success' : 'text-category-coral')}>
             {type === 'income' ? 'Income' : 'Expense'}
