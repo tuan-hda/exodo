@@ -11,7 +11,7 @@ import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { evaluateExpression } from '@/lib/amount'
-import { SavingsIcon, savingsIconTone } from './savings-icons'
+import { SavingsIcon } from './savings-icons'
 import type { SavingsGoal } from './types'
 import { useMediaQuery } from '@/hooks/use-media-query'
 import { mediaQueries } from '@/lib/breakpoints'
@@ -63,7 +63,7 @@ export function SavingsDepositComposer({
           </Button>
         </ComposerHeader>
         <div className="mb-5 flex items-center gap-3 border-b border-line pb-4">
-          <IconTile size="md" shape="input" tone={savingsIconTone(goal.icon)} aria-hidden="true" className="text-lg">
+          <IconTile size="md" shape="input" tone="inverse" aria-hidden="true" className="text-lg">
             <SavingsIcon name={goal.icon} size={20} />
           </IconTile>
           <div className="min-w-0">
@@ -95,7 +95,7 @@ export function SavingsDepositComposer({
             />
           </Field>
           <ComposerFooter>
-            <Button className="w-full gap-2" disabled={isSaving} type="submit" variant="income-primary">
+            <Button className="w-full gap-2" disabled={isSaving} type="submit">
               {isSaving ? 'Saving…' : 'Save'} <Check size={17} />
             </Button>
           </ComposerFooter>

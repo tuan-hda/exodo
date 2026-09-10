@@ -93,20 +93,8 @@ export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack
       )}
       {notice && !validationError && !error && <StateMessage tone="success">{notice}</StateMessage>}
       <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
-        <MetricCard
-          label="saved"
-          value={formatMoney(summary.saved)}
-          detail="across goals"
-          accent="sage"
-          isLoading={isLoading}
-        />
-        <MetricCard
-          label="target"
-          value={formatMoney(summary.target)}
-          detail="across goals"
-          accent="blue"
-          isLoading={isLoading}
-        />
+        <MetricCard label="saved" value={formatMoney(summary.saved)} detail="across goals" isLoading={isLoading} />
+        <MetricCard label="target" value={formatMoney(summary.target)} detail="across goals" isLoading={isLoading} />
       </div>
       {showForm && (
         <Card className="p-5">
@@ -191,7 +179,6 @@ export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack
       {!isLoading && !error && goals.length === 0 && !showForm && (
         <EmptyState
           icon={<SavingsIcon name="target" size={22} />}
-          iconTone="blue"
           title="No savings goals yet"
           description="Create your first goal and give your extra money somewhere meaningful to go."
           action={

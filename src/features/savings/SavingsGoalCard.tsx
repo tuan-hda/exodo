@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { formatMoney } from '@/lib/money'
-import { SavingsIcon, savingsIconTone } from './savings-icons'
+import { SavingsIcon } from './savings-icons'
 import type { SavingsDeposit, SavingsGoal } from './types'
 import { formatMonthChip } from '@/lib/date-format'
 
@@ -21,10 +21,10 @@ export function SavingsGoalCard({
   const recentDeposits = deposits.filter((deposit) => deposit.goalId === goal.id).slice(0, 4)
   const statusLabel = goal.status === 'completed' ? 'Complete' : goal.status === 'paused' ? 'Paused' : null
   return (
-    <Card as="article" accent={savingsIconTone(goal.icon)} className="p-6 md:p-7">
+    <Card as="article" className="p-6 md:p-7">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
-          <IconTile size="lg" shape="control" tone={savingsIconTone(goal.icon)} aria-hidden="true" className="text-xl">
+          <IconTile size="lg" shape="control" tone="inverse" aria-hidden="true" className="text-xl">
             <SavingsIcon name={goal.icon} size={21} />
           </IconTile>
           <div className="min-w-0">

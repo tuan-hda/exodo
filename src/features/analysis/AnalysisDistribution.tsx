@@ -91,7 +91,7 @@ export function AnalysisDistribution({
 
   return (
     <section aria-label={`${type} distribution`}>
-      <Card tone={isIncome ? 'success' : 'danger'} className="p-5 max-md:p-4">
+      <Card className="p-5 max-md:p-4">
         {isLoading ? (
           <div className="grid min-h-[360px] content-center gap-5 p-8">
             <Skeleton className="mx-auto size-[240px] rounded-full max-xs:size-[190px]" />
@@ -112,7 +112,7 @@ export function AnalysisDistribution({
           </>
         ) : (
           <div className="grid min-h-[360px] place-items-center content-center gap-3 p-8 text-center">
-            <IconTile size="lg" shape="circle" tone={isIncome ? 'success' : 'danger'} aria-hidden="true">
+            <IconTile size="lg" shape="circle" aria-hidden="true">
               {isIncome ? <TrendUp size={20} /> : <TrendDown size={20} />}
             </IconTile>
             <div className="grid gap-1">

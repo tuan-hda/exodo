@@ -57,7 +57,6 @@ export function SavingsGoalsPanel({ savings }: { savings: SavingsState }) {
       {!isLoading && !error && goals.length === 0 && (
         <EmptyState
           icon={<SavingsIcon name="target" size={22} />}
-          iconTone="blue"
           title="No savings goals yet"
           description="Create one in Settings to start tracking a target."
         />

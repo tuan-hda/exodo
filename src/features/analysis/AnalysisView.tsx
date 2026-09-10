@@ -92,12 +92,8 @@ export function AnalysisView({
       )}
       <Tabs value={activeType} onValueChange={(value) => isEntryType(value) && setActiveType(value)}>
         <TabsList aria-label="Analysis type">
-          <TabsTrigger tone="danger" value="expense">
-            Expense
-          </TabsTrigger>
-          <TabsTrigger tone="success" value="income">
-            Income
-          </TabsTrigger>
+          <TabsTrigger value="expense">Expense</TabsTrigger>
+          <TabsTrigger value="income">Income</TabsTrigger>
         </TabsList>
         <TabsContent className="analysis-tab-content swipe-left" value="expense">
           <AnalysisDistribution
