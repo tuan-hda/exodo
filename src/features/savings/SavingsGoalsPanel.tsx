@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SavingsDepositComposer } from './SavingsDepositComposer'
 import { SavingsGoalList } from './SavingsGoalList'
+import { SavingsIcon } from './savings-icons'
 import type { SavingsState } from './use-savings'
 
 export function SavingsGoalsLoading() {
@@ -54,7 +55,12 @@ export function SavingsGoalsPanel({ savings }: { savings: SavingsState }) {
         </div>
       )}
       {!isLoading && !error && goals.length === 0 && (
-        <EmptyState title="No savings goals yet" description="Create one in Settings to start tracking a target." />
+        <EmptyState
+          icon={<SavingsIcon name="target" size={22} />}
+          iconTone="blue"
+          title="No savings goals yet"
+          description="Create one in Settings to start tracking a target."
+        />
       )}
       {goals.length > 0 && (
         <div className="mt-4">

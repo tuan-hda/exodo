@@ -190,6 +190,8 @@ export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack
       {isLoading && goals.length === 0 && <SavingsGoalsLoading />}
       {!isLoading && !error && goals.length === 0 && !showForm && (
         <EmptyState
+          icon={<SavingsIcon name="target" size={22} />}
+          iconTone="blue"
           title="No savings goals yet"
           description="Create your first goal and give your extra money somewhere meaningful to go."
           action={

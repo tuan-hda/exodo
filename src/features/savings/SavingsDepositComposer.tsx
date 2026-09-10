@@ -95,7 +95,7 @@ export function SavingsDepositComposer({
             />
           </Field>
           <ComposerFooter>
-            <Button className="w-full gap-2" disabled={isSaving} type="submit">
+            <Button className="w-full gap-2" disabled={isSaving} type="submit" variant="income-primary">
               {isSaving ? 'Saving…' : 'Save'} <Check size={17} />
             </Button>
           </ComposerFooter>
