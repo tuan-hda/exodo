@@ -4,7 +4,7 @@ import { ArrowClockwise, Bell, EnvelopeSimple } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { PageHeader } from '@/components/PageHeader'
 import { PageShell } from '@/components/PageShell'
-import { IconTile, type IconTileTone } from '@/components/IconTile'
+import { IconTile } from '@/components/IconTile'
 import { StateMessage } from '@/components/StateMessage'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -17,34 +17,29 @@ type GmailStatus = 'loading' | 'connected' | 'disconnected' | 'unavailable' | 'e
 function getGmailPresentation(status: GmailStatus, email: string) {
   if (status === 'loading') {
     return {
-      iconTone: 'muted' as IconTileTone,
       title: 'Checking Gmail.',
       description: 'Checking whether transaction alerts are ready to review.',
     }
   }
   if (status === 'error') {
     return {
-      iconTone: 'danger' as IconTileTone,
       title: 'Gmail status is unavailable.',
       description: 'We could not confirm the connection status.',
     }
   }
   if (status === 'unavailable') {
     return {
-      iconTone: 'amber' as IconTileTone,
       title: 'Gmail is not enabled.',
       description: 'Gmail notifications are not enabled for this account.',
     }
   }
   if (status === 'connected') {
     return {
-      iconTone: 'success' as IconTileTone,
       title: 'Gmail is connected.',
       description: `Transaction alerts from ${email} will appear here for you to name, categorize, and approve.`,
     }
   }
   return {
-    iconTone: 'amber' as IconTileTone,
     title: 'Connect your Gmail.',
     description: 'Connect your Gmail so Exodo can find transaction alerts for your review.',
   }
@@ -98,7 +93,7 @@ export function NotificationsView() {
   return (
     <PageShell size="centered" aria-busy={isLoading}>
       <div className="grid justify-items-center gap-5">
-        <IconTile size="xl" shape="circle" tone={presentation.iconTone}>
+        <IconTile size="xl" shape="circle" tone="muted">
           <Bell size={24} weight="regular" />
         </IconTile>
         <PageHeader
