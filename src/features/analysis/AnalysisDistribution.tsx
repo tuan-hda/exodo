@@ -47,6 +47,7 @@ function CategoryDetail({
         <AnimatedList items={categoryEntries} getKey={(entry) => entry.id}>
           {(entry) => (
             <div className="flex min-h-16 items-center gap-3 border-b border-line py-3">
+              <CategoryIcon category={entry.category ?? category} size="xs" />
               <div className="min-w-0 flex-1">
                 <strong className="block truncate text-sm font-medium text-ink">{entry.title || category}</strong>
                 <small className="ui-meta mt-1 block">{formatEntryDateTime(entry.occurredAt)}</small>
@@ -111,7 +112,7 @@ export function AnalysisDistribution({
           </>
         ) : (
           <div className="grid min-h-[360px] place-items-center content-center gap-3 p-8 text-center">
-            <IconTile size="lg" shape="circle" aria-hidden="true">
+            <IconTile size="lg" shape="circle" tone={isIncome ? 'success' : 'danger'} aria-hidden="true">
               {isIncome ? <TrendUp size={20} /> : <TrendDown size={20} />}
             </IconTile>
             <div className="grid gap-1">
