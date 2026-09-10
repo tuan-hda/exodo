@@ -3,7 +3,7 @@ import { BrandLockup } from '@/components/BrandLockup'
 
 export default function Loading() {
   return (
-    <main className="ui-color-wash ui-dashboard-frame grid min-h-dvh content-start gap-6 pt-6 pb-12">
+    <main className="ui-dashboard-frame grid min-h-dvh content-start gap-6 bg-page pt-6 pb-12">
       <div className="flex items-center justify-between border-b border-line pb-4">
         <BrandLockup />
         <Skeleton className="h-9 w-56" />
