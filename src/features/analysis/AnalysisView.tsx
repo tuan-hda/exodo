@@ -78,14 +78,14 @@ export function AnalysisView({
           <Skeleton className="h-3 w-24" />
         </div>
       ) : (
-        <div className="ui-label flex gap-5 border-y border-line py-3 max-xs:gap-3 max-xs:text-[9px]">
-          <span>
+        <div className="ui-label grid grid-cols-3 gap-4 border-y border-line py-3 max-xs:gap-2 max-xs:text-[9px]">
+          <span className="min-w-0">
             <MoneyAmount amount={income} tone="income" showSign as="b" className="font-normal" /> income
           </span>
-          <span>
+          <span className="min-w-0">
             <MoneyAmount amount={expense} tone="expense" showSign as="b" className="font-normal" /> expense
           </span>
-          <span>
+          <span className="min-w-0">
             <b className="ui-number font-normal text-ink">{monthEntries.length}</b> records
           </span>
         </div>

@@ -1,18 +1,16 @@
 import type { ReactNode } from 'react'
-import { IconTile, type IconTileTone } from './IconTile'
+import { IconTile } from './IconTile'
 import { Card } from './ui/card'
 import { cn } from '@/lib/utils'
 
 export function EmptyState({
   icon,
-  iconTone = 'muted',
   title,
   description,
   action,
   className,
 }: {
   icon?: ReactNode
-  iconTone?: IconTileTone
   title: string
   description?: ReactNode
   action?: ReactNode
@@ -21,7 +19,7 @@ export function EmptyState({
   return (
     <Card tone="flat" className={cn('grid justify-items-center gap-3 p-8 text-center', className)}>
       {icon && (
-        <IconTile size="lg" tone={iconTone}>
+        <IconTile size="lg" tone="muted">
           {icon}
         </IconTile>
       )}

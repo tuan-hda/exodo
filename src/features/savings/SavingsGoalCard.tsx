@@ -53,9 +53,9 @@ export function SavingsGoalCard({
         tone={goal.status === 'paused' ? 'default' : 'success'}
         aria-label={`${goal.name} savings progress`}
       />
-      <div className="mt-3 flex justify-between text-xs text-muted">
+      <div className="mt-3 grid grid-cols-2 gap-3 text-xs text-muted max-xs:grid-cols-1">
         <span className="ui-number">{formatMoney(Math.max(0, goal.targetAmount - goal.savedAmount))} remaining</span>
-        <span className="ui-number">Target {formatMoney(goal.targetAmount)}</span>
+        <span className="ui-number text-right max-xs:text-left">Target {formatMoney(goal.targetAmount)}</span>
       </div>
       {recentDeposits.length > 0 && (
         <div className="mt-5 border-t border-line pt-3">

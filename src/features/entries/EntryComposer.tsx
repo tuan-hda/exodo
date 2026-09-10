@@ -167,20 +167,20 @@ export function EntryComposer({
             <X size={19} />
           </Button>
         </ComposerHeader>
-        <div
-          className="mb-5 grid grid-cols-3 gap-2 border-b border-line pb-4 max-md:mb-2"
-          role="group"
+        <ol
+          className="m-0 mb-5 grid list-none grid-cols-3 gap-2 border-b border-line p-0 pb-4 max-md:mb-2"
           aria-label="Record steps">
           {stepLabels.map((label, index) => {
             const isComplete = step > index + 1
             const isCurrent = step === index + 1
 
             return (
-              <span
+              <li
                 className={clsx(
                   'ui-meta inline-flex items-center gap-1.5 max-md:text-[9px]',
                   isCurrent && composerAccent.text,
                 )}
+                aria-current={isCurrent ? 'step' : undefined}
                 key={label}>
                 <i
                   className={clsx(
@@ -192,10 +192,10 @@ export function EntryComposer({
                   {isComplete ? <Check size={11} weight="bold" /> : index + 1}
                 </i>
                 {label}
-              </span>
+              </li>
             )
           })}
-        </div>
+        </ol>
         <form
           className="grid gap-3 max-md:flex max-md:min-w-0 max-md:flex-1 max-md:flex-col max-md:gap-4"
           onSubmit={submit}>

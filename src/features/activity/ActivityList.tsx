@@ -206,7 +206,6 @@ export function ActivityList({
           <EmptyState
             className="mt-4"
             icon={<CalendarDots size={21} />}
-            iconTone="coral"
             title={entries.length ? 'No matching records found' : 'No activity yet'}
             description={
               entries.length

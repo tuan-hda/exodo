@@ -86,14 +86,14 @@ export function BudgetProgress({
           By category
         </h3>
       </div>
-      <div className="mt-7 flex items-end justify-between gap-4 border-y border-line py-4">
+      <div className="mt-7 grid grid-cols-[minmax(0,1fr)_minmax(0,22ch)] items-end gap-4 border-y border-line py-4 max-xs:grid-cols-1 max-xs:items-start">
         <div className="grid gap-1">
           <span className="ui-label">Available each day</span>
           <strong className="ui-number text-xl font-semibold tracking-[-.04em] text-success">
             {formatMoney(dailyPace)} <small className="ui-meta font-normal">/ day</small>
           </strong>
         </div>
-        <span className="ui-meta max-w-[22ch] text-right">
+        <span className="ui-meta max-w-[22ch] text-right max-xs:max-w-none max-xs:text-left">
           {formatMoney(remainingBudget)} remaining across {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'}{' '}
           including today
         </span>
