@@ -8,6 +8,7 @@ import { StateMessage } from '@/components/StateMessage'
 import { CategoryIcon } from '@/features/finance/CategoryIcon'
 import { categoryForegroundClass } from '@/features/finance/category'
 import { ComposerStepActions } from './ComposerStepActions'
+import { entryTypePresentation } from './entry-type'
 import type { Entry, EntryType } from './types'
 import { evaluateExpression } from '@/lib/amount'
 import { formatMoney } from '@/lib/money'
@@ -39,18 +40,14 @@ export function ComposerReviewStep({
   onOccurredAtChange: (occurredAt: string) => void
   onBack: () => void
 }) {
+  const typePresentation = entryTypePresentation[type]
+
   return (
     <section className="grid content-start gap-4" aria-label="Review record">
       <Card className="grid gap-3 p-4">
         <div className="flex items-end justify-between border-b border-line-strong pb-3">
-          <span className={clsx('ui-label', type === 'income' ? 'text-success' : 'text-category-coral')}>
-            {type === 'income' ? 'Income' : 'Expense'}
-          </span>
-          <strong
-            className={clsx(
-              'ui-number text-2xl font-semibold tracking-[-.05em]',
-              type === 'income' ? 'text-success' : 'text-category-coral',
-            )}>
+          <span className={clsx('ui-label', typePresentation.textClass)}>{typePresentation.label}</span>
+          <strong className={clsx('ui-number text-2xl font-semibold tracking-[-.05em]', typePresentation.textClass)}>
             {formatMoney(evaluateExpression(amount))}
           </strong>
         </div>
@@ -86,11 +83,7 @@ export function ComposerReviewStep({
       </Field>
       {error && <StateMessage tone="danger">{error}</StateMessage>}
       <ComposerStepActions disabled={disabled} onBack={onBack}>
-        <Button
-          className="flex-1 gap-2"
-          disabled={disabled}
-          type="submit"
-          variant={type === 'income' ? 'income-primary' : 'expense-primary'}>
+        <Button className="flex-1 gap-2" disabled={disabled} type="submit" variant="default">
           {isSaving ? (
             <>
               <CircleNotch className="animate-spin" size={17} /> Saving…

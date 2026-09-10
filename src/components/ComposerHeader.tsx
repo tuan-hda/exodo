@@ -5,16 +5,14 @@ import { SheetTitle } from '@/components/ui/sheet'
 export function ComposerHeader({
   title,
   accessibleTitle,
-  accent = 'neutral',
+  accentClass = 'bg-line-strong',
   children,
 }: {
   title: ReactNode
   accessibleTitle?: ReactNode
-  accent?: 'neutral' | 'income' | 'expense'
+  accentClass?: string
   children: ReactNode
 }) {
-  const accentClass = accent === 'income' ? 'bg-success' : accent === 'expense' ? 'bg-category-coral' : 'bg-line-strong'
-
   return (
     <>
       <SheetTitle className="sr-only">{accessibleTitle ?? title}</SheetTitle>

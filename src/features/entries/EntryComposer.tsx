@@ -12,6 +12,7 @@ import { defaultCategory, type Category } from '@/features/finance/category'
 import { ComposerAmountStep } from './ComposerAmountStep'
 import { ComposerCategoryStep } from './ComposerCategoryStep'
 import { ComposerReviewStep } from './ComposerReviewStep'
+import { entryTypePresentation } from './entry-type'
 import type { Entry, EntryType } from './types'
 import { evaluateExpression, formatAmountExpression } from '@/lib/amount'
 import { getCurrentTime, getDayKey } from '@/lib/date'
@@ -61,20 +62,7 @@ export function EntryComposer({
   const [isDeleting, setIsDeleting] = useState(false)
   const isMobile = useMediaQuery(mediaQueries.mobile)
   const isBusy = isSaving || isDeleting
-  const composerAccent =
-    type === 'income'
-      ? {
-          border: 'border-success/50',
-          soft: 'bg-success-soft',
-          solid: 'bg-success',
-          text: 'text-success',
-        }
-      : {
-          border: 'border-category-coral/50',
-          soft: 'bg-category-coral-soft',
-          solid: 'bg-category-coral',
-          text: 'text-category-coral',
-        }
+  const typePresentation = entryTypePresentation[type]
 
   function validateAmount() {
     try {
@@ -141,7 +129,9 @@ export function EntryComposer({
         if (!open && !isBusy) onClose()
       }}>
       <SheetContent side="bottom" variant="composer" showCloseButton={false} aria-busy={isBusy}>
-        <ComposerHeader title={entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'} accent={type}>
+        <ComposerHeader
+          title={entry ? `Edit ${typePresentation.label.toLowerCase()}` : typePresentation.label}
+          accentClass={typePresentation.solidClass}>
           {entry && onDelete && (
             <Button
               variant="outline-danger"
@@ -154,14 +144,14 @@ export function EntryComposer({
             </Button>
           )}
           <Button
-            variant={type === 'income' ? 'income' : 'expense'}
+            variant={typePresentation.toggleVariant}
             size="meta"
             type="button"
             disabled={isBusy}
             onClick={toggleType}
             aria-label={`Switch to ${type === 'income' ? 'expense' : 'income'}`}>
             {type === 'income' ? <ArrowDown size={14} weight="bold" /> : <ArrowUp size={14} weight="bold" />}
-            {type === 'income' ? 'Income' : 'Expense'}
+            {typePresentation.label}
           </Button>
           <Button variant="outline" size="icon-lg" type="button" disabled={isBusy} onClick={onClose} aria-label="Close">
             <X size={19} />
@@ -178,7 +168,7 @@ export function EntryComposer({
               <li
                 className={clsx(
                   'ui-meta inline-flex items-center gap-1.5 max-md:text-[9px]',
-                  isCurrent && composerAccent.text,
+                  isCurrent && typePresentation.textClass,
                 )}
                 aria-current={isCurrent ? 'step' : undefined}
                 key={label}>
@@ -186,8 +176,9 @@ export function EntryComposer({
                   className={clsx(
                     'grid size-5 shrink-0 place-items-center rounded-full border not-italic',
                     !isComplete && !isCurrent && 'border-line-strong bg-surface',
-                    isComplete && `${composerAccent.border} ${composerAccent.solid} text-white`,
-                    isCurrent && `${composerAccent.border} ${composerAccent.soft} ${composerAccent.text}`,
+                    isComplete && `${typePresentation.borderClass} ${typePresentation.solidClass} text-white`,
+                    isCurrent &&
+                      `${typePresentation.borderClass} ${typePresentation.softClass} ${typePresentation.textClass}`,
                   )}>
                   {isComplete ? <Check size={11} weight="bold" /> : index + 1}
                 </i>
@@ -217,7 +208,6 @@ export function EntryComposer({
             <FadeContent>
               <ComposerAmountStep
                 amount={amount}
-                type={type}
                 disabled={isBusy}
                 error={error || persistenceError || ''}
                 isMobile={isMobile}

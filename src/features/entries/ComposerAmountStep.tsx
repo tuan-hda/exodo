@@ -2,11 +2,9 @@ import { ArrowRight } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { ComposerStepActions } from './ComposerStepActions'
 import { ExpressionAmountField } from '@/components/ExpressionAmountField'
-import type { EntryType } from './types'
 
 export function ComposerAmountStep({
   amount,
-  type,
   disabled,
   error,
   isMobile,
@@ -16,7 +14,6 @@ export function ComposerAmountStep({
   onBack,
 }: {
   amount: string
-  type: EntryType
   disabled: boolean
   error: string
   isMobile: boolean
@@ -39,12 +36,7 @@ export function ComposerAmountStep({
         inputId="entry-amount"
       />
       <ComposerStepActions disabled={disabled} onBack={onBack}>
-        <Button
-          className="flex-1 gap-2"
-          disabled={disabled}
-          type="button"
-          variant={type === 'income' ? 'income-primary' : 'expense-primary'}
-          onClick={onNext}>
+        <Button className="flex-1 gap-2" disabled={disabled} type="button" variant="default" onClick={onNext}>
           Continue <ArrowRight size={17} />
         </Button>
       </ComposerStepActions>

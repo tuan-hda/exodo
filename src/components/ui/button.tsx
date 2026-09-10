@@ -5,12 +5,15 @@ import { Slot } from 'radix-ui'
 import { cn } from '@/lib/utils'
 import { triggerHaptic } from '@/lib/haptics'
 
+const primaryButtonClasses =
+  'border-ink bg-ink text-white shadow-button hover:border-ink-strong hover:bg-ink-strong hover:shadow-button-hover'
+
 const buttonVariants = cva(
   "group/button ui-control-motion inline-flex shrink-0 items-center justify-center border bg-clip-padding text-xs font-medium whitespace-nowrap transition-[background-color,border-color,color,box-shadow,transform] outline-none select-none focus-visible:ring-2 focus-visible:ring-ink/20 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-danger aria-invalid:ring-1 aria-invalid:ring-danger/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: 'border-ink bg-ink text-white shadow-button hover:bg-ink-strong hover:shadow-button-hover',
+        default: primaryButtonClasses,
         outline: 'border-line-strong bg-surface text-ink hover:border-ink hover:bg-soft',
         secondary: 'border-transparent bg-soft text-ink hover:bg-line',
         ghost: 'border-transparent text-muted hover:bg-soft hover:text-ink',
@@ -18,10 +21,6 @@ const buttonVariants = cva(
         'outline-danger': 'border-danger/30 bg-surface text-danger hover:border-danger/50 hover:bg-danger-soft',
         income: 'border-success/25 bg-success-soft text-success hover:border-success/35 hover:bg-success-soft',
         expense: 'border-danger/25 bg-danger-soft text-danger hover:border-danger/35 hover:bg-danger-soft',
-        'income-primary':
-          'border-success bg-success text-white shadow-button hover:border-success/90 hover:bg-success/90 hover:shadow-button-hover',
-        'expense-primary':
-          'border-category-coral bg-category-coral text-white shadow-button hover:border-category-coral/90 hover:bg-category-coral/90 hover:shadow-button-hover',
         'destructive-ghost': 'border-transparent bg-transparent text-danger hover:bg-danger-soft hover:text-danger',
         link: 'border-transparent text-ink underline-offset-4 hover:underline',
         'outline-muted': 'border-line-strong bg-surface text-muted hover:border-ink hover:bg-soft hover:text-ink',
