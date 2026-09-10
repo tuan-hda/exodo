@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
 import { PwaRegistration } from '@/features/pwa/PwaRegistration'
 import { getClerkAllowedRedirectOrigins } from '@/lib/clerk-origins'
+import { themeColors } from '@/lib/theme'
 import '../styles.css'
 
 const clerkAllowedRedirectOrigins = getClerkAllowedRedirectOrigins()
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#151515',
+  themeColor: themeColors.ink,
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',

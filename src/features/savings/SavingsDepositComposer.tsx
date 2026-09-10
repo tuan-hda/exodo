@@ -4,13 +4,14 @@ import { useState, type FormEvent } from 'react'
 import { Check, X } from '@phosphor-icons/react'
 import { ComposerHeader } from '@/components/ComposerHeader'
 import { ComposerFooter } from '@/components/ComposerFooter'
-import { CalculatorKeypad } from '@/components/CalculatorKeypad'
-import { StateMessage } from '@/components/StateMessage'
+import { ExpressionAmountField } from '@/components/ExpressionAmountField'
+import { IconTile } from '@/components/IconTile'
 import { Button } from '@/components/ui/button'
+import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
-import { evaluateExpression, formatAmountExpression } from '@/lib/amount'
-import { SavingsIcon } from './savings-icons'
+import { evaluateExpression } from '@/lib/amount'
+import { SavingsIcon, savingsIconTone } from './savings-icons'
 import type { SavingsGoal } from './types'
 import { useMediaQuery } from '@/hooks/use-media-query'
 import { mediaQueries } from '@/lib/breakpoints'
@@ -62,48 +63,37 @@ export function SavingsDepositComposer({
           </Button>
         </ComposerHeader>
         <div className="mb-5 flex items-center gap-3 border-b border-line pb-4">
-          <span className="ui-icon-tile-inverse size-10 rounded-input text-lg" aria-hidden="true">
+          <IconTile size="md" shape="input" tone={savingsIconTone(goal.icon)} aria-hidden="true" className="text-lg">
             <SavingsIcon name={goal.icon} size={20} />
-          </span>
+          </IconTile>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">{goal.name}</p>
             <p className="text-xs text-muted">Target {formatMoney(goal.targetAmount)}</p>
           </div>
         </div>
         <form className="grid gap-4 max-md:flex max-md:min-w-0 max-md:flex-1 max-md:flex-col" onSubmit={submit}>
-          <label className="ui-field">
-            Amount
-            <Input
-              autoFocus={!isMobile}
-              className="w-full max-md:hidden"
-              disabled={isSaving}
-              inputMode="decimal"
-              value={amount}
-              onChange={(event) => {
-                setError('')
-                setAmount(formatAmountExpression(event.target.value))
-              }}
-              placeholder="0 or 1200 + 350"
-            />
-          </label>
-          <CalculatorKeypad
+          <ExpressionAmountField
             amount={amount}
             disabled={isSaving}
-            onChange={(value) => {
-              setError('')
-              setAmount(value)
-            }}
+            error={error || persistenceError}
+            errorId="savings-deposit-amount-error"
+            isMobile={isMobile}
+            onAmountChange={setAmount}
+            onClearError={() => setError('')}
+            inputId="savings-deposit-amount"
           />
-          <label className="ui-field">
-            Note{' '}
+          <Field>
+            <FieldLabel htmlFor="savings-deposit-note" hint="optional">
+              Note
+            </FieldLabel>
             <Input
+              id="savings-deposit-note"
               value={note}
               onChange={(event) => setNote(event.target.value)}
               placeholder="Optional note"
               disabled={isSaving}
             />
-          </label>
-          {(error || persistenceError) && <StateMessage tone="danger">{error || persistenceError}</StateMessage>}
+          </Field>
           <ComposerFooter>
             <Button className="w-full gap-2" disabled={isSaving} type="submit">
               {isSaving ? 'Saving…' : 'Save'} <Check size={17} />

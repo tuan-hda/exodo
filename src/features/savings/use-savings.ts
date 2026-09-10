@@ -5,9 +5,14 @@ import { useSupabase } from '@/hooks/use-supabase'
 import { readStorageCache, storageCacheTtl, writeStorageCache } from '@/lib/storage'
 import { monthKey } from '@/lib/date'
 import type { Entry } from '@/features/entries/types'
-import { allocateRemainder, calculateMonthlyRemainder } from './savings-utils'
-import { normalizeSavingsIcon } from './savings-icons'
-import type { SavingsDeposit, SavingsGoal, StoredSavingsDeposit, StoredSavingsGoal } from './types'
+import {
+  buildAutomaticSavingsPlan,
+  calculateMonthlyRemainder,
+  normalizeSavingsDeposit,
+  normalizeSavingsGoal,
+} from './savings-utils'
+import { applyAutomaticSavingsPlan } from './savings-sync'
+import type { SavingsDeposit, SavingsGoal } from './types'
 
 function savingsCacheKey(userId: string) {
   return `exodo.savings.${userId}`
@@ -15,13 +20,19 @@ function savingsCacheKey(userId: string) {
 
 function readSavingsCache(userId: string) {
   const cached = readStorageCache<{
-    goals?: SavingsGoal[]
-    deposits?: SavingsDeposit[]
+    goals?: unknown
+    deposits?: unknown
   }>(savingsCacheKey(userId), storageCacheTtl)
   if (!Array.isArray(cached?.goals) || !Array.isArray(cached.deposits)) return null
   return {
-    goals: cached.goals.map((goal) => ({ ...goal, icon: normalizeSavingsIcon(goal.icon) })),
-    deposits: cached.deposits,
+    goals: cached.goals.flatMap((goal) => {
+      const normalized = normalizeSavingsGoal(goal)
+      return normalized ? [normalized] : []
+    }),
+    deposits: cached.deposits.flatMap((deposit) => {
+      const normalized = normalizeSavingsDeposit(deposit)
+      return normalized ? [normalized] : []
+    }),
   }
 }
 
@@ -29,36 +40,7 @@ function writeSavingsCache(userId: string, goals: SavingsGoal[], deposits: Savin
   writeStorageCache(savingsCacheKey(userId), { goals, deposits })
 }
 
-function normalizeGoalStatus(status: string): SavingsGoal['status'] {
-  if (status === 'paused' || status === 'completed') return status
-  return 'active'
-}
-
-function normalizeGoal(goal: StoredSavingsGoal): SavingsGoal {
-  return {
-    id: goal.id,
-    name: goal.name,
-    targetAmount: Number(goal.target_amount),
-    savedAmount: Number(goal.saved_amount),
-    targetDate: goal.target_date,
-    icon: normalizeSavingsIcon(goal.icon),
-    priority: goal.priority,
-    status: normalizeGoalStatus(goal.status),
-  }
-}
-function normalizeDeposit(deposit: StoredSavingsDeposit): SavingsDeposit {
-  return {
-    id: deposit.id,
-    goalId: deposit.goal_id,
-    amount: Number(deposit.amount),
-    occurredAt: deposit.occurred_at,
-    source: deposit.source,
-    monthKey: deposit.month_key,
-    note: deposit.note,
-  }
-}
-
-export function useSavings(userId: string | undefined, entries: Entry[]) {
+export function useSavings(userId: string | undefined, entries: Entry[], entriesLoading: boolean) {
   const { getSupabase } = useSupabase()
   const [goals, setGoals] = useState<SavingsGoal[]>([])
   const [deposits, setDeposits] = useState<SavingsDeposit[]>([])
@@ -68,9 +50,10 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
   const goalsRef = useRef<SavingsGoal[]>([])
   const depositsRef = useRef<SavingsDeposit[]>([])
   const previousUserIdRef = useRef<string | undefined>(userId)
+  const automaticSyncInFlightRef = useRef(false)
 
   const refresh = useCallback(
-    async (signal?: AbortSignal) => {
+    async (signal?: AbortSignal, showLoading = true) => {
       if (!userId) {
         goalsRef.current = []
         depositsRef.current = []
@@ -80,7 +63,7 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
         setIsLoading(false)
         return
       }
-      setIsLoading(true)
+      if (showLoading) setIsLoading(true)
       setError('')
       try {
         const supabase = await getSupabase()
@@ -99,8 +82,14 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
         if (goalResult.error) throw goalResult.error
         if (depositResult.error) throw depositResult.error
         if (signal?.aborted) return
-        const nextGoals = ((goalResult.data ?? []) as StoredSavingsGoal[]).map(normalizeGoal)
-        const nextDeposits = ((depositResult.data ?? []) as StoredSavingsDeposit[]).map(normalizeDeposit)
+        const nextGoals = (goalResult.data ?? []).flatMap((goal) => {
+          const normalized = normalizeSavingsGoal(goal)
+          return normalized ? [normalized] : []
+        })
+        const nextDeposits = (depositResult.data ?? []).flatMap((deposit) => {
+          const normalized = normalizeSavingsDeposit(deposit)
+          return normalized ? [normalized] : []
+        })
         goalsRef.current = nextGoals
         depositsRef.current = nextDeposits
         setGoals(nextGoals)
@@ -111,7 +100,7 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
         console.error('Failed to load savings goals', loadError)
         setError('Could not load savings goals. Run the savings migration first.')
       } finally {
-        if (!signal?.aborted) setIsLoading(false)
+        if (!signal?.aborted && showLoading) setIsLoading(false)
       }
     },
     [getSupabase, userId],
@@ -135,9 +124,12 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
         depositsRef.current = cachedSavings.deposits
         setGoals(cachedSavings.goals)
         setDeposits(cachedSavings.deposits)
+        setIsLoading(false)
       }
+      void refresh(controller.signal, !cachedSavings)
+    } else {
+      void refresh(controller.signal)
     }
-    void refresh(controller.signal)
     return () => controller.abort()
   }, [refresh])
 
@@ -163,7 +155,7 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
         }
         const { error: saveError } = await supabase.from('savings_goals').upsert(payload)
         if (saveError) throw saveError
-        await refresh()
+        await refresh(undefined, false)
         return true
       } catch (saveError) {
         console.error('Failed to save savings goal', saveError)
@@ -222,7 +214,7 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
         setGoals(nextGoals)
         setDeposits(nextDeposits)
         writeSavingsCache(userId, nextGoals, nextDeposits)
-        await refresh()
+        await refresh(undefined, false)
         return true
       } catch (depositError) {
         console.error('Failed to add savings deposit', depositError)
@@ -236,68 +228,31 @@ export function useSavings(userId: string | undefined, entries: Entry[]) {
   )
 
   const syncAutomaticRemainder = useCallback(async () => {
+    if (automaticSyncInFlightRef.current) return
     const currentGoals = goalsRef.current
     const currentDeposits = depositsRef.current
     if (!userId || !currentGoals.length) return
-    const remainder = calculateMonthlyRemainder(entries)
-    const allocations = allocateRemainder(currentGoals, remainder)
-    if (!allocations.length) return
-    const currentMonth = monthKey()
-    const supabase = await getSupabase()
-    let changed = false
-    for (const allocation of allocations) {
-      const existing = currentDeposits.find(
-        (deposit) =>
-          deposit.goalId === allocation.goalId && deposit.monthKey === currentMonth && deposit.source === 'automatic',
-      )
-      const goal = currentGoals.find((item) => item.id === allocation.goalId)
-      if (!goal) continue
-      const amount = Math.round(allocation.amount * 100) / 100
-      if (existing) {
-        const delta = amount - existing.amount
-        if (Math.abs(delta) < 0.01) continue
-        const depositResult = await supabase
-          .from('savings_deposits')
-          .update({ amount })
-          .eq('id', existing.id)
-          .eq('user_id', userId)
-        if (depositResult.error) throw depositResult.error
-        const goalResult = await supabase
-          .from('savings_goals')
-          .update({ saved_amount: Math.max(0, goal.savedAmount + delta) })
-          .eq('id', goal.id)
-          .eq('user_id', userId)
-        if (goalResult.error) throw goalResult.error
-        changed = true
-      } else {
-        const depositResult = await supabase.from('savings_deposits').insert({
-          user_id: userId,
-          goal_id: goal.id,
-          amount,
-          occurred_at: new Date().toISOString(),
-          source: 'automatic',
-          month_key: currentMonth,
-          note: 'Monthly remainder',
-        })
-        if (depositResult.error) throw depositResult.error
-        const goalResult = await supabase
-          .from('savings_goals')
-          .update({ saved_amount: goal.savedAmount + amount })
-          .eq('id', goal.id)
-          .eq('user_id', userId)
-        if (goalResult.error) throw goalResult.error
-        changed = true
-      }
+    automaticSyncInFlightRef.current = true
+    try {
+      const remainder = calculateMonthlyRemainder(entries)
+      const currentMonth = monthKey()
+      const supabase = await getSupabase()
+      const plan = buildAutomaticSavingsPlan(currentGoals, currentDeposits, remainder, currentMonth)
+      const changed = await applyAutomaticSavingsPlan(supabase, userId, plan, currentMonth)
+      if (changed) await refresh(undefined, false)
+    } finally {
+      automaticSyncInFlightRef.current = false
     }
-    if (changed) await refresh()
   }, [entries, getSupabase, refresh, userId])
 
   useEffect(() => {
-    if (isLoading || !goals.length) return
+    if (isLoading || entriesLoading || !goals.length) return
     syncAutomaticRemainder().catch((syncError) => {
       console.error('Failed to sync automatic savings remainder', syncError)
       setError('Could not update automatic savings.')
     })
-  }, [goals.length, isLoading, syncAutomaticRemainder])
+  }, [entriesLoading, goals, isLoading, syncAutomaticRemainder])
   return { goals, deposits, isLoading, isSaving, error, saveGoal, addDeposit, refresh }
 }
+
+export type SavingsState = ReturnType<typeof useSavings>

@@ -5,21 +5,27 @@ import { Plus, X } from '@phosphor-icons/react'
 import { EmptyState } from '@/components/EmptyState'
 import { MetricCard } from '@/components/MetricCard'
 import { PageHeader } from '@/components/PageHeader'
+import { PageShell } from '@/components/PageShell'
 import { StateMessage } from '@/components/StateMessage'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import type { Entry } from '@/features/entries/types'
 import { formatMoney } from '@/lib/money'
 import { SavingsDepositComposer } from './SavingsDepositComposer'
 import { SavingsGoalList } from './SavingsGoalList'
 import { SavingsGoalsLoading } from './SavingsGoalsPanel'
 import { SavingsIcon, defaultSavingsIcon, savingsIconOptions, type SavingsIconName } from './savings-icons'
-import { useSavings } from './use-savings'
+import type { SavingsState } from './use-savings'
 
-export function SavingsView({ userId, entries, onBack }: { userId?: string; entries: Entry[]; onBack?: () => void }) {
-  const { goals, deposits, isLoading, isSaving, error, saveGoal, addDeposit } = useSavings(userId, entries)
+type GoalValidationError = {
+  field: 'name' | 'target'
+  message: string
+}
+
+export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack?: () => void }) {
+  const { goals, deposits, isLoading, isSaving, error, saveGoal, addDeposit } = savings
   const [showForm, setShowForm] = useState(false)
   const [name, setName] = useState('')
   const [target, setTarget] = useState('')
@@ -28,7 +34,7 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
   const [iconPickerOpen, setIconPickerOpen] = useState(false)
   const [depositGoal, setDepositGoal] = useState<string | null>(null)
   const [notice, setNotice] = useState('')
-  const [validationError, setValidationError] = useState('')
+  const [validationError, setValidationError] = useState<GoalValidationError | null>(null)
   const selectedGoal = goals.find((goal) => goal.id === depositGoal)
 
   const summary = {
@@ -41,14 +47,14 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
     const goalName = name.trim()
     const targetAmount = Number(target)
     if (!goalName) {
-      setValidationError('Give this goal a name.')
+      setValidationError({ field: 'name', message: 'Give this goal a name.' })
       return
     }
     if (!Number.isFinite(targetAmount) || targetAmount <= 0) {
-      setValidationError('Enter a target amount greater than zero.')
+      setValidationError({ field: 'target', message: 'Enter a target amount greater than zero.' })
       return
     }
-    setValidationError('')
+    setValidationError(null)
     const saved = await saveGoal({
       name: goalName,
       targetAmount,
@@ -67,7 +73,7 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
     }
   }
   return (
-    <section className="ui-page-enter mx-auto grid max-w-[760px] gap-8 pb-12" aria-busy={isLoading}>
+    <PageShell size="wide" aria-busy={isLoading}>
       <PageHeader
         eyebrow="the goal tracker"
         title="Save for what matters."
@@ -82,38 +88,46 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
       />
       {(validationError || error) && (
         <StateMessage id={validationError ? 'goal-form-error' : undefined} tone="danger">
-          {validationError || error}
+          {validationError?.message || error}
         </StateMessage>
       )}
       {notice && !validationError && !error && <StateMessage tone="success">{notice}</StateMessage>}
       <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
-        <MetricCard label="saved" value={formatMoney(summary.saved)} detail="across goals" isLoading={isLoading} />
-        <MetricCard label="target" value={formatMoney(summary.target)} detail="across goals" isLoading={isLoading} />
+        <MetricCard
+          label="saved"
+          value={formatMoney(summary.saved)}
+          detail="across goals"
+          accent="sage"
+          isLoading={isLoading}
+        />
+        <MetricCard
+          label="target"
+          value={formatMoney(summary.target)}
+          detail="across goals"
+          accent="blue"
+          isLoading={isLoading}
+        />
       </div>
       {showForm && (
         <Card className="p-5">
           <form className="grid gap-4" noValidate onSubmit={submitGoal}>
-            <div className="ui-field">
-              <label className="ui-field-label" htmlFor="goal-name">
-                Goal name
-              </label>
+            <Field>
+              <FieldLabel htmlFor="goal-name">Goal name</FieldLabel>
               <Input
                 id="goal-name"
                 value={name}
                 onChange={(event) => {
-                  setValidationError('')
+                  setValidationError(null)
                   setName(event.target.value)
                 }}
                 placeholder="Japan trip"
                 required
-                aria-describedby={validationError ? 'goal-form-error' : undefined}
-                aria-invalid={validationError === 'Give this goal a name.'}
+                aria-describedby={validationError?.field === 'name' ? 'goal-form-error' : undefined}
+                aria-invalid={validationError?.field === 'name'}
               />
-            </div>
-            <div className="ui-field">
-              <label className="ui-field-label" htmlFor="goal-target">
-                Target amount
-              </label>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="goal-target">Target amount</FieldLabel>
               <Input
                 id="goal-target"
                 inputMode="decimal"
@@ -122,22 +136,22 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
                 step="0.01"
                 value={target}
                 onChange={(event) => {
-                  setValidationError('')
+                  setValidationError(null)
                   setTarget(event.target.value)
                 }}
                 placeholder="3000"
                 required
-                aria-describedby={validationError ? 'goal-form-error' : undefined}
-                aria-invalid={validationError === 'Enter a target amount greater than zero.'}
+                aria-describedby={validationError?.field === 'target' ? 'goal-form-error' : undefined}
+                aria-invalid={validationError?.field === 'target'}
               />
-            </div>
-            <div className="ui-field">
-              <label className="ui-field-label" htmlFor="goal-date">
-                Target date <span className="ui-field-hint">optional</span>
-              </label>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="goal-date" hint="optional">
+                Target date
+              </FieldLabel>
               <Input id="goal-date" type="date" value={date} onChange={(event) => setDate(event.target.value)} />
-            </div>
-            <div className="ui-field">
+            </Field>
+            <Field>
               <p className="ui-field-label">Choose an icon</p>
               <Popover open={iconPickerOpen} onOpenChange={setIconPickerOpen}>
                 <PopoverTrigger asChild>
@@ -166,7 +180,7 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
                   </div>
                 </PopoverContent>
               </Popover>
-            </div>
+            </Field>
             <Button disabled={isSaving} type="submit">
               {isSaving ? 'Saving…' : 'Create goal'}
             </Button>
@@ -174,7 +188,7 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
         </Card>
       )}
       {isLoading && goals.length === 0 && <SavingsGoalsLoading />}
-      {!isLoading && goals.length === 0 && !showForm && (
+      {!isLoading && !error && goals.length === 0 && !showForm && (
         <EmptyState
           title="No savings goals yet"
           description="Create your first goal and give your extra money somewhere meaningful to go."
@@ -195,6 +209,6 @@ export function SavingsView({ userId, entries, onBack }: { userId?: string; entr
           onSave={(amount, note) => addDeposit(selectedGoal.id, amount, note)}
         />
       )}
-    </section>
+    </PageShell>
   )
 }

@@ -1,3 +1,5 @@
+import { isRecord } from './guards'
+
 export const storageCacheTtl = 24 * 60 * 60 * 1000
 
 export function readStorageValue(key: string) {
@@ -20,12 +22,12 @@ export function writeStorageValue(key: string, value: string) {
   }
 }
 
-export function readStorageJson<T>(key: string) {
+export function readStorageJson(key: string): unknown {
   const value = readStorageValue(key)
   if (!value) return null
 
   try {
-    return JSON.parse(value) as T
+    return JSON.parse(value)
   } catch {
     return null
   }
@@ -40,9 +42,9 @@ export function writeStorageJson<T>(key: string, value: T) {
 }
 
 export function readStorageCache<T extends object>(key: string, maxAgeMs: number) {
-  const cached = readStorageJson<T & { cachedAt?: number }>(key)
+  const cached = readStorageJson(key)
   if (
-    !cached ||
+    !isRecord(cached) ||
     typeof cached.cachedAt !== 'number' ||
     !Number.isFinite(cached.cachedAt) ||
     Date.now() - cached.cachedAt > maxAgeMs

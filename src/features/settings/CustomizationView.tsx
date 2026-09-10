@@ -2,15 +2,22 @@
 
 import { Check } from '@phosphor-icons/react'
 import { PageHeader } from '@/components/PageHeader'
+import { PageShell } from '@/components/PageShell'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { useBackgroundPreference } from './use-background-preference'
+import type { BackgroundPreferenceState } from './use-background-preference'
 
-export function CustomizationView({ onBack }: { onBack: () => void }) {
-  const { enabled, setEnabled } = useBackgroundPreference()
+export function CustomizationView({
+  onBack,
+  preference,
+}: {
+  onBack: () => void
+  preference: BackgroundPreferenceState
+}) {
+  const { enabled, setEnabled } = preference
 
   return (
-    <section className="ui-page-enter mx-auto grid max-w-[620px] gap-8 pb-8">
+    <PageShell>
       <PageHeader
         eyebrow="appearance"
         title="Customization"
@@ -33,6 +40,6 @@ export function CustomizationView({ onBack }: { onBack: () => void }) {
           {enabled ? 'Enabled' : 'Disabled'}
         </Button>
       </Card>
-    </section>
+    </PageShell>
   )
 }

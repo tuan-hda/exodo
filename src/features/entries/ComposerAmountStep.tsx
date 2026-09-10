@@ -1,10 +1,7 @@
 import { ArrowRight } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { StateMessage } from '@/components/StateMessage'
 import { ComposerStepActions } from './ComposerStepActions'
-import { CalculatorKeypad } from '@/components/CalculatorKeypad'
-import { formatAmountExpression } from '@/lib/amount'
+import { ExpressionAmountField } from '@/components/ExpressionAmountField'
 
 export function ComposerAmountStep({
   amount,
@@ -27,38 +24,17 @@ export function ComposerAmountStep({
 }) {
   return (
     <section className="grid content-start gap-4" aria-label="Enter amount">
-      <label className="ui-field">
-        Amount
-        <Input
-          className="max-md:hidden"
-          disabled={disabled}
-          readOnly={isMobile}
-          autoFocus
-          inputMode="decimal"
-          value={amount}
-          onChange={(event) => {
-            onClearError()
-            onAmountChange(formatAmountExpression(event.target.value))
-          }}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault()
-              onNext()
-            }
-          }}
-          onBlur={() => onAmountChange(formatAmountExpression(amount))}
-          placeholder="0 or 1200 + 350"
-        />
-      </label>
-      <CalculatorKeypad
+      <ExpressionAmountField
         amount={amount}
         disabled={disabled}
-        onChange={(value) => {
-          onAmountChange(value)
-          onClearError()
-        }}
+        error={error}
+        isMobile={isMobile}
+        onAmountChange={onAmountChange}
+        onClearError={onClearError}
+        onEnter={onNext}
+        errorId="entry-amount-error"
+        inputId="entry-amount"
       />
-      {error && <StateMessage tone="danger">{error}</StateMessage>}
       <ComposerStepActions disabled={disabled} onBack={onBack}>
         <Button className="flex-1 gap-2" disabled={disabled} type="button" onClick={onNext}>
           Continue <ArrowRight size={17} />

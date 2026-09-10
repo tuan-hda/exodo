@@ -5,10 +5,9 @@ import { EmptyState } from '@/components/EmptyState'
 import { StateMessage } from '@/components/StateMessage'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { Entry } from '@/features/entries/types'
 import { SavingsDepositComposer } from './SavingsDepositComposer'
 import { SavingsGoalList } from './SavingsGoalList'
-import { useSavings } from './use-savings'
+import type { SavingsState } from './use-savings'
 
 export function SavingsGoalsLoading() {
   return (
@@ -30,22 +29,38 @@ export function SavingsGoalsLoading() {
   )
 }
 
-export function SavingsGoalsPanel({ userId, entries }: { userId?: string; entries: Entry[] }) {
-  const { goals, deposits, isLoading, isSaving, error, addDeposit } = useSavings(userId, entries)
+export function SavingsGoalsPanel({ savings }: { savings: SavingsState }) {
+  const { goals, deposits, isLoading, isSaving, error, addDeposit } = savings
   const [depositGoal, setDepositGoal] = useState<string | null>(null)
   const selectedGoal = goals.find((goal) => goal.id === depositGoal)
+  const showHeader = Boolean(error) || isLoading || goals.length > 0
+  const countLabel = isLoading && goals.length === 0 ? 'loading' : `${goals.length} tracked`
   return (
     <section aria-label="Savings goals" aria-busy={isLoading}>
+      {showHeader && (
+        <div className="flex items-center justify-between gap-4 border-b border-line pb-3">
+          <span className="ui-eyebrow">savings goals</span>
+          <span className="ui-eyebrow">{countLabel}</span>
+        </div>
+      )}
       {error && (
         <StateMessage tone="danger" className="mb-4">
           {error}
         </StateMessage>
       )}
-      {isLoading && goals.length === 0 && <SavingsGoalsLoading />}
-      {!isLoading && goals.length === 0 && (
+      {isLoading && goals.length === 0 && (
+        <div className="mt-4">
+          <SavingsGoalsLoading />
+        </div>
+      )}
+      {!isLoading && !error && goals.length === 0 && (
         <EmptyState title="No savings goals yet" description="Create one in Settings to start tracking a target." />
       )}
-      <SavingsGoalList goals={goals} deposits={deposits} onAdd={setDepositGoal} />
+      {goals.length > 0 && (
+        <div className="mt-4">
+          <SavingsGoalList goals={goals} deposits={deposits} onAdd={setDepositGoal} />
+        </div>
+      )}
       {selectedGoal && (
         <SavingsDepositComposer
           goal={selectedGoal}

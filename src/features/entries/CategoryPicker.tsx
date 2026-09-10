@@ -1,13 +1,7 @@
 import { clsx } from 'clsx'
-import { Button } from '@/components/ui/button'
-import {
-  categoryBorderStyle,
-  categoryClass,
-  categoryIcon,
-  expenseCategories,
-  incomeCategories,
-  type Category,
-} from '@/features/finance/category'
+import { categoryClass, expenseCategories, incomeCategories, type Category } from '@/features/finance/category'
+import { CategoryIcon } from '@/features/finance/CategoryIcon'
+import { CategoryOptionGrid } from '@/features/finance/CategoryOptionGrid'
 
 export function CategoryPicker({
   type,
@@ -27,32 +21,19 @@ export function CategoryPicker({
         <span>Category</span>
         <span
           className={clsx(
-            'ui-meta inline-flex items-center gap-1 rounded-chip bg-soft px-2 py-1 text-ink max-md:px-3 max-md:py-2 max-md:text-xs',
+            'ui-meta inline-flex items-center gap-1.5 rounded-chip bg-soft px-2 py-1 text-ink max-md:px-3 max-md:py-2 max-md:text-xs',
             categoryClass(value),
           )}>
-          {categoryIcon(value, 14)} {value}
+          <CategoryIcon category={value} size="xs" shape="control" /> {value}
         </span>
       </div>
-      <div className="grid w-full grid-cols-2 gap-2 max-md:gap-2.5 max-xs:gap-1.5">
-        {options.map((item) => (
-          <Button
-            key={item}
-            disabled={disabled}
-            type="button"
-            variant="option"
-            size="option"
-            className={clsx(categoryClass(item))}
-            style={categoryBorderStyle(item)}
-            data-selected={value === item}
-            aria-label={item}
-            title={item}
-            aria-pressed={value === item}
-            onClick={() => onChange(item)}>
-            {categoryIcon(item, 18)}
-            <span>{item}</span>
-          </Button>
-        ))}
-      </div>
+      <CategoryOptionGrid
+        categories={options}
+        value={value}
+        disabled={disabled}
+        ariaLabel={`${type === 'expense' ? 'Expense' : 'Income'} categories`}
+        onChange={onChange}
+      />
     </div>
   )
 }

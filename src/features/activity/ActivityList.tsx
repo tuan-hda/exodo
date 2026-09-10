@@ -1,7 +1,8 @@
-import { CalendarDots, CaretLeft, CaretRight, ClockCounterClockwise, MagnifyingGlass } from '@phosphor-icons/react'
+import { CalendarDots, CaretLeft, CaretRight, ClockCounterClockwise, MagnifyingGlass, X } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { useEffect, useState } from 'react'
 import { EmptyState } from '@/components/EmptyState'
+import { IconTile } from '@/components/IconTile'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CategoryIcon } from '@/features/finance/CategoryIcon'
@@ -11,6 +12,7 @@ import { filterActivityEntries, formatActivityMonth, groupActivityByDate, groupA
 import { formatMoney } from '@/lib/money'
 import { formatEntryTime } from '@/lib/date-format'
 import { monthKey } from '@/lib/date'
+import { categoryForegroundClass } from '@/features/finance/category'
 
 export function ActivityList({
   entries,
@@ -51,25 +53,42 @@ export function ActivityList({
           <p className="ui-eyebrow mb-3">recent activity</p>
           <h2 className="ui-section-title m-0">What moved.</h2>
         </div>
-        <span className="ui-icon-tile size-10 rounded-full" aria-hidden="true">
+        <IconTile size="md" shape="circle" aria-hidden="true">
           <ClockCounterClockwise className="text-muted" size={19} />
-        </span>
+        </IconTile>
       </div>
       {entries.length > 0 && (
         <div className="mt-5 flex items-center justify-between gap-3">
-          <label className="relative block min-w-0 flex-1">
+          <div className="relative block min-w-0 flex-1">
             <MagnifyingGlass
               className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted"
               size={16}
             />
-            <span className="sr-only">Search activity</span>
+            <label className="sr-only" htmlFor="activity-search">
+              Search activity
+            </label>
             <Input
-              className="pl-10"
+              id="activity-search"
+              type="search"
+              enterKeyHint="search"
+              autoComplete="off"
+              className={query ? 'pr-10 pl-10' : 'pl-10'}
               value={query}
               onChange={(event) => updateQuery(event.target.value)}
               placeholder="Search activity"
             />
-          </label>
+            {query && (
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                type="button"
+                className="absolute top-1/2 right-1 -translate-y-1/2"
+                onClick={() => updateQuery('')}
+                aria-label="Clear activity search">
+                <X size={14} />
+              </Button>
+            )}
+          </div>
           <span className="ui-meta shrink-0">
             {filteredEntries.length} {filteredEntries.length === 1 ? 'record' : 'records'}
           </span>
@@ -114,44 +133,30 @@ export function ActivityList({
           <section className="border-b border-line-strong">
             <div className="flex items-center justify-between gap-3 border-b border-line py-3">
               <h3 className="ui-eyebrow m-0">{activeGroup.label}</h3>
-              <Button
-                variant="outline"
-                size="sm"
-                className="ui-meta"
-                type="button"
-                onClick={() => onOpenAnalysis(activeGroup.key)}>
+              <Button variant="outline" size="meta" type="button" onClick={() => onOpenAnalysis(activeGroup.key)}>
                 Analysis
               </Button>
             </div>
-            <Button
-              variant="list"
-              size="summary"
-              type="button"
-              onClick={() => onOpenAnalysis(activeGroup.key)}
-              aria-label={`Analyze ${activeGroup.label}`}>
-              <span className="grid gap-1">
-                <b className="ui-label">Income</b>
-                <strong className="ui-number text-xs font-normal text-success">
-                  +{formatMoney(activeGroup.income)}
-                </strong>
-              </span>
-              <span className="grid justify-items-center gap-1 text-center">
-                <b className="ui-label">Expense</b>
-                <strong className="ui-number text-xs font-normal text-danger">
-                  -{formatMoney(activeGroup.expense)}
-                </strong>
-              </span>
-              <span className="grid justify-items-end gap-1 text-right">
-                <b className="ui-label">Leftover</b>
-                <strong
+            <dl className="grid grid-cols-3 border-b border-line py-4">
+              <div className="grid gap-1">
+                <dt className="ui-label">Income</dt>
+                <dd className="ui-number m-0 text-xs font-normal text-success">+{formatMoney(activeGroup.income)}</dd>
+              </div>
+              <div className="grid justify-items-center gap-1 text-center">
+                <dt className="ui-label">Expense</dt>
+                <dd className="ui-number m-0 text-xs font-normal text-danger">-{formatMoney(activeGroup.expense)}</dd>
+              </div>
+              <div className="grid justify-items-end gap-1 text-right">
+                <dt className="ui-label">Leftover</dt>
+                <dd
                   className={clsx(
-                    'ui-number text-xs font-normal',
-                    activeGroup.income - activeGroup.expense < 0 ? 'text-danger' : 'text-ink',
+                    'ui-number m-0 text-xs font-normal',
+                    activeGroup.income - activeGroup.expense < 0 ? 'text-danger' : 'text-success',
                   )}>
                   {formatMoney(activeGroup.income - activeGroup.expense)}
-                </strong>
-              </span>
-            </Button>
+                </dd>
+              </div>
+            </dl>
             {groupActivityByDate(activeGroup.entries).map((day) => (
               <section key={day.key}>
                 <h4 className="ui-label m-0 border-b border-line px-2 py-3">{day.label}</h4>
@@ -163,7 +168,10 @@ export function ActivityList({
                         {entry.title || entry.category || (entry.type === 'income' ? 'Income' : 'Expense')}
                       </strong>
                       <small className="ui-meta mt-1 block">
-                        {entry.category ?? 'Other'} · {formatEntryTime(entry.occurredAt)}
+                        <span className={categoryForegroundClass(entry.category ?? 'Other')}>
+                          {entry.category ?? 'Other'}
+                        </span>{' '}
+                        · {formatEntryTime(entry.occurredAt)}
                       </small>
                     </span>
                     <b

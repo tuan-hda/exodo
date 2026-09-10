@@ -1,4 +1,4 @@
-import { Check } from '@phosphor-icons/react'
+import { Check, CircleNotch } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { dailyIncome } from '@/features/finance/allocation'
 import { entryDate } from '@/lib/date'
@@ -9,6 +9,7 @@ import { DashboardValuePanel } from './DashboardValuePanel'
 import { BudgetProgress } from '@/features/budgets/BudgetProgress'
 import type { CategoryBudget } from '@/features/budgets/types'
 import { SavingsGoalsPanel } from '@/features/savings/SavingsGoalsPanel'
+import type { SavingsState } from '@/features/savings/use-savings'
 import { formatMoney } from '@/lib/money'
 import { monthKey } from '@/lib/date'
 
@@ -18,14 +19,16 @@ export function SummaryPanels({
   dayKey,
   budgets,
   budgetsLoading,
-  userId,
+  savings,
+  onOpenBudgetSettings,
 }: {
   entries: Entry[]
   entriesLoading: boolean
   dayKey: string
   budgets: CategoryBudget[]
   budgetsLoading: boolean
-  userId?: string
+  savings: SavingsState
+  onOpenBudgetSettings: () => void
 }) {
   const allocationEntries = entries.map((entry) => ({ type: entry.type, amount: entry.amount, date: entryDate(entry) }))
   const todayIncome = dailyIncome(allocationEntries, dayKey)
@@ -55,8 +58,9 @@ export function SummaryPanels({
               ? `${formatMoney(todayIncome)} allocated - ${formatMoney(todaySpent)} spent`
               : 'Add income to set your daily pace'
           }
-          iconClassName={availableToday < 0 ? 'border-danger/40 text-danger' : undefined}
-          icon={<Check size={24} weight="bold" />}
+          iconTone={entriesLoading ? 'muted' : availableToday < 0 ? 'danger' : 'success'}
+          tone={entriesLoading ? 'default' : availableToday < 0 ? 'danger' : 'success'}
+          icon={entriesLoading ? <CircleNotch className="animate-spin" size={24} /> : <Check size={24} weight="bold" />}
         />
       </FadeContent>
       <BudgetProgress
@@ -65,8 +69,9 @@ export function SummaryPanels({
         entries={entries}
         monthStart={`${monthKey(dayKey)}-`}
         dayKey={dayKey}
+        onOpenSettings={onOpenBudgetSettings}
       />
-      <SavingsGoalsPanel userId={userId} entries={entries} />
+      <SavingsGoalsPanel savings={savings} />
     </section>
   )
 }

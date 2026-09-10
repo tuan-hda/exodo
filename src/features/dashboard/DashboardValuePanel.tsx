@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react'
 import { clsx } from 'clsx'
+import { IconTile } from '@/components/IconTile'
+import type { IconTileTone } from '@/components/IconTile'
+import type { CardTone } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DashboardPanel } from './DashboardPanel'
 
@@ -15,7 +18,8 @@ export function DashboardValuePanel({
   className,
   minHeightClassName = 'min-h-[210px]',
   asideClassName,
-  iconClassName,
+  iconTone = 'surface',
+  tone = 'default',
   descriptionClassName = 'max-w-[38ch]',
   descriptionSkeletonClassName = 'w-56',
 }: {
@@ -30,7 +34,8 @@ export function DashboardValuePanel({
   className?: string
   minHeightClassName?: string
   asideClassName?: string
-  iconClassName?: string
+  iconTone?: IconTileTone
+  tone?: CardTone
   descriptionClassName?: string
   descriptionSkeletonClassName?: string
 }) {
@@ -42,13 +47,14 @@ export function DashboardValuePanel({
         className,
       )}
       asideClassName={clsx('grid justify-items-end gap-3', asideClassName)}
+      tone={tone}
       label={label}
       aside={aside}
       ariaLabel={ariaLabel}
       ariaBusy={ariaBusy}>
       <div className="col-start-1 row-start-2 min-w-0">
         {valueLabel && <span className="ui-eyebrow mb-3 block">{valueLabel}</span>}
-        <strong className="ui-number block text-[clamp(38px,5vw,62px)] font-sans font-semibold leading-[.9] tracking-[-.09em]">
+        <strong className="ui-display-number block text-[clamp(38px,5vw,62px)] font-semibold leading-[.9] tracking-[-.09em]">
           {ariaBusy ? <Skeleton className="h-[clamp(38px,5vw,62px)] w-64 max-w-full" /> : value}
         </strong>
         {ariaBusy ? (
@@ -60,7 +66,9 @@ export function DashboardValuePanel({
         )}
       </div>
       <div className="col-start-2 row-start-2 self-center justify-self-end">
-        <div className={clsx('ui-icon-tile size-14 rounded-full bg-surface', iconClassName)}>{icon}</div>
+        <IconTile size="xl" shape="circle" tone={iconTone}>
+          {icon}
+        </IconTile>
       </div>
     </DashboardPanel>
   )

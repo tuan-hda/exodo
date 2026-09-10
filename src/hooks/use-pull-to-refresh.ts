@@ -14,6 +14,7 @@ export function usePullToRefresh(onRefresh: () => Promise<boolean>) {
   useEffect(() => {
     let startY = 0
     let tracking = false
+    let disposed = false
 
     function handleTouchStart(event: TouchEvent) {
       if (window.scrollY <= 0 && event.touches.length === 1) {
@@ -24,7 +25,9 @@ export function usePullToRefresh(onRefresh: () => Promise<boolean>) {
 
     function handleTouchMove(event: TouchEvent) {
       if (!tracking) return
-      const distance = event.touches[0].clientY - startY
+      const touch = event.touches[0]
+      if (!touch) return
+      const distance = touch.clientY - startY
       if (distance <= 0) {
         pullDistanceRef.current = 0
         setPullDistance(0)
@@ -48,6 +51,7 @@ export function usePullToRefresh(onRefresh: () => Promise<boolean>) {
       try {
         await refreshRef.current()
       } finally {
+        if (disposed) return
         isRefreshingRef.current = false
         setIsRefreshing(false)
       }
@@ -64,6 +68,7 @@ export function usePullToRefresh(onRefresh: () => Promise<boolean>) {
     window.addEventListener('touchend', handleTouchEnd)
     window.addEventListener('touchcancel', handleTouchCancel)
     return () => {
+      disposed = true
       window.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchend', handleTouchEnd)

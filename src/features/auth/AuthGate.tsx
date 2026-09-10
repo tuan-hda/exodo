@@ -13,7 +13,10 @@ export function AuthGate({ children }: { children: ReactNode }) {
     <>
       <ClerkLoading>
         <AuthShell>
-          <div className="grid w-full max-w-[360px] justify-items-center gap-3" aria-label="Loading your account">
+          <div
+            className="grid w-full max-w-[360px] justify-items-center gap-3"
+            role="status"
+            aria-label="Loading your account">
             <Skeleton className="size-14 rounded-full" />
             <Skeleton className="h-4 w-40" />
             <Skeleton className="h-3 w-56" />

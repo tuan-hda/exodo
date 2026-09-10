@@ -15,7 +15,7 @@ Useful checks:
 pnpm format        # format source files
 pnpm format:check  # verify formatting
 pnpm typecheck     # run TypeScript checks
-pnpm test          # run allocation tests
+  pnpm test          # run the unit test suite
 pnpm build         # verify the production build
 ```
 

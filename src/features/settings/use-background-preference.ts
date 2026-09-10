@@ -33,3 +33,5 @@ export function useBackgroundPreference() {
 
   return { enabled, setEnabled: updatePreference }
 }
+
+export type BackgroundPreferenceState = ReturnType<typeof useBackgroundPreference>

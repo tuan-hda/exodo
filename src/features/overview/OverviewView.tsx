@@ -1,8 +1,10 @@
 import { MetricCard } from '@/components/MetricCard'
 import { AccumulatedPanel } from '@/features/dashboard/AccumulatedPanel'
 import { PageHeader } from '@/components/PageHeader'
+import { PageShell } from '@/components/PageShell'
 import { formatMoney } from '@/lib/money'
 import type { Entry } from '@/features/entries/types'
+import { sumEntriesByType } from '@/features/entries/entry-utils'
 
 export function OverviewView({
   accumulation,
@@ -13,11 +15,11 @@ export function OverviewView({
   entries: Entry[]
   isLoading?: boolean
 }) {
-  const income = entries.filter((entry) => entry.type === 'income').reduce((sum, entry) => sum + entry.amount, 0)
-  const expense = entries.filter((entry) => entry.type === 'expense').reduce((sum, entry) => sum + entry.amount, 0)
+  const income = sumEntriesByType(entries, 'income')
+  const expense = sumEntriesByType(entries, 'expense')
 
   return (
-    <section className="grid gap-10 pb-12" aria-busy={isLoading}>
+    <PageShell size="wide" className="gap-10" aria-busy={isLoading}>
       <PageHeader
         eyebrow="overview"
         title="The full picture."
@@ -30,6 +32,7 @@ export function OverviewView({
             label="income"
             value={formatMoney(income)}
             detail="all time"
+            tone="success"
             valueClassName="text-success"
             isLoading={isLoading}
           />
@@ -37,6 +40,7 @@ export function OverviewView({
             label="spent"
             value={formatMoney(expense)}
             detail="all time"
+            tone="danger"
             valueClassName="text-danger"
             isLoading={isLoading}
           />
@@ -49,6 +53,6 @@ export function OverviewView({
           />
         </div>
       </div>
-    </section>
+    </PageShell>
   )
 }

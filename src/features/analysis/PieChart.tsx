@@ -121,7 +121,8 @@ export function PieChart({
         <svg
           className="pie-reveal size-full overflow-visible"
           viewBox="0 0 100 100"
-          role="img"
+          role="group"
+          aria-roledescription="donut chart"
           aria-label={segments.length ? `Distribution totaling ${formatMoney(total)}` : 'No records for this month'}>
           {segments.map((segment) => {
             const isSelected = segment.category === visualSelectedCategory

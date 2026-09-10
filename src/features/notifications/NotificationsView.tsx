@@ -3,13 +3,55 @@
 import { ArrowClockwise, Bell, EnvelopeSimple } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { PageHeader } from '@/components/PageHeader'
+import { PageShell } from '@/components/PageShell'
+import { IconTile, type IconTileTone } from '@/components/IconTile'
 import { StateMessage } from '@/components/StateMessage'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { parseGmailStatus } from '@/features/gmail/types'
+import { updateSearchParams } from '@/features/navigation/navigation'
+
+type GmailStatus = 'loading' | 'connected' | 'disconnected' | 'unavailable' | 'error'
+
+function getGmailPresentation(status: GmailStatus, email: string) {
+  if (status === 'loading') {
+    return {
+      iconTone: 'muted' as IconTileTone,
+      title: 'Checking Gmail.',
+      description: 'Checking whether transaction alerts are ready to review.',
+    }
+  }
+  if (status === 'error') {
+    return {
+      iconTone: 'danger' as IconTileTone,
+      title: 'Gmail status is unavailable.',
+      description: 'We could not confirm the connection status.',
+    }
+  }
+  if (status === 'unavailable') {
+    return {
+      iconTone: 'amber' as IconTileTone,
+      title: 'Gmail is not enabled.',
+      description: 'Gmail notifications are not enabled for this account.',
+    }
+  }
+  if (status === 'connected') {
+    return {
+      iconTone: 'success' as IconTileTone,
+      title: 'Gmail is connected.',
+      description: `Transaction alerts from ${email} will appear here for you to name, categorize, and approve.`,
+    }
+  }
+  return {
+    iconTone: 'amber' as IconTileTone,
+    title: 'Connect your Gmail.',
+    description: 'Connect your Gmail so Exodo can find transaction alerts for your review.',
+  }
+}
 
 export function NotificationsView() {
-  const [status, setStatus] = useState<'loading' | 'connected' | 'disconnected' | 'unavailable' | 'error'>('loading')
+  const [status, setStatus] = useState<GmailStatus>('loading')
   const [gmailEmail, setGmailEmail] = useState('')
   const [error, setError] = useState('')
   const [notice, setNotice] = useState<'connected' | 'error' | null>(null)
@@ -19,9 +61,7 @@ export function NotificationsView() {
     const result = new URLSearchParams(window.location.search).get('gmail')
     if (result !== 'connected' && result !== 'error') return
     setNotice(result)
-    const url = new URL(window.location.href)
-    url.searchParams.delete('gmail')
-    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`)
+    window.history.replaceState(null, '', updateSearchParams(window.location.href, { gmail: null }))
   }, [])
 
   useEffect(() => {
@@ -37,9 +77,9 @@ export function NotificationsView() {
           return
         }
         if (!response.ok) throw new Error('Unable to load Gmail status.')
-        const data = (await response.json()) as { connected?: boolean; email?: string }
+        const data = parseGmailStatus(await response.json())
         setStatus(data.connected ? 'connected' : 'disconnected')
-        setGmailEmail(typeof data.email === 'string' ? data.email : '')
+        setGmailEmail(data.email ?? '')
       } catch {
         if (!controller.signal.aborted) {
           setStatus('error')
@@ -54,34 +94,17 @@ export function NotificationsView() {
 
   const connected = status === 'connected'
   const isLoading = status === 'loading'
+  const presentation = getGmailPresentation(status, gmailEmail)
   return (
-    <section className="ui-page-enter mx-auto grid max-w-[560px] gap-8 pb-12 text-center" aria-busy={isLoading}>
+    <PageShell size="centered" aria-busy={isLoading}>
       <div className="grid justify-items-center gap-5">
-        <span className="ui-icon-tile size-14 rounded-full">
+        <IconTile size="xl" shape="circle" tone={presentation.iconTone}>
           <Bell size={24} weight="regular" />
-        </span>
+        </IconTile>
         <PageHeader
           eyebrow="inbox"
-          title={
-            isLoading
-              ? 'Checking Gmail.'
-              : status === 'error'
-                ? 'Gmail status is unavailable.'
-                : connected
-                  ? 'Gmail is connected.'
-                  : 'Connect your Gmail.'
-          }
-          description={
-            isLoading
-              ? 'Checking whether transaction alerts are ready to review.'
-              : status === 'error'
-                ? 'We could not confirm the connection status.'
-                : status === 'unavailable'
-                  ? 'Gmail notifications are not enabled for this account.'
-                  : connected
-                    ? `Transaction alerts from ${gmailEmail} will appear here for you to name, categorize, and approve.`
-                    : 'Connect your Gmail so Exodo can find transaction alerts for your review.'
-          }
+          title={presentation.title}
+          description={presentation.description}
           className="justify-items-center gap-0"
         />
       </div>
@@ -111,6 +134,6 @@ export function NotificationsView() {
           )}
         </div>
       )}
-    </section>
+    </PageShell>
   )
 }

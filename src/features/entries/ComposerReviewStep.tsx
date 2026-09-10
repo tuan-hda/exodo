@@ -1,8 +1,12 @@
 import { Check, CircleNotch } from '@phosphor-icons/react'
+import { clsx } from 'clsx'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { StateMessage } from '@/components/StateMessage'
+import { CategoryIcon } from '@/features/finance/CategoryIcon'
+import { categoryForegroundClass } from '@/features/finance/category'
 import { ComposerStepActions } from './ComposerStepActions'
 import type { Entry, EntryType } from './types'
 import { evaluateExpression } from '@/lib/amount'
@@ -46,27 +50,34 @@ export function ComposerReviewStep({
         </div>
         <div className="flex items-center justify-between">
           <span className="ui-label">Category</span>
-          <strong className="text-sm font-medium">{category}</strong>
+          <span className={clsx('flex items-center gap-2 text-sm font-medium', categoryForegroundClass(category))}>
+            <CategoryIcon category={category} size="xs" shape="control" />
+            {category}
+          </span>
         </div>
       </Card>
-      <label className="ui-field">
-        Name <span className="ui-field-hint">optional</span>
+      <Field>
+        <FieldLabel htmlFor="entry-title" hint="optional">
+          Name
+        </FieldLabel>
         <Input
+          id="entry-title"
           disabled={disabled}
           value={title}
           onChange={(event) => onTitleChange(event.target.value)}
           placeholder={type === 'income' ? 'Salary, bonus...' : 'Coffee, groceries...'}
         />
-      </label>
-      <label className="ui-field">
-        Date and time
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="entry-occurred-at">Date and time</FieldLabel>
         <Input
+          id="entry-occurred-at"
           disabled={disabled}
           type="datetime-local"
           value={occurredAt}
           onChange={(event) => onOccurredAtChange(event.target.value)}
         />
-      </label>
+      </Field>
       {error && <StateMessage tone="danger">{error}</StateMessage>}
       <ComposerStepActions disabled={disabled} onBack={onBack}>
         <Button className="flex-1 gap-2" disabled={disabled} type="submit" variant="default">

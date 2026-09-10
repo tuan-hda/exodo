@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupabase } from '@/hooks/use-supabase'
-import type { Entry, StoredEntry } from './types'
+import type { Entry } from './types'
 import { calculateAccumulation, normalizeStoredEntry, readEntriesCache, writeEntriesCache } from './entry-utils'
 
 export function useEntries(userId?: string) {
@@ -24,7 +24,10 @@ export function useEntries(userId?: string) {
       .order('occurred_at', { ascending: false })
 
     if (error) throw error
-    return ((data ?? []) as StoredEntry[]).map(normalizeStoredEntry)
+    return (data ?? []).flatMap((row) => {
+      const entry = normalizeStoredEntry(row)
+      return entry ? [entry] : []
+    })
   }, [getSupabase, userId])
 
   useEffect(() => {
@@ -44,8 +47,8 @@ export function useEntries(userId?: string) {
         setIsLoading(false)
         return
       }
-      setIsLoading(true)
       const cachedEntries = readEntriesCache(userId)
+      setIsLoading(!cachedEntries)
       if (cachedEntries) {
         entriesRef.current = cachedEntries
         setEntries(cachedEntries)

@@ -1,4 +1,5 @@
 import { createAdminSupabaseClient } from '@/lib/supabase-admin'
+import { isRecord } from '@/lib/guards'
 
 export const gmailOAuthStateCookie = 'exodo_gmail_oauth_state'
 
@@ -6,6 +7,21 @@ type GmailTokens = {
   access_token?: string
   refresh_token?: string
   expires_in?: number
+}
+
+function parseGmailTokens(value: unknown): GmailTokens {
+  if (!isRecord(value)) throw new Error('Gmail returned an invalid token response.')
+  return {
+    access_token: typeof value.access_token === 'string' ? value.access_token : undefined,
+    refresh_token: typeof value.refresh_token === 'string' ? value.refresh_token : undefined,
+    expires_in:
+      typeof value.expires_in === 'number' && Number.isFinite(value.expires_in) ? value.expires_in : undefined,
+  }
+}
+
+function parseGmailProfile(value: unknown) {
+  if (!isRecord(value) || typeof value.email !== 'string') throw new Error('Gmail did not return an email address.')
+  return value.email
 }
 
 function getGmailOAuthConfig() {
@@ -49,7 +65,7 @@ async function exchangeCode(code: string): Promise<GmailTokens & { access_token:
   })
   if (!response.ok) throw new Error('Gmail token exchange failed.')
 
-  const tokens = (await response.json()) as GmailTokens
+  const tokens = parseGmailTokens(await response.json())
   if (!tokens.access_token) throw new Error('Gmail did not return an access token.')
   return { ...tokens, access_token: tokens.access_token }
 }
@@ -60,9 +76,7 @@ async function getGmailEmail(accessToken: string) {
   })
   if (!response.ok) throw new Error('Gmail profile lookup failed.')
 
-  const profile = (await response.json()) as { email?: string }
-  if (!profile.email) throw new Error('Gmail did not return an email address.')
-  return profile.email
+  return parseGmailProfile(await response.json())
 }
 
 export async function connectGmail(userId: string, code: string) {

@@ -1,5 +1,6 @@
 import { entryDate, monthKey } from '@/lib/date'
 import type { Entry } from '@/features/entries/types'
+import { canonicalCategory } from '@/features/finance/category'
 
 export type AnalysisSlice = {
   category: string
@@ -17,7 +18,7 @@ export function groupByCategory(entries: Entry[], type: Entry['type']): Analysis
   const totals = entries
     .filter((entry) => entry.type === type)
     .reduce<Record<string, { amount: number; transactionCount: number }>>((groups, entry) => {
-      const category = entry.category || 'Other'
+      const category = canonicalCategory(entry.category || 'Other')
       const current = groups[category] ?? { amount: 0, transactionCount: 0 }
       groups[category] = {
         amount: current.amount + entry.amount,

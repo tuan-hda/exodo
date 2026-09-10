@@ -5,9 +5,3 @@ export type CategoryBudget = {
   category: Category
   amount: number
 }
-
-export type StoredCategoryBudget = {
-  id: string
-  category: string
-  amount: number | string
-}

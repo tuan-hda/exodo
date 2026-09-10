@@ -4,28 +4,24 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupabase } from '@/hooks/use-supabase'
 import { readStorageCache, storageCacheTtl, writeStorageCache } from '@/lib/storage'
 import type { Category } from '@/features/finance/category'
-import type { CategoryBudget, StoredCategoryBudget } from './types'
+import { normalizeBudget } from './budget-utils'
+import type { CategoryBudget } from './types'
 
 function budgetCacheKey(userId: string) {
   return `exodo.budgets.${userId}`
 }
 
 function readBudgetCache(userId: string) {
-  const cached = readStorageCache<{ budgets?: CategoryBudget[] }>(budgetCacheKey(userId), storageCacheTtl)
+  const cached = readStorageCache<{ budgets?: unknown }>(budgetCacheKey(userId), storageCacheTtl)
   if (!Array.isArray(cached?.budgets)) return null
-  return cached.budgets
+  return cached.budgets.flatMap((budget) => {
+    const normalized = normalizeBudget(budget)
+    return normalized ? [normalized] : []
+  })
 }
 
 function writeBudgetCache(userId: string, budgets: CategoryBudget[]) {
   writeStorageCache(budgetCacheKey(userId), { budgets })
-}
-
-function normalizeBudget(budget: StoredCategoryBudget): CategoryBudget {
-  return {
-    id: budget.id,
-    category: budget.category as Category,
-    amount: Number(budget.amount),
-  }
 }
 
 export function useBudgets(userId: string | undefined) {
@@ -47,11 +43,14 @@ export function useBudgets(userId: string | undefined) {
       .order('category')
 
     if (fetchError) throw fetchError
-    return ((data ?? []) as StoredCategoryBudget[]).map(normalizeBudget)
+    return (data ?? []).flatMap((budget) => {
+      const normalized = normalizeBudget(budget)
+      return normalized ? [normalized] : []
+    })
   }, [getSupabase, userId])
 
   const refreshBudgets = useCallback(
-    async (signal?: AbortSignal) => {
+    async (signal?: AbortSignal, showLoading = true) => {
       if (!userId) {
         budgetsRef.current = []
         setBudgets([])
@@ -59,7 +58,7 @@ export function useBudgets(userId: string | undefined) {
         setIsLoading(false)
         return false
       }
-      setIsLoading(true)
+      if (showLoading) setIsLoading(true)
       setError('')
       try {
         const nextBudgets = await fetchBudgets()
@@ -74,7 +73,7 @@ export function useBudgets(userId: string | undefined) {
         setError('Could not load category budgets. Run the budget migration first.')
         return false
       } finally {
-        if (!signal?.aborted) setIsLoading(false)
+        if (!signal?.aborted && showLoading) setIsLoading(false)
       }
     },
     [fetchBudgets, userId],
@@ -94,9 +93,12 @@ export function useBudgets(userId: string | undefined) {
       if (cachedBudgets) {
         budgetsRef.current = cachedBudgets
         setBudgets(cachedBudgets)
+        setIsLoading(false)
       }
+      void refreshBudgets(controller.signal, !cachedBudgets)
+    } else {
+      void refreshBudgets(controller.signal)
     }
-    void refreshBudgets(controller.signal)
     return () => controller.abort()
   }, [refreshBudgets])
 
@@ -116,7 +118,8 @@ export function useBudgets(userId: string | undefined) {
           .select('id, category, amount')
           .single()
         if (saveError) throw saveError
-        const nextBudget = normalizeBudget(data as StoredCategoryBudget)
+        const nextBudget = normalizeBudget(data)
+        if (!nextBudget) throw new Error('Supabase returned an invalid category budget.')
         const nextBudgets = [...budgetsRef.current.filter((budget) => budget.category !== category), nextBudget].sort(
           (a, b) => a.category.localeCompare(b.category),
         )
@@ -166,3 +169,5 @@ export function useBudgets(userId: string | undefined) {
 
   return { budgets, isLoading, isSaving, isRemoving, error, saveBudget, removeBudget, refreshBudgets }
 }
+
+export type BudgetState = ReturnType<typeof useBudgets>

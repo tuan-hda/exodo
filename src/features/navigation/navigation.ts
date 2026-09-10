@@ -16,6 +16,7 @@ const notificationsNavigationItem = {
 const settingsNavigationItem = { id: 'settings', label: 'Settings', mobileLabel: 'Settings', Icon: Gear } as const
 
 export type AppTab = 'today' | 'overview' | 'analysis' | 'notifications' | 'settings'
+export type SettingsPage = 'menu' | 'budgets' | 'savings' | 'customization'
 
 export const appTabLabels: Record<AppTab, string> = {
   today: 'Today',
@@ -44,4 +45,22 @@ export function isAppTab(value: string | null): value is AppTab {
 export function getAppTabFromSearch(search: string): AppTab {
   const requestedTab = new URLSearchParams(search).get('tab')
   return isAppTab(requestedTab) ? requestedTab : 'today'
+}
+
+export function getSettingsPageFromSearch(search: string): SettingsPage {
+  const section = new URLSearchParams(search).get('section')
+  return section === 'budgets' || section === 'savings' || section === 'customization' ? section : 'menu'
+}
+
+export function isNavigationItemActive(activeTab: AppTab, itemId: Exclude<AppTab, 'analysis'>) {
+  return activeTab === itemId || (activeTab === 'analysis' && itemId === 'today')
+}
+
+export function updateSearchParams(href: string, updates: Record<string, string | null>) {
+  const url = new URL(href)
+  for (const [key, value] of Object.entries(updates)) {
+    if (value === null) url.searchParams.delete(key)
+    else url.searchParams.set(key, value)
+  }
+  return `${url.pathname}${url.search}${url.hash}`
 }

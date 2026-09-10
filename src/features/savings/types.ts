@@ -20,24 +20,3 @@ export type SavingsDeposit = {
   monthKey: string | null
   note: string | null
 }
-
-export type StoredSavingsGoal = {
-  id: string
-  name: string
-  target_amount: number | string
-  saved_amount: number | string
-  target_date: string | null
-  icon: string
-  priority: number
-  status: SavingsGoal['status']
-}
-
-export type StoredSavingsDeposit = {
-  id: string
-  goal_id: string
-  amount: number | string
-  occurred_at: string
-  source: SavingsDeposit['source']
-  month_key: string | null
-  note: string | null
-}

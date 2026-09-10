@@ -1,6 +1,15 @@
+import type { MouseEventHandler } from 'react'
 import { cn } from '@/lib/utils'
 
-export function BrandLockup({ href, className }: { href?: string; className?: string }) {
+export function BrandLockup({
+  href,
+  className,
+  onClick,
+}: {
+  href?: string
+  className?: string
+  onClick?: MouseEventHandler<HTMLAnchorElement>
+}) {
   const content = (
     <>
       <span className="grid size-7 place-items-center rounded-chip bg-ink font-sans text-xs font-semibold text-white">
@@ -16,7 +25,7 @@ export function BrandLockup({ href, className }: { href?: string; className?: st
 
   if (href) {
     return (
-      <a className={classes} href={href} aria-label="Exodo home">
+      <a className={classes} href={href} onClick={onClick} aria-label="Exodo home">
         {content}
       </a>
     )

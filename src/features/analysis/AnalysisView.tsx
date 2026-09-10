@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react'
 import { CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { PageHeader } from '@/components/PageHeader'
+import { PageShell } from '@/components/PageShell'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatMoney } from '@/lib/money'
-import type { Entry } from '@/features/entries/types'
+import { isEntryType, type Entry } from '@/features/entries/types'
+import { sumEntriesByType } from '@/features/entries/entry-utils'
 import { getMonthEntries } from './analysis-utils'
 import { AnalysisDistribution } from './AnalysisDistribution'
 import { formatMonthLabel } from '@/lib/date-format'
@@ -29,8 +31,8 @@ export function AnalysisView({
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const monthEntries = getMonthEntries(entries, viewMonth)
   const monthLabel = formatMonthLabel(viewMonth)
-  const income = monthEntries.filter((entry) => entry.type === 'income').reduce((sum, entry) => sum + entry.amount, 0)
-  const expense = monthEntries.filter((entry) => entry.type === 'expense').reduce((sum, entry) => sum + entry.amount, 0)
+  const income = sumEntriesByType(monthEntries, 'income')
+  const expense = sumEntriesByType(monthEntries, 'expense')
 
   useEffect(() => {
     setSelectedCategory(null)
@@ -41,9 +43,7 @@ export function AnalysisView({
   }
 
   return (
-    <section
-      className="ui-page-enter ui-page-enter-delay-120 grid gap-8 pb-12 pt-16 max-md:pt-10"
-      aria-busy={isLoading}>
+    <PageShell size="wide" className="ui-page-enter-delay-120 gap-8" aria-busy={isLoading}>
       <PageHeader
         eyebrow="the month analysis"
         title={monthLabel}
@@ -90,10 +90,14 @@ export function AnalysisView({
           </span>
         </div>
       )}
-      <Tabs value={activeType} onValueChange={(value) => setActiveType(value as Entry['type'])}>
+      <Tabs value={activeType} onValueChange={(value) => isEntryType(value) && setActiveType(value)}>
         <TabsList aria-label="Analysis type">
-          <TabsTrigger value="expense">Expense</TabsTrigger>
-          <TabsTrigger value="income">Income</TabsTrigger>
+          <TabsTrigger tone="danger" value="expense">
+            Expense
+          </TabsTrigger>
+          <TabsTrigger tone="success" value="income">
+            Income
+          </TabsTrigger>
         </TabsList>
         <TabsContent className="analysis-tab-content swipe-left" value="expense">
           <AnalysisDistribution
@@ -116,6 +120,6 @@ export function AnalysisView({
           />
         </TabsContent>
       </Tabs>
-    </section>
+    </PageShell>
   )
 }

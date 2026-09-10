@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { clsx } from 'clsx'
-import { useReducedMotion } from 'motion/react'
 import { useUser } from '@clerk/nextjs'
 import { ArrowClockwise } from '@phosphor-icons/react'
 import { fromKey } from '@/lib/date'
@@ -10,25 +9,26 @@ import { SettingsView } from '@/features/settings/SettingsView'
 import { ActivityList } from '@/features/activity/ActivityList'
 import { EntryComposer } from '@/features/entries/EntryComposer'
 import { MobileTabBar } from '@/features/navigation/MobileTabBar'
-import { getAppTabFromSearch, type AppTab } from '@/features/navigation/navigation'
+import { useAppNavigation } from '@/features/navigation/use-app-navigation'
 import { NotificationsView } from '@/features/notifications/NotificationsView'
 import { SummaryPanels } from './SummaryPanels'
 import { useEntries } from '@/features/entries/use-entries'
 import { useDayBoundary } from './use-day-boundary'
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh'
-import type { Entry, EntryType } from '@/features/entries/types'
 import { useBudgets } from '@/features/budgets/use-budgets'
+import { useSavings } from '@/features/savings/use-savings'
 import { AnalysisView } from '@/features/analysis/AnalysisView'
 import { OverviewView } from '@/features/overview/OverviewView'
 import { useBackgroundPreference } from '@/features/settings/use-background-preference'
 import { StateMessage } from '@/components/StateMessage'
 import { DashboardHeader } from './DashboardHeader'
 import { formatLongDate } from '@/lib/date-format'
+import { useEntryComposer } from '@/features/entries/use-entry-composer'
+import { useDashboardShortcuts } from './use-dashboard-shortcuts'
 
 function Dashboard() {
   const { user } = useUser()
-  const prefersReducedMotion = useReducedMotion()
-  const { enabled: gradientBackgroundEnabled } = useBackgroundPreference()
+  const backgroundPreference = useBackgroundPreference()
   const {
     entries,
     accumulation,
@@ -42,14 +42,18 @@ function Dashboard() {
   const { pullDistance, isRefreshing } = usePullToRefresh(refreshEntries)
   const currentDayKey = useDayBoundary()
   const currentDay = fromKey(currentDayKey)
-  const [composerOpen, setComposerOpen] = useState(false)
-  const [composerType, setComposerType] = useState<EntryType>('expense')
-  const [editingEntry, setEditingEntry] = useState<Entry | undefined>()
   const [viewMonth, setViewMonth] = useState(new Date(currentDay.getFullYear(), currentDay.getMonth(), 1, 12))
-  const [activeTab, setActiveTab] = useState<AppTab>(() =>
-    typeof window === 'undefined' ? 'today' : getAppTabFromSearch(window.location.search),
-  )
-  const { budgets, isLoading: budgetsLoading } = useBudgets(user?.id)
+  const { activeTab, navigate } = useAppNavigation()
+  const budgetState = useBudgets(user?.id)
+  const savings = useSavings(user?.id, entries, entriesLoading)
+  const composer = useEntryComposer({ saveEntry, removeEntry })
+
+  const moveMonth = useCallback((delta: number) => {
+    setViewMonth((current) => {
+      const next = new Date(current.getFullYear(), current.getMonth() + delta, 1, 12)
+      return next
+    })
+  }, [])
 
   useEffect(() => {
     const nextDay = fromKey(currentDayKey)
@@ -60,81 +64,24 @@ function Dashboard() {
     )
   }, [currentDayKey])
 
-  useEffect(() => {
-    const syncTab = () => setActiveTab(getAppTabFromSearch(window.location.search))
-    syncTab()
-    window.addEventListener('popstate', syncTab)
-    return () => window.removeEventListener('popstate', syncTab)
-  }, [])
-
-  useEffect(() => {
-    function handleShortcut(event: KeyboardEvent) {
-      const target = event.target as HTMLElement
-      const isEditing = ['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName)
-      if (event.key === 'Escape' && composerOpen) {
-        setComposerOpen(false)
-        return
-      }
-      if (isEditing || composerOpen) return
-      if (event.key.toLowerCase() === 'i') {
-        event.preventDefault()
-        openComposer('income')
-      }
-      if (event.key.toLowerCase() === 'e' || event.key.toLowerCase() === 'n') {
-        event.preventDefault()
-        openComposer('expense')
-      }
-      if (event.key === 'ArrowLeft') moveMonth(-1)
-      if (event.key === 'ArrowRight') moveMonth(1)
-    }
-
-    window.addEventListener('keydown', handleShortcut)
-    return () => window.removeEventListener('keydown', handleShortcut)
-  }, [composerOpen])
-
-  function openComposer(type: EntryType, entry?: Entry) {
-    setComposerType(type)
-    setEditingEntry(entry)
-    setComposerOpen(true)
-  }
-
-  function moveMonth(delta: number) {
-    setViewMonth((current) => {
-      const next = new Date(current.getFullYear(), current.getMonth() + delta, 1, 12)
-      return next
-    })
-  }
-
-  function navigateTab(tab: AppTab) {
-    setActiveTab(tab)
-    const url = new URL(window.location.href)
-    if (tab === 'today') url.searchParams.delete('tab')
-    else url.searchParams.set('tab', tab)
-    if (tab !== 'settings') url.searchParams.delete('section')
-    window.history.pushState(null, '', `${url.pathname}${url.search}${url.hash}`)
-    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' })
-  }
-
-  async function handleSave(entry: Entry) {
-    const saved = await saveEntry(entry, Boolean(editingEntry))
-    if (saved) {
-      setComposerOpen(false)
-      setEditingEntry(undefined)
-    }
-    return saved
-  }
+  useDashboardShortcuts({
+    composerOpen: composer.isOpen,
+    closeComposer: composer.close,
+    openComposer: composer.open,
+    moveMonth,
+  })
 
   return (
-    <div className={clsx('min-h-dvh', !gradientBackgroundEnabled && 'bg-surface')}>
+    <div className={clsx('min-h-dvh', !backgroundPreference.enabled && 'bg-surface')}>
       <a
-        className="sr-only fixed top-3 left-3 z-30 rounded-chip bg-ink px-3 py-2 font-mono text-[10px] uppercase tracking-[.08em] text-white focus:not-sr-only"
+        className="sr-only fixed top-3 left-3 z-system rounded-chip bg-ink px-3 py-2 font-mono text-[10px] uppercase tracking-[.08em] text-white focus:not-sr-only"
         href="#main-content">
         Skip to content
       </a>
       {(pullDistance > 0 || isRefreshing) && (
         <div
           className={clsx(
-            'pointer-events-none fixed inset-x-0 top-3 z-30 mx-auto flex w-fit items-center gap-2 rounded-input bg-ink px-3 py-2 font-mono text-[10px] uppercase tracking-[.08em] text-white opacity-95 shadow-toast',
+            'pointer-events-none fixed inset-x-0 top-3 z-system mx-auto flex w-fit items-center gap-2 rounded-input bg-ink px-3 py-2 font-mono text-[10px] uppercase tracking-[.08em] text-white opacity-95 shadow-toast',
             isRefreshing && 'ui-control-motion transition-transform',
           )}
           style={{ transform: `translateY(${pullDistance}px)` }}
@@ -143,8 +90,13 @@ function Dashboard() {
           <span>{isRefreshing ? 'Refreshing' : pullDistance >= 56 ? 'Release to refresh' : 'Pull to refresh'}</span>
         </div>
       )}
-      <main id="top" className="mx-auto w-[min(1120px,calc(100%-40px))] pb-20 max-md:w-[calc(100%-32px)] max-md:pb-32">
-        <DashboardHeader activeTab={activeTab} onNavigate={navigateTab} onRecord={() => openComposer('expense')} />
+      <main id="top" className="ui-dashboard-frame pb-20 max-md:pb-32">
+        <DashboardHeader
+          activeTab={activeTab}
+          onNavigate={navigate}
+          onRecord={() => composer.open('expense')}
+          gradientBackgroundEnabled={backgroundPreference.enabled}
+        />
         <div id="main-content" tabIndex={-1} className="outline-none">
           {persistenceError && (
             <StateMessage tone="danger" className="mt-4">
@@ -170,71 +122,61 @@ function Dashboard() {
                 entries={entries}
                 entriesLoading={entriesLoading}
                 dayKey={currentDayKey}
-                budgets={budgets}
-                budgetsLoading={budgetsLoading}
-                userId={user?.id}
+                budgets={budgetState.budgets}
+                budgetsLoading={budgetState.isLoading}
+                savings={savings}
+                onOpenBudgetSettings={() => navigate('settings', 'budgets')}
               />
               <div className="pt-24 max-md:pt-16">
                 <ActivityList
                   entries={entries}
                   isLoading={entriesLoading}
                   todayKey={currentDayKey}
-                  onEdit={(entry) => openComposer(entry.type, entry)}
+                  onEdit={(entry) => composer.open(entry.type, entry)}
                   onOpenAnalysis={(monthKey) => {
                     const [year, month] = monthKey.split('-').map(Number)
                     setViewMonth(new Date(year, month - 1, 1, 12))
-                    navigateTab('analysis')
+                    navigate('analysis')
                   }}
                 />
               </div>
             </>
           )}
           {activeTab === 'overview' && (
-            <section className="pt-16 max-md:pt-10">
-              <OverviewView accumulation={accumulation} entries={entries} isLoading={entriesLoading} />
-            </section>
+            <OverviewView accumulation={accumulation} entries={entries} isLoading={entriesLoading} />
           )}
-          {activeTab === 'notifications' && (
-            <section className="pt-16 max-md:pt-10">
-              <NotificationsView />
-            </section>
-          )}
+          {activeTab === 'notifications' && <NotificationsView />}
           {activeTab === 'analysis' && (
             <AnalysisView
               entries={entries}
               isLoading={entriesLoading}
               viewMonth={viewMonth}
               onMonthChange={moveMonth}
-              onBack={() => navigateTab('today')}
+              onBack={() => navigate('today')}
             />
           )}
           {activeTab === 'settings' && (
-            <section className="pt-16 max-md:pt-10">
-              <SettingsView userId={user?.id} entries={entries} />
-            </section>
+            <SettingsView savings={savings} budgets={budgetState} backgroundPreference={backgroundPreference} />
           )}
         </div>
       </main>
-      <footer className="mx-auto flex w-[min(1120px,calc(100%-40px))] justify-between border-t border-line py-5 font-mono text-[10px] tracking-[.06em] text-muted max-md:w-[calc(100%-32px)] max-md:pb-28">
+      <footer className="ui-dashboard-frame flex justify-between border-t border-line py-5 font-mono text-[10px] tracking-[.06em] text-muted max-md:pb-28">
         <span>exodo / έξοδο</span>
         <span>money / a daily practice</span>
       </footer>
-      <MobileTabBar activeTab={activeTab} onChange={navigateTab} onRecord={() => openComposer('expense')} />
-      {composerOpen && (
+      <MobileTabBar activeTab={activeTab} onChange={navigate} onRecord={() => composer.open('expense')} />
+      {composer.isOpen && (
         <EntryComposer
-          key={editingEntry?.id ?? composerType}
-          entry={editingEntry}
-          type={composerType}
+          key={composer.entry?.id ?? composer.type}
+          entry={composer.entry}
+          type={composer.type}
           dayKey={currentDayKey}
           isSaving={isSaving}
-          onClose={() => {
-            setComposerOpen(false)
-            setEditingEntry(undefined)
-          }}
-          onTypeChange={setComposerType}
+          onClose={composer.close}
+          onTypeChange={composer.setType}
           persistenceError={persistenceError}
-          onDelete={editingEntry ? () => removeEntry(editingEntry.id) : undefined}
-          onSave={handleSave}
+          onDelete={composer.entry ? composer.remove : undefined}
+          onSave={composer.save}
         />
       )}
     </div>

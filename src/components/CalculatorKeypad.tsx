@@ -1,7 +1,6 @@
 'use client'
 
 import { Backspace } from '@phosphor-icons/react'
-import { clsx } from 'clsx'
 import { Button } from '@/components/ui/button'
 import { formatAmountExpression } from '@/lib/amount'
 
@@ -38,13 +37,9 @@ export function CalculatorKeypad({
             key={key}
             disabled={disabled}
             type="button"
-            variant="keypad"
+            variant={key === '⌫' ? 'keypad-action' : ['÷', '×', '−', '+'].includes(key) ? 'keypad-operator' : 'keypad'}
             size="keypad"
             aria-label={key === '⌫' ? 'Delete last character' : key}
-            className={clsx(
-              ['÷', '×', '−', '+'].includes(key) && 'border-line-strong',
-              key === '⌫' ? 'bg-surface text-muted hover:bg-soft' : 'bg-soft text-ink hover:bg-line',
-            )}
             onClick={() => pressKey(key)}>
             {key === '⌫' ? <Backspace size={21} weight="regular" /> : key}
           </Button>

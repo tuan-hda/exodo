@@ -14,7 +14,7 @@ import { ComposerCategoryStep } from './ComposerCategoryStep'
 import { ComposerReviewStep } from './ComposerReviewStep'
 import type { Entry, EntryType } from './types'
 import { evaluateExpression, formatAmountExpression } from '@/lib/amount'
-import { getCurrentTime, todayKey } from '@/lib/date'
+import { getCurrentTime, getDayKey } from '@/lib/date'
 import { useMediaQuery } from '@/hooks/use-media-query'
 import { mediaQueries } from '@/lib/breakpoints'
 import {
@@ -34,7 +34,7 @@ export function EntryComposer({
   entry,
   type,
   isSaving,
-  dayKey = todayKey,
+  dayKey = getDayKey(),
   onClose,
   onSave,
   onTypeChange,
@@ -80,7 +80,7 @@ export function EntryComposer({
 
   function previousStep() {
     setError('')
-    setStep((current) => Math.max(1, current - 1) as ComposerStep)
+    setStep((current) => (current === 3 ? 2 : 1))
   }
 
   async function submit(event: FormEvent) {
@@ -140,9 +140,8 @@ export function EntryComposer({
             </Button>
           )}
           <Button
-            variant={type === 'income' ? 'secondary' : 'outline'}
-            size="sm"
-            className={clsx('ui-label tracking-[.06em] max-md:text-[11px]', type === 'income' && 'text-success')}
+            variant={type === 'income' ? 'income' : 'expense'}
+            size="meta"
             type="button"
             disabled={isBusy}
             onClick={toggleType}
@@ -154,7 +153,10 @@ export function EntryComposer({
             <X size={19} />
           </Button>
         </ComposerHeader>
-        <div className="mb-5 grid grid-cols-3 gap-2 border-b border-line pb-4 max-md:mb-2" aria-label="Record steps">
+        <div
+          className="mb-5 grid grid-cols-3 gap-2 border-b border-line pb-4 max-md:mb-2"
+          role="group"
+          aria-label="Record steps">
           {stepLabels.map((label, index) => (
             <span
               className={clsx(
@@ -215,7 +217,7 @@ export function EntryComposer({
                 occurredAt={occurredAt}
                 disabled={isBusy}
                 isSaving={isSaving}
-                error={error}
+                error={error || persistenceError || ''}
                 category={category}
                 onTitleChange={setTitle}
                 onOccurredAtChange={setOccurredAt}
@@ -237,7 +239,13 @@ export function EntryComposer({
             {persistenceError && <StateMessage tone="danger">{persistenceError}</StateMessage>}
             <AlertDialogFooter>
               <AlertDialogCancel disabled={isBusy}>Cancel</AlertDialogCancel>
-              <AlertDialogAction disabled={isBusy} onClick={() => void handleDelete()}>
+              <AlertDialogAction
+                variant="destructive"
+                disabled={isBusy}
+                onClick={(event) => {
+                  event.preventDefault()
+                  void handleDelete()
+                }}>
                 {isDeleting ? 'Deleting…' : 'Delete transaction'}
               </AlertDialogAction>
             </AlertDialogFooter>

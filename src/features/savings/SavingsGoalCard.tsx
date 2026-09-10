@@ -1,9 +1,10 @@
 import { Plus } from '@phosphor-icons/react'
+import { IconTile } from '@/components/IconTile'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { formatMoney } from '@/lib/money'
-import { SavingsIcon } from './savings-icons'
+import { SavingsIcon, savingsIconTone } from './savings-icons'
 import type { SavingsDeposit, SavingsGoal } from './types'
 import { formatMonthChip } from '@/lib/date-format'
 
@@ -20,12 +21,12 @@ export function SavingsGoalCard({
   const recentDeposits = deposits.filter((deposit) => deposit.goalId === goal.id).slice(0, 4)
   const statusLabel = goal.status === 'completed' ? 'Complete' : goal.status === 'paused' ? 'Paused' : null
   return (
-    <Card className="p-6 md:p-7">
+    <Card as="article" accent={savingsIconTone(goal.icon)} className="p-6 md:p-7">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="ui-icon-tile-inverse size-11 rounded-control text-xl" aria-hidden="true">
+          <IconTile size="lg" shape="control" tone={savingsIconTone(goal.icon)} aria-hidden="true" className="text-xl">
             <SavingsIcon name={goal.icon} size={21} />
-          </span>
+          </IconTile>
           <div className="min-w-0">
             <h2 className="truncate text-lg font-semibold">{goal.name}</h2>
             <p className="mt-1 text-xs text-muted">

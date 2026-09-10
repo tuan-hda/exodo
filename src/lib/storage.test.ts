@@ -32,4 +32,10 @@ describe('storage cache', () => {
 
     expect(readStorageCache<{ value: number }>('test', 1_000)).toBeNull()
   })
+
+  it('rejects a cache whose JSON payload is not an object', () => {
+    values.set('test', JSON.stringify(['not', 'a', 'cache']))
+
+    expect(readStorageCache<{ value: number }>('test', 1_000)).toBeNull()
+  })
 })

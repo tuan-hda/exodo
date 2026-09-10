@@ -16,12 +16,18 @@ const buttonVariants = cva(
         ghost: 'border-transparent text-muted hover:bg-soft hover:text-ink',
         destructive: 'border-danger/20 bg-danger-soft text-danger hover:border-danger/35 hover:bg-danger/15',
         'outline-danger': 'border-danger/30 bg-surface text-danger hover:border-danger/50 hover:bg-danger-soft',
+        income: 'border-success/25 bg-success-soft text-success hover:border-success/35 hover:bg-success-soft',
+        expense: 'border-danger/25 bg-danger-soft text-danger hover:border-danger/35 hover:bg-danger-soft',
         'destructive-ghost': 'border-transparent bg-transparent text-danger hover:bg-danger-soft hover:text-danger',
         link: 'border-transparent text-ink underline-offset-4 hover:underline',
         'outline-muted': 'border-line-strong bg-surface text-muted hover:border-ink hover:bg-soft hover:text-ink',
         option:
           'border-line-strong bg-soft text-muted hover:border-ink hover:bg-surface hover:text-ink data-[selected=true]:border-ink data-[selected=true]:bg-surface data-[selected=true]:text-ink data-[selected=true]:shadow-option',
+        category:
+          'border-line-strong bg-soft text-muted hover:border-ink hover:bg-surface hover:text-ink data-[selected=true]:border-ink data-[selected=true]:shadow-option',
         keypad: 'border-line bg-soft text-ink hover:border-line-strong hover:bg-line',
+        'keypad-operator': 'border-line-strong bg-soft text-ink hover:bg-line',
+        'keypad-action': 'border-line-strong bg-surface text-muted hover:bg-soft',
         list: 'bg-transparent text-ink hover:bg-soft',
         nav: 'border-transparent text-muted hover:bg-soft hover:text-ink data-[active=true]:bg-ink data-[active=true]:text-white data-[active=true]:shadow-button',
         'subtle-nav':

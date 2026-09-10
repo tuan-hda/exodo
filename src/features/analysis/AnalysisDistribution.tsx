@@ -3,9 +3,11 @@
 import { TrendDown, TrendUp, X } from '@phosphor-icons/react'
 import { clsx } from 'clsx'
 import { CategoryIcon } from '@/features/finance/CategoryIcon'
+import { canonicalCategory, categoryForegroundClass } from '@/features/finance/category'
 import { AnimatedList } from '@/components/ui/animated-list'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { IconTile } from '@/components/IconTile'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatMoney } from '@/lib/money'
 import { formatEntryDateTime } from '@/lib/date-format'
@@ -25,7 +27,7 @@ function CategoryDetail({
   onClose: () => void
 }) {
   const categoryEntries = entries
-    .filter((entry) => entry.type === type && (entry.category || 'Other') === category)
+    .filter((entry) => entry.type === type && canonicalCategory(entry.category || 'Other') === category)
     .sort((left, right) => right.occurredAt.localeCompare(left.occurredAt))
 
   return (
@@ -33,7 +35,9 @@ function CategoryDetail({
       <div className="mb-2 flex items-center justify-between gap-3">
         <div>
           <p className="ui-label mb-1 tracking-[.1em]">selected category</p>
-          <h3 className="m-0 text-xl font-semibold tracking-[-.05em]">{category}</h3>
+          <h3 className={clsx('m-0 text-xl font-semibold tracking-[-.05em]', categoryForegroundClass(category))}>
+            {category}
+          </h3>
         </div>
         <Button variant="outline" size="icon-sm" type="button" onClick={onClose} aria-label="Close category details">
           <X size={17} />
@@ -86,7 +90,7 @@ export function AnalysisDistribution({
 
   return (
     <section aria-label={`${type} distribution`}>
-      <Card className="p-5 max-md:p-4">
+      <Card tone={isIncome ? 'success' : 'danger'} className="p-5 max-md:p-4">
         {isLoading ? (
           <div className="grid min-h-[360px] content-center gap-5 p-8">
             <Skeleton className="mx-auto size-[240px] rounded-full max-xs:size-[190px]" />
@@ -107,9 +111,9 @@ export function AnalysisDistribution({
           </>
         ) : (
           <div className="grid min-h-[360px] place-items-center content-center gap-3 p-8 text-center">
-            <span className="ui-icon-tile size-11 rounded-full" aria-hidden="true">
+            <IconTile size="lg" shape="circle" aria-hidden="true">
               {isIncome ? <TrendUp size={20} /> : <TrendDown size={20} />}
-            </span>
+            </IconTile>
             <div className="grid gap-1">
               <h3 className="m-0 text-base font-semibold">No {type} records</h3>
               <p className="m-0 max-w-[30ch] text-sm leading-[1.55] text-muted">
@@ -137,7 +141,9 @@ export function AnalysisDistribution({
             <Button variant="list" size="row" type="button" onClick={() => onSelectCategory(slice.category)}>
               <CategoryIcon category={slice.category} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium text-ink">
-                <span className="block truncate">{slice.category}</span>
+                <span className={clsx('block truncate', categoryForegroundClass(slice.category))}>
+                  {slice.category}
+                </span>
                 <small className="ui-meta mt-1 block">
                   {formatPercentage(slice.percentage)} · {slice.transactionCount}{' '}
                   {slice.transactionCount === 1 ? 'transaction' : 'transactions'}
