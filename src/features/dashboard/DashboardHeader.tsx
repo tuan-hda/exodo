@@ -39,7 +39,7 @@ export function DashboardHeader({
             <NavigationButton key={tab.id} item={tab} activeTab={activeTab} onChange={onNavigate} />
           ))}
         </nav>
-        <Button size="sm" type="button" onClick={onRecord} aria-label="Record an expense">
+        <Button variant="expense-primary" size="sm" type="button" onClick={onRecord} aria-label="Record an expense">
           <Plus size={15} weight="bold" /> Record
         </Button>
       </div>

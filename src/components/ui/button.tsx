@@ -18,6 +18,10 @@ const buttonVariants = cva(
         'outline-danger': 'border-danger/30 bg-surface text-danger hover:border-danger/50 hover:bg-danger-soft',
         income: 'border-success/25 bg-success-soft text-success hover:border-success/35 hover:bg-success-soft',
         expense: 'border-danger/25 bg-danger-soft text-danger hover:border-danger/35 hover:bg-danger-soft',
+        'income-primary':
+          'border-success bg-success text-white shadow-button hover:border-success/90 hover:bg-success/90 hover:shadow-button-hover',
+        'expense-primary':
+          'border-category-coral bg-category-coral text-white shadow-button hover:border-category-coral/90 hover:bg-category-coral/90 hover:shadow-button-hover',
         'destructive-ghost': 'border-transparent bg-transparent text-danger hover:bg-danger-soft hover:text-danger',
         link: 'border-transparent text-ink underline-offset-4 hover:underline',
         'outline-muted': 'border-line-strong bg-surface text-muted hover:border-ink hover:bg-soft hover:text-ink',

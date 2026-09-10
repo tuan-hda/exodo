@@ -20,6 +20,7 @@ export function MobileTabBar({
         <NavigationButton key={item.id} item={item} activeTab={activeTab} onChange={onChange} mobile />
       ))}
       <Button
+        variant="expense-primary"
         size="fab"
         className="self-center justify-self-center"
         type="button"

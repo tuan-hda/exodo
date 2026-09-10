@@ -41,10 +41,16 @@ export function ComposerReviewStep({
 }) {
   return (
     <section className="grid content-start gap-4" aria-label="Review record">
-      <Card tone="soft" className="grid gap-3 p-4">
+      <Card accent={type === 'income' ? 'success' : 'coral'} className="grid gap-3 p-4">
         <div className="flex items-end justify-between border-b border-line-strong pb-3">
-          <span className="ui-label">{type === 'income' ? 'Income' : 'Expense'}</span>
-          <strong className="ui-number text-2xl font-semibold tracking-[-.05em]">
+          <span className={clsx('ui-label', type === 'income' ? 'text-success' : 'text-category-coral')}>
+            {type === 'income' ? 'Income' : 'Expense'}
+          </span>
+          <strong
+            className={clsx(
+              'ui-number text-2xl font-semibold tracking-[-.05em]',
+              type === 'income' ? 'text-success' : 'text-category-coral',
+            )}>
             {formatMoney(evaluateExpression(amount))}
           </strong>
         </div>
@@ -80,7 +86,11 @@ export function ComposerReviewStep({
       </Field>
       {error && <StateMessage tone="danger">{error}</StateMessage>}
       <ComposerStepActions disabled={disabled} onBack={onBack}>
-        <Button className="flex-1 gap-2" disabled={disabled} type="submit" variant="default">
+        <Button
+          className="flex-1 gap-2"
+          disabled={disabled}
+          type="submit"
+          variant={type === 'income' ? 'income-primary' : 'expense-primary'}>
           {isSaving ? (
             <>
               <CircleNotch className="animate-spin" size={17} /> Saving…

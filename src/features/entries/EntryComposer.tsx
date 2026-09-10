@@ -61,6 +61,20 @@ export function EntryComposer({
   const [isDeleting, setIsDeleting] = useState(false)
   const isMobile = useMediaQuery(mediaQueries.mobile)
   const isBusy = isSaving || isDeleting
+  const composerAccent =
+    type === 'income'
+      ? {
+          border: 'border-success/50',
+          soft: 'bg-success-soft',
+          solid: 'bg-success',
+          text: 'text-success',
+        }
+      : {
+          border: 'border-category-coral/50',
+          soft: 'bg-category-coral-soft',
+          solid: 'bg-category-coral',
+          text: 'text-category-coral',
+        }
 
   function validateAmount() {
     try {
@@ -127,7 +141,7 @@ export function EntryComposer({
         if (!open && !isBusy) onClose()
       }}>
       <SheetContent side="bottom" variant="composer" showCloseButton={false} aria-busy={isBusy}>
-        <ComposerHeader title={entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'}>
+        <ComposerHeader title={entry ? `Edit ${type}` : type === 'income' ? 'Income' : 'Expense'} accent={type}>
           {entry && onDelete && (
             <Button
               variant="outline-danger"
@@ -157,24 +171,30 @@ export function EntryComposer({
           className="mb-5 grid grid-cols-3 gap-2 border-b border-line pb-4 max-md:mb-2"
           role="group"
           aria-label="Record steps">
-          {stepLabels.map((label, index) => (
-            <span
-              className={clsx(
-                'ui-meta inline-flex items-center gap-1.5 max-md:text-[9px]',
-                step === index + 1 && 'text-ink',
-              )}
-              key={label}>
-              <i
+          {stepLabels.map((label, index) => {
+            const isComplete = step > index + 1
+            const isCurrent = step === index + 1
+
+            return (
+              <span
                 className={clsx(
-                  'grid size-5 shrink-0 place-items-center rounded-full border border-line-strong bg-surface not-italic',
-                  step > index + 1 && 'border-ink text-ink',
-                  step === index + 1 && 'border-ink bg-surface text-ink',
-                )}>
-                {step > index + 1 ? <Check size={11} weight="bold" /> : index + 1}
-              </i>
-              {label}
-            </span>
-          ))}
+                  'ui-meta inline-flex items-center gap-1.5 max-md:text-[9px]',
+                  isCurrent && composerAccent.text,
+                )}
+                key={label}>
+                <i
+                  className={clsx(
+                    'grid size-5 shrink-0 place-items-center rounded-full border not-italic',
+                    !isComplete && !isCurrent && 'border-line-strong bg-surface',
+                    isComplete && `${composerAccent.border} ${composerAccent.solid} text-white`,
+                    isCurrent && `${composerAccent.border} ${composerAccent.soft} ${composerAccent.text}`,
+                  )}>
+                  {isComplete ? <Check size={11} weight="bold" /> : index + 1}
+                </i>
+                {label}
+              </span>
+            )
+          })}
         </div>
         <form
           className="grid gap-3 max-md:flex max-md:min-w-0 max-md:flex-1 max-md:flex-col max-md:gap-4"
@@ -197,6 +217,7 @@ export function EntryComposer({
             <FadeContent>
               <ComposerAmountStep
                 amount={amount}
+                type={type}
                 disabled={isBusy}
                 error={error || persistenceError || ''}
                 isMobile={isMobile}
