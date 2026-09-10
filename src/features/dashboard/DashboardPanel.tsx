@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import { clsx } from 'clsx'
-import { Card, type cardVariants } from '@/components/ui/card'
-import type { VariantProps } from 'class-variance-authority'
+import { Card } from '@/components/ui/card'
 
 export function DashboardPanel({
   children,
@@ -12,7 +11,6 @@ export function DashboardPanel({
   ariaLabel,
   ariaLabelledBy,
   ariaBusy,
-  tone,
 }: {
   children: ReactNode
   label?: string
@@ -22,12 +20,10 @@ export function DashboardPanel({
   ariaLabel?: string
   ariaLabelledBy?: string
   ariaBusy?: boolean
-  tone?: VariantProps<typeof cardVariants>['tone']
 }) {
   return (
     <Card
       as="section"
-      tone={tone}
       className={clsx(className)}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}

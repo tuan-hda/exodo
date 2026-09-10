@@ -1,15 +1,14 @@
 import { CalendarDots, CaretLeft, CaretRight, ClockCounterClockwise, MagnifyingGlass, X } from '@phosphor-icons/react'
-import { clsx } from 'clsx'
 import { useEffect, useState } from 'react'
 import { EmptyState } from '@/components/EmptyState'
 import { IconTile } from '@/components/IconTile'
+import { MoneyAmount } from '@/components/MoneyAmount'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CategoryIcon } from '@/features/finance/CategoryIcon'
 import type { Entry } from '@/features/entries/types'
 import { Input } from '@/components/ui/input'
 import { filterActivityEntries, formatActivityMonth, groupActivityByDate, groupActivityByMonth } from './activity-utils'
-import { formatMoney } from '@/lib/money'
 import { formatEntryTime } from '@/lib/date-format'
 import { monthKey } from '@/lib/date'
 import { categoryForegroundClass } from '@/features/finance/category'
@@ -140,20 +139,23 @@ export function ActivityList({
             <dl className="grid grid-cols-3 border-b border-line py-4">
               <div className="grid gap-1">
                 <dt className="ui-label">Income</dt>
-                <dd className="ui-number m-0 text-xs font-normal text-success">+{formatMoney(activeGroup.income)}</dd>
+                <dd className="m-0 text-xs font-normal">
+                  <MoneyAmount amount={activeGroup.income} tone="income" showSign />
+                </dd>
               </div>
               <div className="grid justify-items-center gap-1 text-center">
                 <dt className="ui-label">Expense</dt>
-                <dd className="ui-number m-0 text-xs font-normal text-danger">-{formatMoney(activeGroup.expense)}</dd>
+                <dd className="m-0 text-xs font-normal">
+                  <MoneyAmount amount={activeGroup.expense} tone="expense" showSign />
+                </dd>
               </div>
               <div className="grid justify-items-end gap-1 text-right">
                 <dt className="ui-label">Leftover</dt>
-                <dd
-                  className={clsx(
-                    'ui-number m-0 text-xs font-normal',
-                    activeGroup.income - activeGroup.expense < 0 ? 'text-danger' : 'text-success',
-                  )}>
-                  {formatMoney(activeGroup.income - activeGroup.expense)}
+                <dd className="m-0 text-xs font-normal">
+                  <MoneyAmount
+                    amount={activeGroup.income - activeGroup.expense}
+                    tone={activeGroup.income - activeGroup.expense < 0 ? 'expense' : 'income'}
+                  />
                 </dd>
               </div>
             </dl>
@@ -174,14 +176,13 @@ export function ActivityList({
                         · {formatEntryTime(entry.occurredAt)}
                       </small>
                     </span>
-                    <b
-                      className={clsx(
-                        'ui-number text-base font-semibold',
-                        entry.type === 'expense' ? 'text-danger' : 'text-success',
-                      )}>
-                      {entry.type === 'income' ? '+' : '-'}
-                      {formatMoney(entry.amount)}
-                    </b>
+                    <MoneyAmount
+                      amount={entry.amount}
+                      tone={entry.type}
+                      showSign
+                      as="b"
+                      className="text-base font-semibold"
+                    />
                   </Button>
                 ))}
               </section>

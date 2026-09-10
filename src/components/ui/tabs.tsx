@@ -20,21 +20,13 @@ function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimi
   )
 }
 
-function TabsTrigger({
-  className,
-  tone = 'default',
-  ...props
-}: React.ComponentProps<typeof TabsPrimitive.Trigger> & {
-  tone?: 'default' | 'success' | 'danger'
-}) {
+function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
         'ui-control-motion inline-flex h-full flex-1 items-center justify-center rounded-chip px-3 font-mono text-[10px] uppercase tracking-[.1em] transition-[background-color,color,box-shadow] outline-none focus-visible:ring-2 focus-visible:ring-ink/20 data-[state=active]:shadow-panel',
-        tone === 'success' && 'data-[state=active]:bg-success-soft data-[state=active]:text-success',
-        tone === 'danger' && 'data-[state=active]:bg-danger-soft data-[state=active]:text-danger',
-        tone === 'default' && 'data-[state=active]:bg-surface data-[state=active]:text-ink',
+        'data-[state=active]:bg-surface data-[state=active]:text-ink',
         className,
       )}
       {...props}

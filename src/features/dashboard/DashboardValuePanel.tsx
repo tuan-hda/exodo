@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react'
 import { clsx } from 'clsx'
 import { IconTile } from '@/components/IconTile'
-import type { IconTileTone } from '@/components/IconTile'
-import type { CardTone } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DashboardPanel } from './DashboardPanel'
 
@@ -18,8 +16,6 @@ export function DashboardValuePanel({
   className,
   minHeightClassName = 'min-h-[210px]',
   asideClassName,
-  iconTone = 'surface',
-  tone = 'default',
   descriptionClassName = 'max-w-[38ch]',
   descriptionSkeletonClassName = 'w-56',
 }: {
@@ -34,8 +30,6 @@ export function DashboardValuePanel({
   className?: string
   minHeightClassName?: string
   asideClassName?: string
-  iconTone?: IconTileTone
-  tone?: CardTone
   descriptionClassName?: string
   descriptionSkeletonClassName?: string
 }) {
@@ -47,7 +41,6 @@ export function DashboardValuePanel({
         className,
       )}
       asideClassName={clsx('grid justify-items-end gap-3', asideClassName)}
-      tone={tone}
       label={label}
       aside={aside}
       ariaLabel={ariaLabel}
@@ -66,7 +59,7 @@ export function DashboardValuePanel({
         )}
       </div>
       <div className="col-start-2 row-start-2 self-center justify-self-end">
-        <IconTile size="xl" shape="circle" tone={iconTone}>
+        <IconTile size="xl" shape="circle" tone="muted">
           {icon}
         </IconTile>
       </div>

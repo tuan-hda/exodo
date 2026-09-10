@@ -4,10 +4,10 @@ import { useEffect, useState } from 'react'
 import { CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { PageHeader } from '@/components/PageHeader'
 import { PageShell } from '@/components/PageShell'
+import { MoneyAmount } from '@/components/MoneyAmount'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { formatMoney } from '@/lib/money'
 import { isEntryType, type Entry } from '@/features/entries/types'
 import { sumEntriesByType } from '@/features/entries/entry-utils'
 import { getMonthEntries } from './analysis-utils'
@@ -80,10 +80,10 @@ export function AnalysisView({
       ) : (
         <div className="ui-label flex gap-5 border-y border-line py-3 max-xs:gap-3 max-xs:text-[9px]">
           <span>
-            <b className="ui-number font-normal text-success">+{formatMoney(income)}</b> income
+            <MoneyAmount amount={income} tone="income" showSign as="b" className="font-normal" /> income
           </span>
           <span>
-            <b className="ui-number font-normal text-danger">-{formatMoney(expense)}</b> expense
+            <MoneyAmount amount={expense} tone="expense" showSign as="b" className="font-normal" /> expense
           </span>
           <span>
             <b className="ui-number font-normal text-ink">{monthEntries.length}</b> records

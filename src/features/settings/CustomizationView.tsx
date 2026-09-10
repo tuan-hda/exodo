@@ -27,8 +27,8 @@ export function CustomizationView({
       />
       <Card tone="soft" className="flex items-center justify-between gap-4 p-5">
         <div>
-          <strong className="block text-sm font-semibold">Gradient background</strong>
-          <p className="mt-1 text-xs leading-[1.5] text-muted">Show the soft color wash behind the dashboard.</p>
+          <strong className="block text-sm font-semibold">Ambient background</strong>
+          <p className="mt-1 text-xs leading-[1.5] text-muted">Show the subtle paper tone behind the dashboard.</p>
         </div>
         <Button
           variant={enabled ? 'default' : 'outline'}

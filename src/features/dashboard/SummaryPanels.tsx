@@ -58,7 +58,6 @@ export function SummaryPanels({
               ? `${formatMoney(todayIncome)} allocated - ${formatMoney(todaySpent)} spent`
               : 'Add income to set your daily pace'
           }
-          iconTone="muted"
           icon={entriesLoading ? <CircleNotch className="animate-spin" size={24} /> : <Check size={24} weight="bold" />}
         />
       </FadeContent>

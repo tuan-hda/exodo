@@ -9,8 +9,6 @@ const cardVariants = cva('rounded-panel border transition-colors', {
       default: 'border-line bg-surface shadow-panel',
       soft: 'border-transparent bg-soft shadow-none',
       flat: 'border-line bg-transparent shadow-none',
-      success: 'border-success/20 bg-success-soft shadow-none',
-      danger: 'border-danger/20 bg-danger-soft shadow-none',
     },
   },
   defaultVariants: { tone: 'default' },

@@ -8,8 +8,8 @@ import { AnimatedList } from '@/components/ui/animated-list'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { IconTile } from '@/components/IconTile'
+import { MoneyAmount } from '@/components/MoneyAmount'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatMoney } from '@/lib/money'
 import { formatEntryDateTime } from '@/lib/date-format'
 import type { Entry } from '@/features/entries/types'
 import { formatPercentage, groupByCategory } from './analysis-utils'
@@ -52,14 +52,7 @@ function CategoryDetail({
                 <strong className="block truncate text-sm font-medium text-ink">{entry.title || category}</strong>
                 <small className="ui-meta mt-1 block">{formatEntryDateTime(entry.occurredAt)}</small>
               </div>
-              <strong
-                className={clsx(
-                  'ui-number text-base font-semibold',
-                  type === 'expense' ? 'text-danger' : 'text-success',
-                )}>
-                {type === 'expense' ? '-' : '+'}
-                {formatMoney(entry.amount)}
-              </strong>
+              <MoneyAmount amount={entry.amount} tone={type} showSign as="strong" className="text-base font-semibold" />
             </div>
           )}
         </AnimatedList>
@@ -150,14 +143,7 @@ export function AnalysisDistribution({
                   {slice.transactionCount === 1 ? 'transaction' : 'transactions'}
                 </small>
               </span>
-              <strong
-                className={clsx(
-                  'ui-number text-base font-semibold',
-                  type === 'expense' ? 'text-danger' : 'text-success',
-                )}>
-                {type === 'expense' ? '-' : '+'}
-                {formatMoney(slice.amount)}
-              </strong>
+              <MoneyAmount amount={slice.amount} tone={type} showSign as="strong" className="text-base font-semibold" />
             </Button>
           )}
         </AnimatedList>
