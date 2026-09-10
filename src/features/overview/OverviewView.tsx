@@ -32,7 +32,6 @@ export function OverviewView({
             label="income"
             value={formatMoney(income)}
             detail="all time"
-            tone="success"
             valueClassName="text-success"
             isLoading={isLoading}
           />
@@ -40,7 +39,6 @@ export function OverviewView({
             label="spent"
             value={formatMoney(expense)}
             detail="all time"
-            tone="danger"
             valueClassName="text-danger"
             isLoading={isLoading}
           />
