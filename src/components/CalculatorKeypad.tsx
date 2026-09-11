@@ -35,16 +35,28 @@ export function CalculatorKeypad({
       </div>
       <div className="mt-2 grid grid-cols-4 gap-1.5">
         {['1', '2', '3', '÷', '4', '5', '6', '×', '7', '8', '9', '−', '0', '000', '⌫', '+'].map((key) => (
-          <Button
-            key={key}
-            disabled={disabled}
-            type="button"
-            variant={key === '⌫' ? 'keypad-action' : ['÷', '×', '−', '+'].includes(key) ? 'keypad-operator' : 'keypad'}
-            size="keypad"
-            aria-label={key === '⌫' ? 'Delete last character' : key}
-            onClick={() => pressKey(key)}>
-            {key === '⌫' ? <Backspace size={21} weight="regular" /> : key}
-          </Button>
+          <div className="relative" key={key}>
+            <Button
+              disabled={disabled}
+              type="button"
+              tabIndex={-1}
+              aria-hidden="true"
+              variant={
+                key === '⌫' ? 'keypad-action' : ['÷', '×', '−', '+'].includes(key) ? 'keypad-operator' : 'keypad'
+              }
+              size="keypad"
+              className="pointer-events-none">
+              {key === '⌫' ? <Backspace size={21} weight="regular" /> : key}
+            </Button>
+            <input
+              type="checkbox"
+              ref={(input) => input?.setAttribute('switch', '')}
+              disabled={disabled}
+              aria-label={key === '⌫' ? 'Delete last character' : key}
+              className="absolute inset-0 z-10 m-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-wait"
+              onChange={() => pressKey(key)}
+            />
+          </div>
         ))}
       </div>
     </div>
