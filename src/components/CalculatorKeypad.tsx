@@ -3,6 +3,7 @@
 import { Backspace } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { formatAmountExpression } from '@/lib/amount'
+import { triggerHaptic } from '@/lib/haptics'
 
 export function CalculatorKeypad({
   amount,
@@ -22,6 +23,7 @@ export function CalculatorKeypad({
   }
 
   function pressKey(key: string) {
+    triggerHaptic()
     if (key === '⌫') backspace()
     else append(key === '−' ? '-' : key)
   }
