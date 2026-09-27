@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Plus } from '@phosphor-icons/react'
 import { IconTile } from '@/components/IconTile'
 import { Button } from '@/components/ui/button'
@@ -12,17 +13,19 @@ export function SavingsGoalCard({
   goal,
   deposits,
   onAdd,
+  actions,
 }: {
   goal: SavingsGoal
   deposits: SavingsDeposit[]
   onAdd?: (goalId: string) => void
+  actions?: ReactNode
 }) {
   const percentage = goal.targetAmount ? Math.min(100, (goal.savedAmount / goal.targetAmount) * 100) : 0
   const recentDeposits = deposits.filter((deposit) => deposit.goalId === goal.id).slice(0, 4)
   const statusLabel = goal.status === 'completed' ? 'Complete' : goal.status === 'paused' ? 'Paused' : null
   return (
     <Card as="article" className="p-6 md:p-7">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <IconTile size="lg" shape="control" tone="inverse" aria-hidden="true" className="text-xl">
             <SavingsIcon name={goal.icon} size={21} />
@@ -35,11 +38,14 @@ export function SavingsGoalCard({
             </p>
           </div>
         </div>
-        {onAdd && goal.status === 'active' && (
-          <Button variant="outline" size="sm" type="button" onClick={() => onAdd(goal.id)}>
-            <Plus size={15} /> Add
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {actions}
+          {onAdd && goal.status === 'active' && (
+            <Button variant="outline" size="sm" type="button" onClick={() => onAdd(goal.id)}>
+              <Plus size={15} /> Add
+            </Button>
+          )}
+        </div>
       </div>
       <div className="mt-5 flex items-end justify-between text-sm">
         <span>

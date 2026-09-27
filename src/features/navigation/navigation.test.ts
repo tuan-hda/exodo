@@ -13,6 +13,7 @@ import {
 describe('app navigation', () => {
   it('maps supported query tabs to the active view', () => {
     expect(getAppTabFromSearch('?tab=analysis')).toBe('analysis')
+    expect(getAppTabFromSearch('?tab=overview')).toBe('analysis')
     expect(getAppTabFromSearch('?tab=settings&section=budgets')).toBe('settings')
   })
 
@@ -27,19 +28,20 @@ describe('app navigation', () => {
     expect(getSettingsPageFromSearch('?section=unknown')).toBe('menu')
   })
 
-  it('keeps analysis attached to the today navigation item', () => {
-    expect(isNavigationItemActive('analysis', 'today')).toBe(true)
+  it('highlights analysis as its own navigation item', () => {
+    expect(isNavigationItemActive('analysis', 'analysis')).toBe(true)
+    expect(isNavigationItemActive('analysis', 'today')).toBe(false)
     expect(isNavigationItemActive('analysis', 'settings')).toBe(false)
-    expect(isNavigationItemActive('overview', 'today')).toBe(false)
   })
 
   it('keeps labels and mobile navigation aligned with the supported tabs', () => {
     const itemIds = navigationItems.map((item) => item.id)
     const mobileItemIds = mobileNavigationGroups.flat().map((item) => item.id)
 
-    expect(itemIds).toEqual(['today', 'overview', 'notifications', 'settings'])
+    expect(itemIds).toEqual(['today', 'analysis', 'notifications', 'settings'])
     expect(mobileItemIds).toEqual(itemIds)
     expect(itemIds.every((id) => isAppTab(id))).toBe(true)
+    expect(isAppTab('overview')).toBe(false)
     expect(appTabLabels.analysis).toBe('Analysis')
     expect(navigationItems.find((item) => item.id === 'notifications')?.mobileLabel).toBe('Inbox')
   })

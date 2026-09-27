@@ -7,6 +7,7 @@ import {
   getAutomaticSavingsBaseline,
   normalizeSavingsDeposit,
   normalizeSavingsGoal,
+  reorderSavingsGoals,
 } from './savings-utils'
 import type { SavingsDeposit, SavingsGoal } from './types'
 
@@ -23,6 +24,24 @@ const goal = (id: string, priority: number, targetAmount = 1_000) =>
   }) satisfies SavingsGoal
 
 describe('savings calculations', () => {
+  it('persists reordered priorities without changing goal balances and uses the new allocation order', () => {
+    const goals = [{ ...goal('first', 0), savedAmount: 100 }, goal('second', 1)]
+    const reordered = reorderSavingsGoals(goals, ['second', 'first'])!
+    expect(reordered.map(({ id, priority, savedAmount }) => ({ id, priority, savedAmount }))).toEqual([
+      { id: 'second', priority: 0, savedAmount: 0 },
+      { id: 'first', priority: 1, savedAmount: 100 },
+    ])
+    expect(allocateRemainder(reordered, 500)).toEqual([{ goalId: 'second', amount: 500 }])
+    expect(goals[0].priority).toBe(0)
+  })
+
+  it('rejects incomplete, duplicate, or unknown goal orders', () => {
+    const goals = [goal('first', 0), goal('second', 1)]
+    expect(reorderSavingsGoals(goals, ['first'])).toBeNull()
+    expect(reorderSavingsGoals(goals, ['first', 'first'])).toBeNull()
+    expect(reorderSavingsGoals(goals, ['first', 'unknown'])).toBeNull()
+  })
+
   it('calculates the current month remainder', () => {
     const entries = [
       { id: 'income', type: 'income' as const, amount: 10_000, occurredAt: '2026-09-03T09:00', title: '' },

@@ -4,6 +4,13 @@ import type { Entry } from '@/features/entries/types'
 import { normalizeSavingsIcon } from './savings-icons'
 import type { SavingsDeposit, SavingsGoal } from './types'
 
+export function reorderSavingsGoals(goals: SavingsGoal[], orderedIds: string[]) {
+  if (orderedIds.length !== goals.length || new Set(orderedIds).size !== goals.length) return null
+  const byId = new Map(goals.map((goal) => [goal.id, goal]))
+  if (orderedIds.some((id) => !byId.has(id))) return null
+  return orderedIds.map((id, priority) => ({ ...byId.get(id)!, priority }))
+}
+
 export function roundSavingsAmount(amount: number) {
   return Math.round(amount * 100) / 100
 }

@@ -18,7 +18,6 @@ import { usePullToRefresh } from '@/hooks/use-pull-to-refresh'
 import { useBudgets } from '@/features/budgets/use-budgets'
 import { useSavings } from '@/features/savings/use-savings'
 import { AnalysisView } from '@/features/analysis/AnalysisView'
-import { OverviewView } from '@/features/overview/OverviewView'
 import { useBackgroundPreference } from '@/features/settings/use-background-preference'
 import { StateMessage } from '@/components/StateMessage'
 import { DashboardHeader } from './DashboardHeader'
@@ -31,7 +30,6 @@ function Dashboard() {
   const backgroundPreference = useBackgroundPreference()
   const {
     entries,
-    accumulation,
     persistenceError,
     isLoading: entriesLoading,
     isSaving,
@@ -142,9 +140,6 @@ function Dashboard() {
               </div>
             </>
           )}
-          {activeTab === 'overview' && (
-            <OverviewView accumulation={accumulation} entries={entries} isLoading={entriesLoading} />
-          )}
           {activeTab === 'notifications' && <NotificationsView />}
           {activeTab === 'analysis' && (
             <AnalysisView
@@ -152,7 +147,6 @@ function Dashboard() {
               isLoading={entriesLoading}
               viewMonth={viewMonth}
               onMonthChange={moveMonth}
-              onBack={() => navigate('today')}
             />
           )}
           {activeTab === 'settings' && (

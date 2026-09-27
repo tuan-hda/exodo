@@ -10,6 +10,7 @@ import {
   calculateMonthlyRemainder,
   normalizeSavingsDeposit,
   normalizeSavingsGoal,
+  reorderSavingsGoals,
 } from './savings-utils'
 import { applyAutomaticSavingsPlan } from './savings-sync'
 import type { SavingsDeposit, SavingsGoal } from './types'
@@ -51,6 +52,7 @@ export function useSavings(userId: string | undefined, entries: Entry[], entries
   const depositsRef = useRef<SavingsDeposit[]>([])
   const previousUserIdRef = useRef<string | undefined>(userId)
   const automaticSyncInFlightRef = useRef(false)
+  const automaticSyncPromiseRef = useRef<Promise<void> | null>(null)
 
   const refresh = useCallback(
     async (signal?: AbortSignal, showLoading = true) => {
@@ -135,7 +137,7 @@ export function useSavings(userId: string | undefined, entries: Entry[], entries
 
   const saveGoal = useCallback(
     async (goal: Omit<SavingsGoal, 'id' | 'savedAmount' | 'priority'> & { id?: string }) => {
-      if (!userId || !goal.name.trim() || goal.targetAmount <= 0) return false
+      if (!userId || !goal.name.trim() || !Number.isFinite(goal.targetAmount) || goal.targetAmount <= 0) return false
       setIsSaving(true)
       setError('')
       try {
@@ -166,6 +168,52 @@ export function useSavings(userId: string | undefined, entries: Entry[], entries
       }
     },
     [getSupabase, refresh, userId],
+  )
+
+  const reorderGoals = useCallback(
+    async (orderedIds: string[]) => {
+      if (!userId || isSaving) return false
+      setIsSaving(true)
+      setError('')
+      try {
+        await automaticSyncPromiseRef.current?.catch(() => undefined)
+        setError('')
+        const previousGoals = goalsRef.current
+        const nextGoals = reorderSavingsGoals(previousGoals, orderedIds)
+        if (!nextGoals) return false
+        const supabase = await getSupabase()
+        const results = await Promise.all(
+          nextGoals.map((goal) =>
+            supabase.from('savings_goals').update({ priority: goal.priority }).eq('id', goal.id).eq('user_id', userId),
+          ),
+        )
+        const failed = results.find((result) => result.error)
+        if (failed?.error) {
+          await Promise.all(
+            previousGoals.map((goal) =>
+              supabase
+                .from('savings_goals')
+                .update({ priority: goal.priority })
+                .eq('id', goal.id)
+                .eq('user_id', userId),
+            ),
+          )
+          throw failed.error
+        }
+        goalsRef.current = nextGoals
+        setGoals(nextGoals)
+        writeSavingsCache(userId, nextGoals, depositsRef.current)
+        return true
+      } catch (saveError) {
+        console.error('Failed to reorder savings goals', saveError)
+        await refresh(undefined, false)
+        setError('Could not save the goal order. Please try again.')
+        return false
+      } finally {
+        setIsSaving(false)
+      }
+    },
+    [getSupabase, isSaving, refresh, userId],
   )
 
   const addDeposit = useCallback(
@@ -246,13 +294,15 @@ export function useSavings(userId: string | undefined, entries: Entry[], entries
   }, [entries, getSupabase, refresh, userId])
 
   useEffect(() => {
-    if (isLoading || entriesLoading || !goals.length) return
-    syncAutomaticRemainder().catch((syncError) => {
+    if (isLoading || isSaving || entriesLoading || !goals.length) return
+    const sync = syncAutomaticRemainder()
+    automaticSyncPromiseRef.current = sync
+    sync.catch((syncError) => {
       console.error('Failed to sync automatic savings remainder', syncError)
       setError('Could not update automatic savings.')
     })
-  }, [entriesLoading, goals, isLoading, syncAutomaticRemainder])
-  return { goals, deposits, isLoading, isSaving, error, saveGoal, addDeposit, refresh }
+  }, [entriesLoading, goals, isLoading, isSaving, syncAutomaticRemainder])
+  return { goals, deposits, isLoading, isSaving, error, saveGoal, reorderGoals, addDeposit, refresh }
 }
 
 export type SavingsState = ReturnType<typeof useSavings>

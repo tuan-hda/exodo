@@ -19,13 +19,11 @@ export function AnalysisView({
   isLoading = false,
   viewMonth,
   onMonthChange,
-  onBack,
 }: {
   entries: Entry[]
   isLoading?: boolean
   viewMonth: Date
   onMonthChange: (delta: number) => void
-  onBack: () => void
 }) {
   const [activeType, setActiveType] = useState<Entry['type']>('expense')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
@@ -48,8 +46,6 @@ export function AnalysisView({
         eyebrow="the month analysis"
         title={monthLabel}
         description="See where the month went, then select a category to review its transactions."
-        backLabel="Dashboard"
-        onBack={onBack}
         actions={
           <div className="flex gap-2">
             <Button

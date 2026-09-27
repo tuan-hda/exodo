@@ -14,10 +14,11 @@ import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { formatMoney } from '@/lib/money'
 import { SavingsDepositComposer } from './SavingsDepositComposer'
-import { SavingsGoalList } from './SavingsGoalList'
+import { SavingsGoalSettingsList } from './SavingsGoalSettingsList'
 import { SavingsGoalsLoading } from './SavingsGoalsPanel'
 import { SavingsIcon, defaultSavingsIcon, savingsIconOptions, type SavingsIconName } from './savings-icons'
 import type { SavingsState } from './use-savings'
+import type { SavingsGoal } from './types'
 
 type GoalValidationError = {
   field: 'name' | 'target'
@@ -25,7 +26,8 @@ type GoalValidationError = {
 }
 
 export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack?: () => void }) {
-  const { goals, deposits, isLoading, isSaving, error, saveGoal, addDeposit } = savings
+  const { goals, deposits, isLoading, isSaving, error, saveGoal, reorderGoals, addDeposit } = savings
+  const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [name, setName] = useState('')
   const [target, setTarget] = useState('')
@@ -36,6 +38,19 @@ export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack
   const [notice, setNotice] = useState('')
   const [validationError, setValidationError] = useState<GoalValidationError | null>(null)
   const selectedGoal = goals.find((goal) => goal.id === depositGoal)
+
+  function openGoalForm(goal: SavingsGoal | null) {
+    setEditingGoal(goal)
+    setName(goal?.name ?? '')
+    setTarget(goal ? String(goal.targetAmount) : '')
+    setDate(goal?.targetDate ?? '')
+    setIcon(goal?.icon ?? defaultSavingsIcon)
+    setIconPickerOpen(false)
+    setValidationError(null)
+    setNotice('')
+    setShowForm(true)
+    requestAnimationFrame(() => document.getElementById('goal-name')?.focus())
+  }
 
   const summary = {
     target: goals.reduce((sum, goal) => sum + goal.targetAmount, 0),
@@ -56,11 +71,12 @@ export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack
     }
     setValidationError(null)
     const saved = await saveGoal({
+      ...(editingGoal ? { id: editingGoal.id } : {}),
       name: goalName,
       targetAmount,
       targetDate: date || null,
       icon,
-      status: 'active',
+      status: editingGoal?.status ?? 'active',
     })
     if (saved) {
       setName('')
@@ -69,7 +85,8 @@ export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack
       setIcon(defaultSavingsIcon)
       setIconPickerOpen(false)
       setShowForm(false)
-      setNotice(`${goalName} created.`)
+      setNotice(`${goalName} ${editingGoal ? 'updated' : 'created'}.`)
+      setEditingGoal(null)
     }
   }
   return (
@@ -81,7 +98,10 @@ export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack
         backLabel="Settings"
         onBack={onBack}
         actions={
-          <Button type="button" onClick={() => setShowForm((value) => !value)}>
+          <Button
+            type="button"
+            disabled={isSaving}
+            onClick={() => (showForm ? setShowForm(false) : openGoalForm(null))}>
             {showForm ? <X size={17} /> : <Plus size={17} />} {showForm ? 'Close' : 'New goal'}
           </Button>
         }
@@ -99,79 +119,82 @@ export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack
       {showForm && (
         <Card className="p-5">
           <form className="grid gap-4" noValidate onSubmit={submitGoal}>
-            <Field>
-              <FieldLabel htmlFor="goal-name">Goal name</FieldLabel>
-              <Input
-                id="goal-name"
-                value={name}
-                onChange={(event) => {
-                  setValidationError(null)
-                  setName(event.target.value)
-                }}
-                placeholder="Japan trip"
-                required
-                aria-describedby={validationError?.field === 'name' ? 'goal-form-error' : undefined}
-                aria-invalid={validationError?.field === 'name'}
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="goal-target">Target amount</FieldLabel>
-              <Input
-                id="goal-target"
-                inputMode="decimal"
-                type="number"
-                min="0.01"
-                step="0.01"
-                value={target}
-                onChange={(event) => {
-                  setValidationError(null)
-                  setTarget(event.target.value)
-                }}
-                placeholder="3000"
-                required
-                aria-describedby={validationError?.field === 'target' ? 'goal-form-error' : undefined}
-                aria-invalid={validationError?.field === 'target'}
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="goal-date" hint="optional">
-                Target date
-              </FieldLabel>
-              <Input id="goal-date" type="date" value={date} onChange={(event) => setDate(event.target.value)} />
-            </Field>
-            <Field>
-              <p className="ui-field-label">Choose an icon</p>
-              <Popover open={iconPickerOpen} onOpenChange={setIconPickerOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size="icon-lg" type="button" aria-label="Choose a goal icon">
-                    <SavingsIcon name={icon} size={24} />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[min(288px,calc(100vw-32px))] p-3" align="start">
-                  <div className="grid grid-cols-4 gap-2" role="group" aria-label="Goal icons">
-                    {savingsIconOptions.map((option) => (
-                      <Button
-                        key={option.name}
-                        variant="option"
-                        size="icon-lg"
-                        type="button"
-                        data-selected={icon === option.name}
-                        aria-label={option.label}
-                        aria-pressed={icon === option.name}
-                        onClick={() => {
-                          setIcon(option.name)
-                          setIconPickerOpen(false)
-                        }}>
-                        <SavingsIcon name={option.name} size={21} />
-                      </Button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </Field>
-            <Button disabled={isSaving} type="submit">
-              {isSaving ? 'Saving…' : 'Create goal'}
-            </Button>
+            <h2 className="text-lg font-semibold">{editingGoal ? 'Edit goal' : 'New goal'}</h2>
+            <fieldset disabled={isSaving} className="grid min-w-0 gap-4">
+              <Field>
+                <FieldLabel htmlFor="goal-name">Goal name</FieldLabel>
+                <Input
+                  id="goal-name"
+                  value={name}
+                  onChange={(event) => {
+                    setValidationError(null)
+                    setName(event.target.value)
+                  }}
+                  placeholder="Japan trip"
+                  required
+                  aria-describedby={validationError?.field === 'name' ? 'goal-form-error' : undefined}
+                  aria-invalid={validationError?.field === 'name'}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="goal-target">Target amount</FieldLabel>
+                <Input
+                  id="goal-target"
+                  inputMode="decimal"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value={target}
+                  onChange={(event) => {
+                    setValidationError(null)
+                    setTarget(event.target.value)
+                  }}
+                  placeholder="3000"
+                  required
+                  aria-describedby={validationError?.field === 'target' ? 'goal-form-error' : undefined}
+                  aria-invalid={validationError?.field === 'target'}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="goal-date" hint="optional">
+                  Target date
+                </FieldLabel>
+                <Input id="goal-date" type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+              </Field>
+              <Field>
+                <p className="ui-field-label">Choose an icon</p>
+                <Popover open={iconPickerOpen} onOpenChange={setIconPickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="icon-lg" type="button" aria-label="Choose a goal icon">
+                      <SavingsIcon name={icon} size={24} />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[min(288px,calc(100vw-32px))] p-3" align="start">
+                    <div className="grid grid-cols-4 gap-2" role="group" aria-label="Goal icons">
+                      {savingsIconOptions.map((option) => (
+                        <Button
+                          key={option.name}
+                          variant="option"
+                          size="icon-lg"
+                          type="button"
+                          data-selected={icon === option.name}
+                          aria-label={option.label}
+                          aria-pressed={icon === option.name}
+                          onClick={() => {
+                            setIcon(option.name)
+                            setIconPickerOpen(false)
+                          }}>
+                          <SavingsIcon name={option.name} size={21} />
+                        </Button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </Field>
+              <Button disabled={isSaving} type="submit">
+                {isSaving ? 'Saving…' : editingGoal ? 'Save changes' : 'Create goal'}
+              </Button>
+            </fieldset>
           </form>
         </Card>
       )}
@@ -182,13 +205,20 @@ export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack
           title="No savings goals yet"
           description="Create your first goal and give your extra money somewhere meaningful to go."
           action={
-            <Button type="button" onClick={() => setShowForm(true)}>
+            <Button type="button" onClick={() => openGoalForm(null)}>
               Create a savings goal
             </Button>
           }
         />
       )}
-      <SavingsGoalList goals={goals} deposits={deposits} onAdd={setDepositGoal} />
+      <SavingsGoalSettingsList
+        goals={goals}
+        deposits={deposits}
+        disabled={isSaving || isLoading}
+        onEdit={openGoalForm}
+        onAdd={setDepositGoal}
+        onReorder={reorderGoals}
+      />
       {selectedGoal && (
         <SavingsDepositComposer
           goal={selectedGoal}

@@ -41,6 +41,7 @@ export function PieChart({
   const animationFrame = useRef<number | null>(null)
   const chartRef = useRef<HTMLDivElement>(null)
   const badgeRefs = useRef<Record<string, HTMLSpanElement | null>>({})
+  const displayedAmount = slices.find((slice) => slice.category === selectedCategory)?.amount ?? total
 
   useEffect(() => {
     const targetRadius = selectedCategory ? 50 : 48
@@ -190,7 +191,7 @@ export function PieChart({
       </div>
       <div className="absolute inset-[25%] grid place-items-center rounded-full bg-surface text-center">
         <strong className="ui-number text-lg font-semibold tracking-[-.05em]">
-          <CountUp value={total} formatValue={formatMoney} />
+          <CountUp value={displayedAmount} formatValue={formatMoney} />
         </strong>
       </div>
     </div>
