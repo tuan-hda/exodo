@@ -13,6 +13,7 @@ const part = (text: string, mimeType = 'text/plain') => ({
 const cakeHtml = readFileSync(new URL('./fixtures/cake-transaction.html', import.meta.url), 'utf8')
 const message = (payload: Record<string, unknown> = part('Hello')) => ({
   id: 'message-1',
+  threadId: 'thread-1',
   internalDate: '1790550000000',
   labelIds: ['INBOX', 'UNREAD'],
   snippet: 'Hello &amp; welcome',

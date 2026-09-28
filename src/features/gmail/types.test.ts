@@ -18,6 +18,7 @@ describe('Gmail status parsing', () => {
 describe('Gmail message response parsing', () => {
   const message = {
     id: 'one',
+    threadId: 'thread-one',
     sender: 'sender@example.com',
     subject: 'Hello',
     snippet: '',

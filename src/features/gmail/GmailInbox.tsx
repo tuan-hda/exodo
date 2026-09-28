@@ -2,21 +2,57 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowClockwise, EnvelopeSimple } from '@phosphor-icons/react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StateMessage } from '@/components/StateMessage'
+import type { Entry } from '@/features/entries/types'
 import type { Category } from '@/features/finance/category'
 import { GmailTransactionListItem } from './GmailTransactionListItem'
 import { GmailReadError, readGmailJson } from './gmail-client'
 import { parseGmailMessagePage, type GmailMessageSummary } from './types'
 
-export function GmailInbox() {
+function toEntryDateTime(value: string) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(new Date(value))
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((item) => item.type === type)?.value ?? ''
+  return `${part('year')}-${part('month')}-${part('day')}T${part('hour')}:${part('minute')}:${part('second')}`
+}
+
+export function GmailInbox({
+  onSaveEntries,
+  isSaving,
+}: {
+  onSaveEntries: (entries: Entry[]) => Promise<boolean>
+  isSaving: boolean
+}) {
   const [messages, setMessages] = useState<GmailMessageSummary[]>([])
   const [nextPageToken, setNextPageToken] = useState<string | null>(null)
   const [deselectedIds, setDeselectedIds] = useState<Set<string>>(() => new Set())
   const [categoriesById, setCategoriesById] = useState<Record<string, Category>>({})
   const [namesById, setNamesById] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
+  const [savingBatch, setSavingBatch] = useState(false)
+  const [importMessage, setImportMessage] = useState('')
+  const [importError, setImportError] = useState('')
+  const [confirmAddOpen, setConfirmAddOpen] = useState(false)
   const [error, setError] = useState<GmailReadError | null>(null)
   const requestRef = useRef<AbortController | null>(null)
   const failedPageRef = useRef<string | undefined>(undefined)
@@ -60,13 +96,84 @@ export function GmailInbox() {
   }, [load])
 
   const transactions = messages
-    .filter((message) => message.transaction !== null)
+    .filter(
+      (message): message is GmailMessageSummary & { transaction: NonNullable<GmailMessageSummary['transaction']> } =>
+        message.transaction !== null,
+    )
     .sort(
       (a, b) =>
-        Date.parse(b.transaction?.occurredAt ?? b.receivedAt) - Date.parse(a.transaction?.occurredAt ?? a.receivedAt),
+        Date.parse(a.transaction.occurredAt ?? a.receivedAt) - Date.parse(b.transaction.occurredAt ?? b.receivedAt),
     )
   const selectedCount = transactions.filter((message) => !deselectedIds.has(message.id)).length
+  const selectedMessages = transactions.filter((message) => !deselectedIds.has(message.id))
+  const selectedHasInvalidAmount = selectedMessages.some(
+    (message) => message.transaction.amount === null || message.transaction.amount === 0,
+  )
   const allSelected = transactions.length > 0 && selectedCount === transactions.length
+
+  async function addSelectedTransactions() {
+    if (selectedMessages.length === 0 || selectedHasInvalidAmount || savingBatch || isSaving) return
+    const entries: Entry[] = selectedMessages.flatMap((message) => {
+      const transaction = message.transaction
+      if (transaction?.amount === null || !transaction) return []
+      return [
+        {
+          id: crypto.randomUUID(),
+          type: transaction.amount > 0 ? 'income' : 'expense',
+          amount: Math.abs(transaction.amount),
+          occurredAt: toEntryDateTime(transaction.occurredAt ?? message.receivedAt),
+          title: namesById[message.id]?.trim() ?? '',
+          category: categoriesById[message.id] ?? (transaction.amount > 0 ? 'Income' : 'Dining'),
+        },
+      ]
+    })
+    if (entries.length !== selectedMessages.length) return
+
+    setSavingBatch(true)
+    setImportMessage('')
+    setImportError('')
+    let entriesSaved = false
+    try {
+      const saved = await onSaveEntries(entries)
+      if (!saved) {
+        setImportError('Could not add the selected transactions. Please try again.')
+        return
+      }
+      entriesSaved = true
+
+      const lastImportedAt = selectedMessages.reduce(
+        (latest, message) => (message.receivedAt > latest ? message.receivedAt : latest),
+        selectedMessages[0].receivedAt,
+      )
+      setMessages((current) =>
+        current.filter((message) => !selectedMessages.some((selected) => selected.id === message.id)),
+      )
+      setDeselectedIds(new Set())
+
+      const response = await fetch('/api/gmail/import-state', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lastImportedAt }),
+      })
+      if (!response.ok) {
+        setImportError(
+          'Transactions were saved, but Gmail’s import cursor could not be updated. Do not add these records again.',
+        )
+        return
+      }
+
+      setImportMessage(`${entries.length} transaction${entries.length === 1 ? '' : 's'} added.`)
+      await load(undefined, true)
+    } catch {
+      setImportError(
+        entriesSaved
+          ? 'Transactions were saved, but Gmail’s import cursor could not be updated. Do not add these records again.'
+          : 'Transactions could not be added. Please try again.',
+      )
+    } finally {
+      setSavingBatch(false)
+    }
+  }
 
   function toggleTransaction(id: string) {
     setDeselectedIds((current) => {
@@ -91,6 +198,11 @@ export function GmailInbox() {
           <ArrowClockwise size={18} />
         </Button>
       </div>
+      {importMessage && <StateMessage tone="success">{importMessage}</StateMessage>}
+      {importError && <StateMessage tone="danger">{importError}</StateMessage>}
+      {selectedHasInvalidAmount && selectedCount > 0 && (
+        <StateMessage tone="danger">Deselect transactions without a valid amount before adding the rest.</StateMessage>
+      )}
       {loading && !messages.length && (
         <div className="grid gap-4" role="status" aria-label="Loading transactions">
           {[0, 1, 2].map((value) => (
@@ -141,7 +253,8 @@ export function GmailInbox() {
           <GmailTransactionListItem
             key={message.id}
             transaction={message.transaction}
-            category={categoriesById[message.id] ?? 'Dining'}
+            threadId={message.threadId}
+            category={categoriesById[message.id] ?? ((message.transaction.amount ?? 0) > 0 ? 'Income' : 'Dining')}
             onCategoryChange={(category) => setCategoriesById((current) => ({ ...current, [message.id]: category }))}
             name={namesById[message.id] ?? ''}
             onNameChange={(name) => setNamesById((current) => ({ ...current, [message.id]: name }))}
@@ -154,11 +267,38 @@ export function GmailInbox() {
       </ul>
       {transactions.length > 0 && (
         <div>
-          <Button variant="default" className="w-full" disabled title="Batch saving is not available yet">
-            Add selected ({selectedCount})
+          <Button
+            variant="default"
+            className="w-full"
+            disabled={selectedCount === 0 || selectedHasInvalidAmount || isSaving || savingBatch}
+            onClick={() => setConfirmAddOpen(true)}>
+            {savingBatch || isSaving ? 'Adding…' : `Add selected (${selectedCount})`}
           </Button>
         </div>
       )}
+      <AlertDialog open={confirmAddOpen} onOpenChange={setConfirmAddOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Add selected transactions?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedCount} transaction{selectedCount === 1 ? '' : 's'} will be saved to your records. Gmail’s import
+              cursor will advance to the newest selected email, removing older emails from this review list.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={savingBatch || isSaving}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={selectedCount === 0 || selectedHasInvalidAmount || savingBatch || isSaving}
+              onClick={(event) => {
+                event.preventDefault()
+                setConfirmAddOpen(false)
+                void addSelectedTransactions()
+              }}>
+              Add transactions
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       {error && (
         <div className="grid gap-3 rounded-panel border border-line bg-surface p-4 shadow-panel">
           <StateMessage tone="danger">{error.message}</StateMessage>

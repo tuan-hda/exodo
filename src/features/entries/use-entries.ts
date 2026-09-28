@@ -126,6 +126,46 @@ export function useEntries(userId?: string) {
     [getSupabase, userId],
   )
 
+  const saveEntries = useCallback(
+    async (newEntries: Entry[]) => {
+      if (!userId || newEntries.length === 0) return false
+      setPersistenceError('')
+      setIsSaving(true)
+      try {
+        const supabase = await getSupabase()
+        const { error } = await supabase.from('entries').insert(
+          newEntries.map((entry) => ({
+            id: entry.id,
+            type: entry.type,
+            amount: entry.amount,
+            occurred_at: entry.occurredAt,
+            title: entry.title,
+            category: entry.category ?? 'Other',
+            user_id: userId,
+            updated_at: new Date().toISOString(),
+          })),
+        )
+        if (error) throw error
+
+        const nextEntries = [...newEntries, ...entriesRef.current].sort((a, b) =>
+          b.occurredAt.localeCompare(a.occurredAt),
+        )
+        entriesRef.current = nextEntries
+        setEntries(nextEntries)
+        setAccumulation(calculateAccumulation(nextEntries))
+        writeEntriesCache(userId, nextEntries)
+        return true
+      } catch (error) {
+        console.error('Failed to save entries to Supabase', error)
+        setPersistenceError('Could not save the selected records. Please try again.')
+        return false
+      } finally {
+        setIsSaving(false)
+      }
+    },
+    [getSupabase, userId],
+  )
+
   const removeEntry = useCallback(
     async (id: string) => {
       if (!userId) return false
@@ -168,5 +208,15 @@ export function useEntries(userId?: string) {
     }
   }, [fetchEntries, userId])
 
-  return { entries, accumulation, persistenceError, isLoading, isSaving, saveEntry, removeEntry, refreshEntries }
+  return {
+    entries,
+    accumulation,
+    persistenceError,
+    isLoading,
+    isSaving,
+    saveEntry,
+    saveEntries,
+    removeEntry,
+    refreshEntries,
+  }
 }

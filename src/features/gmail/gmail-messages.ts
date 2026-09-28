@@ -38,6 +38,7 @@ export function decodeMessageSummary(value: unknown): GmailMessageSummary {
   if (
     !isRecord(value) ||
     typeof value.id !== 'string' ||
+    typeof value.threadId !== 'string' ||
     !isRecord(value.payload) ||
     typeof value.internalDate !== 'string'
   ) {
@@ -47,6 +48,7 @@ export function decodeMessageSummary(value: unknown): GmailMessageSummary {
   if (!Number.isFinite(received.getTime())) throw new Error('Gmail returned an invalid received date.')
   return {
     id: value.id,
+    threadId: value.threadId,
     sender: header(value.payload, 'from'),
     subject: header(value.payload, 'subject') || '(No subject)',
     snippet: typeof value.snippet === 'string' ? convert(value.snippet, { wordwrap: false }) : '',

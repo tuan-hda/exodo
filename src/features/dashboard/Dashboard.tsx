@@ -34,6 +34,7 @@ function Dashboard() {
     isLoading: entriesLoading,
     isSaving,
     saveEntry,
+    saveEntries,
     removeEntry,
     refreshEntries,
   } = useEntries(user?.id)
@@ -140,7 +141,7 @@ function Dashboard() {
               </div>
             </>
           )}
-          {activeTab === 'notifications' && <NotificationsView />}
+          {activeTab === 'notifications' && <NotificationsView onSaveEntries={saveEntries} isSaving={isSaving} />}
           {activeTab === 'analysis' && (
             <AnalysisView
               entries={entries}

@@ -8,10 +8,17 @@ import { Button } from '@/components/ui/button'
 import { parseGmailStatus } from '@/features/gmail/types'
 import { updateSearchParams } from '@/features/navigation/navigation'
 import { GmailInbox } from '@/features/gmail/GmailInbox'
+import type { Entry } from '@/features/entries/types'
 
 type GmailStatus = 'loading' | 'connected' | 'disconnected' | 'unavailable' | 'error'
 
-export function NotificationsView() {
+export function NotificationsView({
+  onSaveEntries,
+  isSaving,
+}: {
+  onSaveEntries: (entries: Entry[]) => Promise<boolean>
+  isSaving: boolean
+}) {
   const [status, setStatus] = useState<GmailStatus>('loading')
   const [gmailEmail, setGmailEmail] = useState('')
   const [error, setError] = useState('')
@@ -60,7 +67,7 @@ export function NotificationsView() {
   const errorMessage = error || (notice === 'error' ? 'Gmail connection failed. Try again.' : '')
   return (
     <PageShell size={connected ? 'wide' : 'centered'} aria-busy={isLoading}>
-      {connected && <GmailInbox key={gmailEmail} />}
+      {connected && <GmailInbox key={gmailEmail} onSaveEntries={onSaveEntries} isSaving={isSaving} />}
       <div className="mt-20 grid min-h-40 w-full content-center justify-items-center gap-4 rounded-panel border border-line bg-surface p-8 shadow-panel max-md:min-h-32 max-md:p-6">
         {isLoading ? (
           <Button variant="secondary" disabled>

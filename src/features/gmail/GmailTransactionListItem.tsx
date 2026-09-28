@@ -10,6 +10,7 @@ import type { GmailTransaction } from './types'
 
 export function GmailTransactionListItem({
   transaction,
+  threadId,
   category,
   onCategoryChange,
   name,
@@ -20,6 +21,7 @@ export function GmailTransactionListItem({
   onToggle,
 }: {
   transaction: GmailTransaction
+  threadId: string
   category: Category
   onCategoryChange: (category: Category) => void
   name: string
@@ -38,16 +40,17 @@ export function GmailTransactionListItem({
 
   return (
     <li className="border-b border-line">
-      <label className="grid min-h-11 cursor-pointer grid-cols-[20px_minmax(0,1fr)] items-center gap-3 py-4">
+      <div className="grid min-w-0 grid-cols-[20px_minmax(0,1fr)] items-center gap-3 py-4">
         <input
           type="checkbox"
           className="size-5 accent-ink"
+          aria-label={`Select ${transaction.source} transaction`}
           checked={selected}
           disabled={disabled}
           onChange={onToggle}
         />
-        <GmailTransactionDetails transaction={transaction} />
-      </label>
+        <GmailTransactionDetails transaction={transaction} threadId={threadId} />
+      </div>
       <div className="grid min-w-0 gap-4 pb-4 pl-8">
         <fieldset className="grid min-w-0 gap-3" aria-label="Transaction name">
           <div className="flex flex-wrap gap-x-5 gap-y-2">

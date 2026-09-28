@@ -9,6 +9,7 @@ export type GmailTransaction = {
 
 export type GmailMessageSummary = {
   id: string
+  threadId: string
   sender: string
   subject: string
   snippet: string
@@ -34,7 +35,7 @@ function isTransaction(value: unknown): value is GmailTransaction | null {
 function isMessageSummary(value: unknown): value is GmailMessageSummary {
   return (
     isRecord(value) &&
-    ['id', 'sender', 'subject', 'snippet', 'receivedAt'].every((key) => typeof value[key] === 'string') &&
+    ['id', 'threadId', 'sender', 'subject', 'snippet', 'receivedAt'].every((key) => typeof value[key] === 'string') &&
     typeof value.unread === 'boolean' &&
     typeof value.receivedAt === 'string' &&
     Number.isFinite(Date.parse(value.receivedAt)) &&
