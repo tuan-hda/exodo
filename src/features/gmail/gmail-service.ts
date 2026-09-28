@@ -1,112 +1,96 @@
 import { createAdminSupabaseClient } from '@/lib/supabase-admin'
-import { isRecord } from '@/lib/guards'
+import { createGmailOAuthClient, createGmailApi, GmailDisconnectedError } from './gmail-api'
+import { decryptGoogleToken, encryptGoogleToken } from '@/lib/google/token-encryption'
 
 export const gmailOAuthStateCookie = 'exodo_gmail_oauth_state'
 
-type GmailTokens = {
-  access_token?: string
-  refresh_token?: string
-  expires_in?: number
-}
-
-function parseGmailTokens(value: unknown): GmailTokens {
-  if (!isRecord(value)) throw new Error('Gmail returned an invalid token response.')
-  return {
-    access_token: typeof value.access_token === 'string' ? value.access_token : undefined,
-    refresh_token: typeof value.refresh_token === 'string' ? value.refresh_token : undefined,
-    expires_in:
-      typeof value.expires_in === 'number' && Number.isFinite(value.expires_in) ? value.expires_in : undefined,
-  }
-}
-
-function parseGmailProfile(value: unknown) {
-  if (!isRecord(value) || typeof value.email !== 'string') throw new Error('Gmail did not return an email address.')
-  return value.email
-}
-
-function getGmailOAuthConfig() {
-  const clientId = process.env.GMAIL_CLIENT_ID
-  const clientSecret = process.env.GMAIL_CLIENT_SECRET
-  const redirectUri = process.env.GMAIL_REDIRECT_URI
-  if (!clientId || !redirectUri) return null
-  return { clientId, clientSecret, redirectUri }
-}
-
 export function createGmailAuthorizationUrl(state: string) {
-  const config = getGmailOAuthConfig()
-  if (!config) return null
-
-  const url = new URL('https://accounts.google.com/o/oauth2/v2/auth')
-  url.searchParams.set('client_id', config.clientId)
-  url.searchParams.set('redirect_uri', config.redirectUri)
-  url.searchParams.set('response_type', 'code')
-  url.searchParams.set('access_type', 'offline')
-  url.searchParams.set('prompt', 'consent')
-  url.searchParams.set('include_granted_scopes', 'true')
-  url.searchParams.set('scope', 'https://www.googleapis.com/auth/gmail.readonly')
-  url.searchParams.set('state', state)
-  return url
-}
-
-async function exchangeCode(code: string): Promise<GmailTokens & { access_token: string }> {
-  const config = getGmailOAuthConfig()
-  if (!config?.clientSecret) throw new Error('Gmail OAuth is not configured.')
-
-  const response = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      code,
-      client_id: config.clientId,
-      client_secret: config.clientSecret,
-      redirect_uri: config.redirectUri,
-      grant_type: 'authorization_code',
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET || !process.env.GOOGLE_REDIRECT_URI)
+    return null
+  return new URL(
+    createGmailOAuthClient().generateAuthUrl({
+      access_type: 'offline',
+      prompt: 'consent',
+      include_granted_scopes: true,
+      scope: ['https://www.googleapis.com/auth/gmail.readonly'],
+      state,
     }),
-  })
-  if (!response.ok) throw new Error('Gmail token exchange failed.')
-
-  const tokens = parseGmailTokens(await response.json())
-  if (!tokens.access_token) throw new Error('Gmail did not return an access token.')
-  return { ...tokens, access_token: tokens.access_token }
-}
-
-async function getGmailEmail(accessToken: string) {
-  const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  })
-  if (!response.ok) throw new Error('Gmail profile lookup failed.')
-
-  return parseGmailProfile(await response.json())
+  )
 }
 
 export async function connectGmail(userId: string, code: string) {
-  const tokens = await exchangeCode(code)
-  const email = await getGmailEmail(tokens.access_token)
+  const auth = createGmailOAuthClient()
+  const { tokens } = await auth.getToken(code)
+  if (!tokens.access_token) throw new Error('Gmail did not return an access token.')
+  auth.setCredentials(tokens)
+  const { data: profile } = await createGmailApi(auth).users.getProfile({ userId: 'me' }, { timeout: 15_000 })
+  const email = profile.emailAddress
+  if (!email) throw new Error('Gmail did not return an email address.')
   const supabase = createAdminSupabaseClient()
-  const existing = await supabase.from('gmail_connections').select('refresh_token').eq('user_id', userId).maybeSingle()
+  const existing = await supabase
+    .from('google_connections')
+    .select('refresh_token,google_email')
+    .eq('user_id', userId)
+    .maybeSingle()
   if (existing.error) throw existing.error
-
-  const result = await supabase.from('gmail_connections').upsert(
+  const sameMailbox = existing.data?.google_email === email
+  const previousToken = sameMailbox ? existing.data?.refresh_token : null
+  const refreshToken = tokens.refresh_token ?? (previousToken ? decryptGoogleToken(previousToken, userId, email) : null)
+  if (!refreshToken) throw new Error('Gmail did not return a refresh token.')
+  const result = await supabase.from('google_connections').upsert(
     {
       user_id: userId,
-      gmail_email: email,
-      refresh_token: tokens.refresh_token ?? existing.data?.refresh_token,
-      access_token_expires_at: tokens.expires_in ? new Date(Date.now() + tokens.expires_in * 1000).toISOString() : null,
+      google_email: email,
+      refresh_token: encryptGoogleToken(refreshToken, userId, email),
+      access_token_expires_at: tokens.expiry_date ? new Date(tokens.expiry_date).toISOString() : null,
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'user_id' },
   )
-  if (result.error || (!tokens.refresh_token && !existing.data?.refresh_token)) {
-    throw result.error ?? new Error('Gmail did not return a refresh token.')
-  }
+  if (result.error) throw result.error
 }
 
 export async function getGmailConnection(userId: string) {
   const { data, error } = await createAdminSupabaseClient()
-    .from('gmail_connections')
-    .select('gmail_email')
+    .from('google_connections')
+    .select('google_email')
     .eq('user_id', userId)
     .maybeSingle()
   if (error) throw error
-  return data?.gmail_email ?? null
+  return data?.google_email ?? null
+}
+
+export async function getGmailClient(userId: string) {
+  const supabase = createAdminSupabaseClient()
+  const { data, error } = await supabase
+    .from('google_connections')
+    .select('google_email,refresh_token')
+    .eq('user_id', userId)
+    .maybeSingle()
+  if (error) throw error
+  if (!data) throw new GmailDisconnectedError()
+  const storedToken: string = data.refresh_token
+  const refreshToken = decryptGoogleToken(storedToken, userId, data.google_email)
+  const auth = createGmailOAuthClient()
+  auth.setCredentials({ refresh_token: refreshToken })
+  // The auth library renews credentials and retries authenticated requests.
+  const access = await auth.getAccessToken()
+  if (!access.token) throw new Error('Gmail did not return an access token.')
+  const updated = await supabase
+    .from('google_connections')
+    .update({
+      refresh_token:
+        auth.credentials.refresh_token && auth.credentials.refresh_token !== refreshToken
+          ? encryptGoogleToken(auth.credentials.refresh_token, userId, data.google_email)
+          : storedToken,
+      access_token_expires_at: auth.credentials.expiry_date
+        ? new Date(auth.credentials.expiry_date).toISOString()
+        : null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('user_id', userId)
+    .eq('google_email', data.google_email)
+    .eq('refresh_token', storedToken)
+  if (updated.error) throw updated.error
+  return createGmailApi(auth)
 }
