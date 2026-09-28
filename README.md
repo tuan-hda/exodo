@@ -4,20 +4,25 @@ Exodo is a mobile-first personal money tracker built with Next.js, Clerk, and Su
 
 ## Development
 
+Use Bun 1.4.2 or newer. Next.js development, build, and start scripts use Bun's runtime.
+
 ```bash
-pnpm install
-pnpm dev
+bun install
+bun run dev
 ```
 
 Useful checks:
 
 ```bash
-pnpm format        # format source files
-pnpm format:check  # verify formatting
-pnpm typecheck     # run TypeScript checks
-  pnpm test          # run the unit test suite
-pnpm build         # verify the production build
+bun run format        # format source files
+bun run format:check  # verify formatting
+bun run typecheck     # run TypeScript checks
+bun run test          # run the Vitest suite
+bun run build         # verify the production build
 ```
+
+Use `bun run test` to run the existing Vitest tests. `bun test` invokes a different test runner.
+Use `bun install --frozen-lockfile` for reproducible installs. Commit `bun.lock` with dependency changes.
 
 ## Structure
 

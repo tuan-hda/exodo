@@ -1,6 +1,5 @@
 # Dependencies and package-manager caches
 node_modules/
-.pnpm-store/
 
 # Next.js build output
 .next/
