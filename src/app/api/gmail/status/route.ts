@@ -10,7 +10,8 @@ export async function GET() {
   if (!userId) return NextResponse.json({ connected: false }, { status: 401, headers: noStoreHeaders })
 
   try {
-    const email = await getGmailConnection(userId)
+    const connection = await getGmailConnection(userId)
+    const email = connection?.email ?? null
     return NextResponse.json({ connected: Boolean(email), email }, { headers: noStoreHeaders })
   } catch (error) {
     console.error('Failed to check Gmail connection status', gmailErrorLogDetails(error))

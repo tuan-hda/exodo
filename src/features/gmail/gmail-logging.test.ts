@@ -55,3 +55,11 @@ it('keeps database error messages and details out of status logs', async () => {
   })
   expect(await response.json()).toEqual({ connected: false })
 })
+
+it('preserves the status response when the connection includes an import boundary', async () => {
+  vi.mocked(getGmailConnection).mockResolvedValue({
+    email: 'owner@example.com',
+    lastImportedAt: '2026-09-27T07:00:00.000Z',
+  })
+  expect(await (await status()).json()).toEqual({ connected: true, email: 'owner@example.com' })
+})

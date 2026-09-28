@@ -9,6 +9,7 @@ create table if not exists public.google_connections (
   google_email text not null,
   refresh_token text not null,
   access_token_expires_at timestamptz,
+  last_imported_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { connectGmail, getGmailClient } from './gmail-service'
+import { connectGmail, getGmailClient, getGmailConnection } from './gmail-service'
 import { decryptGoogleToken, encryptGoogleToken } from '@/lib/google/token-encryption'
 
 const mocks = vi.hoisted(() => ({
   read: vi.fn(),
+  select: vi.fn(),
+  eq: vi.fn(),
   upsert: vi.fn(),
   update: vi.fn(),
   getToken: vi.fn(),
@@ -14,7 +16,15 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/lib/supabase-admin', () => ({
   createAdminSupabaseClient: () => ({
     from: () => ({
-      select: () => ({ eq: () => ({ maybeSingle: mocks.read }) }),
+      select: (columns: string) => {
+        mocks.select(columns)
+        return {
+          eq: (column: string, value: string) => {
+            mocks.eq(column, value)
+            return { maybeSingle: mocks.read }
+          },
+        }
+      },
       upsert: mocks.upsert,
       update: (value: unknown) => {
         mocks.update(value)
@@ -46,11 +56,40 @@ beforeEach(() => {
 })
 afterEach(() => vi.unstubAllEnvs())
 
+it('reads the mailbox and import boundary together without selecting tokens', async () => {
+  mocks.read.mockResolvedValue({
+    data: { google_email: email, last_imported_at: '2026-09-27T07:00:00+00:00' },
+    error: null,
+  })
+  expect(await getGmailConnection(user)).toEqual({ email, lastImportedAt: '2026-09-27T07:00:00.000Z' })
+  expect(mocks.select).toHaveBeenCalledExactlyOnceWith('google_email,last_imported_at')
+  expect(mocks.eq).toHaveBeenCalledExactlyOnceWith('user_id', user)
+  expect(mocks.read).toHaveBeenCalledTimes(1)
+})
+
+it('returns no connection for a missing row and no boundary before the first import', async () => {
+  expect(await getGmailConnection(user)).toBeNull()
+  mocks.read.mockResolvedValue({ data: { google_email: email, last_imported_at: null }, error: null })
+  expect(await getGmailConnection(user)).toEqual({ email, lastImportedAt: null })
+})
+
 it('saves the OAuth refresh token only as ciphertext', async () => {
   await connectGmail(user, 'code')
   const saved = mocks.upsert.mock.calls[0][0]
   expect(saved.refresh_token).not.toContain('refresh-secret')
   expect(decryptGoogleToken(saved.refresh_token, user, email)).toBe('refresh-secret')
+})
+
+it('preserves the import timestamp when reconnecting the same mailbox', async () => {
+  mocks.read.mockResolvedValue({ data: { google_email: email }, error: null })
+  await connectGmail(user, 'code')
+  expect(mocks.upsert.mock.calls[0][0]).not.toHaveProperty('last_imported_at')
+})
+
+it('clears the import timestamp when connecting a different mailbox', async () => {
+  mocks.read.mockResolvedValue({ data: { google_email: 'previous@example.com' }, error: null })
+  await connectGmail(user, 'code')
+  expect(mocks.upsert.mock.calls[0][0]).toHaveProperty('last_imported_at', null)
 })
 
 it('decrypts for Google and encrypts a rotated token before saving', async () => {

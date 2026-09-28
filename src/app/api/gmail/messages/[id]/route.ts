@@ -12,9 +12,11 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   if (!/^[a-zA-Z0-9_-]{1,128}$/.test(id))
     return NextResponse.json({ error: 'Invalid message ID.' }, { status: 400, headers: gmailNoStoreHeaders })
   try {
-    const mailbox = await getGmailConnection(userId)
-    if (!mailbox) throw new GmailDisconnectedError()
-    return NextResponse.json(await getCachedGmailMessage(userId, mailbox, id), { headers: gmailNoStoreHeaders })
+    const connection = await getGmailConnection(userId)
+    if (!connection) throw new GmailDisconnectedError()
+    return NextResponse.json(await getCachedGmailMessage(userId, connection.email, id), {
+      headers: gmailNoStoreHeaders,
+    })
   } catch (error) {
     return gmailRouteError(error)
   }

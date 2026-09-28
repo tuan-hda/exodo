@@ -25,10 +25,12 @@ export async function GET(request: Request) {
   if (pageToken && pageToken.length > 2048)
     return NextResponse.json({ error: 'Invalid page token.' }, { status: 400, headers: gmailNoStoreHeaders })
   try {
-    const mailbox = await timed('getGmailConnection', () => getGmailConnection(userId))
-    if (!mailbox) throw new GmailDisconnectedError()
+    const connection = await timed('getGmailConnection', () => getGmailConnection(userId))
+    if (!connection) throw new GmailDisconnectedError()
     if (query.get('refresh') === '1') invalidateGmailCache(userId)
-    const messages = await timed('getCachedGmailMessages', () => getCachedGmailMessages(userId, mailbox, pageToken))
+    const messages = await timed('getCachedGmailMessages', () =>
+      getCachedGmailMessages(userId, connection.email, pageToken, connection.lastImportedAt),
+    )
     return NextResponse.json(messages, { headers: gmailNoStoreHeaders })
   } catch (error) {
     return gmailRouteError(error)

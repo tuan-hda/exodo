@@ -43,6 +43,7 @@ export async function connectGmail(userId: string, code: string) {
       google_email: email,
       refresh_token: encryptGoogleToken(refreshToken, userId, email),
       access_token_expires_at: tokens.expiry_date ? new Date(tokens.expiry_date).toISOString() : null,
+      ...(!sameMailbox ? { last_imported_at: null } : {}),
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'user_id' },
@@ -50,14 +51,20 @@ export async function connectGmail(userId: string, code: string) {
   if (result.error) throw result.error
 }
 
-export async function getGmailConnection(userId: string) {
+export async function getGmailConnection(
+  userId: string,
+): Promise<{ email: string; lastImportedAt: string | null } | null> {
   const { data, error } = await createAdminSupabaseClient()
     .from('google_connections')
-    .select('google_email')
+    .select('google_email,last_imported_at')
     .eq('user_id', userId)
     .maybeSingle()
   if (error) throw error
-  return data?.google_email ?? null
+  if (!data) return null
+  return {
+    email: data.google_email,
+    lastImportedAt: data.last_imported_at ? new Date(data.last_imported_at).toISOString() : null,
+  }
 }
 
 export async function getGmailClient(userId: string) {

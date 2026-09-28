@@ -1,5 +1,12 @@
 import { isRecord } from '@/lib/guards'
 
+export type GmailTransactionSource = 'cake' | 'vpbank-credit' | 'vpbank-debit'
+export type GmailTransaction = {
+  source: GmailTransactionSource
+  amount: number | null
+  occurredAt: string | null
+}
+
 export type GmailMessageSummary = {
   id: string
   sender: string
@@ -7,10 +14,22 @@ export type GmailMessageSummary = {
   snippet: string
   receivedAt: string
   unread: boolean
+  transaction: GmailTransaction | null
 }
 
 export type GmailMessage = GmailMessageSummary & { recipient: string; body: string }
 export type GmailMessagePage = { messages: GmailMessageSummary[]; nextPageToken: string | null }
+
+function isTransaction(value: unknown): value is GmailTransaction | null {
+  return (
+    value === null ||
+    (isRecord(value) &&
+      ['cake', 'vpbank-credit', 'vpbank-debit'].includes(String(value.source)) &&
+      (value.amount === null || (typeof value.amount === 'number' && Number.isSafeInteger(value.amount))) &&
+      (value.occurredAt === null ||
+        (typeof value.occurredAt === 'string' && Number.isFinite(Date.parse(value.occurredAt)))))
+  )
+}
 
 function isMessageSummary(value: unknown): value is GmailMessageSummary {
   return (
@@ -18,7 +37,8 @@ function isMessageSummary(value: unknown): value is GmailMessageSummary {
     ['id', 'sender', 'subject', 'snippet', 'receivedAt'].every((key) => typeof value[key] === 'string') &&
     typeof value.unread === 'boolean' &&
     typeof value.receivedAt === 'string' &&
-    Number.isFinite(Date.parse(value.receivedAt))
+    Number.isFinite(Date.parse(value.receivedAt)) &&
+    isTransaction(value.transaction)
   )
 }
 

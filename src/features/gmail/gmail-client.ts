@@ -20,7 +20,3 @@ export async function readGmailJson(path: string, signal: AbortSignal) {
   }
   return value
 }
-
-export function formatEmailDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value))
-}

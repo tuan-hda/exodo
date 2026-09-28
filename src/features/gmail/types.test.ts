@@ -23,6 +23,7 @@ describe('Gmail message response parsing', () => {
     snippet: '',
     receivedAt: '2026-09-28T12:00:00Z',
     unread: true,
+    transaction: null,
   }
   it('keeps valid pages and message bodies', () => {
     expect(parseGmailMessagePage({ messages: [message], nextPageToken: 'next' })).toEqual({
@@ -37,5 +38,21 @@ describe('Gmail message response parsing', () => {
     ).toThrow()
     expect(() => parseGmailMessagePage({ messages: [], nextPageToken: 42 })).toThrow()
     expect(() => parseGmailMessage(message)).toThrow()
+  })
+  it('validates extracted transaction fields', () => {
+    const transaction = { source: 'cake', amount: -21000, occurredAt: '2026-09-26T07:43:55.000Z' }
+    expect(
+      parseGmailMessagePage({ messages: [{ ...message, transaction }], nextPageToken: null }).messages[0].transaction,
+    ).toEqual(transaction)
+    for (const invalid of [
+      { ...transaction, source: 'unknown' },
+      { ...transaction, amount: '-21000' },
+      { ...transaction, amount: Infinity },
+      { ...transaction, occurredAt: 'invalid' },
+    ]) {
+      expect(() =>
+        parseGmailMessagePage({ messages: [{ ...message, transaction: invalid }], nextPageToken: null }),
+      ).toThrow()
+    }
   })
 })

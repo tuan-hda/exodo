@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { readFileSync } from 'node:fs'
 import { decodeMessage, decodeMessageSummary, listGmailMessages } from './gmail-messages'
 import { getGmailClient } from './gmail-service'
 
@@ -9,6 +10,7 @@ const part = (text: string, mimeType = 'text/plain') => ({
   mimeType,
   body: { data: Buffer.from(text).toString('base64url') },
 })
+const cakeHtml = readFileSync(new URL('./fixtures/cake-transaction.html', import.meta.url), 'utf8')
 const message = (payload: Record<string, unknown> = part('Hello')) => ({
   id: 'message-1',
   internalDate: '1790550000000',
@@ -25,6 +27,30 @@ const message = (payload: Record<string, unknown> = part('Hello')) => ({
 })
 
 describe('reading Gmail messages', () => {
+  it.each([false, true])('extracts the supplied Cake HTML with a plain-text alternative: %s', async (hasPlain) => {
+    const email = await decodeMessage(
+      message({
+        mimeType: 'multipart/alternative',
+        headers: [{ name: 'Subject', value: '[CAKE] Thông báo giao dịch thành công' }],
+        parts: [
+          ...(hasPlain ? [part('Cake xin thông báo tài khoản của bạn vừa mới phát sinh giao dịch.')] : []),
+          part(cakeHtml, 'text/html'),
+        ],
+      }),
+    )
+    expect(email.transaction).toEqual({ source: 'cake', amount: -1846000, occurredAt: '2026-09-27T07:54:41.000Z' })
+  })
+  it('uses HTML to fill missing fields while preserving parsed plain-text fields', async () => {
+    const email = await decodeMessage(
+      message({
+        mimeType: 'multipart/alternative',
+        headers: [{ name: 'Subject', value: '[CAKE] Thông báo giao dịch thành công' }],
+        parts: [part('Số tiền -21.000 đ'), part(cakeHtml, 'text/html')],
+      }),
+    )
+    expect(email.transaction).toEqual({ source: 'cake', amount: -21000, occurredAt: '2026-09-27T07:54:41.000Z' })
+    expect(email.body).toBe('Số tiền -21.000 đ')
+  })
   it('prefers plain text within nested MIME parts and ignores file attachments', async () => {
     const email = await decodeMessage(
       message({
@@ -52,6 +78,22 @@ describe('reading Gmail messages', () => {
       ),
     )
     expect(email.body).toBe('Hello & welcome')
+  })
+  it('extracts Cake fields from HTML tables with empty spacer cells', async () => {
+    const email = await decodeMessage(
+      message({
+        ...part(
+          `<table>
+        <tr><td>Ngày giờ giao dịch</td><td></td><td>27/09/2026, 14:54:41</td></tr>
+        <tr><td>Số tiền</td><td></td><td>-1.846.000 đ</td></tr>
+        <tr><td>Phí giao dịch</td><td></td><td>0 đ</td></tr>
+      </table>`,
+          'text/html',
+        ),
+        headers: [{ name: 'Subject', value: '[CAKE] Thông báo giao dịch thành công' }],
+      }),
+    )
+    expect(email.transaction).toEqual({ source: 'cake', amount: -1846000, occurredAt: '2026-09-27T07:54:41.000Z' })
   })
   it('decodes MIME encoded subjects and sender names', () => {
     const subject = `=?UTF-8?B?${Buffer.from('Xin chào').toString('base64')}?=`
@@ -116,8 +158,47 @@ describe('reading Gmail messages', () => {
       },
       { timeout: 15000 },
     )
-    expect(get).toHaveBeenCalledWith({ userId: 'me', id: 'one', format: 'metadata' }, { timeout: 15000 })
+    expect(get).toHaveBeenCalledWith({ userId: 'me', id: 'one', format: 'full' }, { timeout: 15000 })
     expect(page.messages[0]).not.toHaveProperty('body')
+  })
+  it('limits both bank subjects by the received timestamp and excludes the imported boundary', async () => {
+    const lastImportedAt = '2026-09-27T07:00:00.123Z'
+    const list = vi.fn().mockResolvedValue({
+      data: {
+        messages: [{ id: 'old' }, { id: 'same-second' }, { id: 'boundary' }, { id: 'new' }],
+        nextPageToken: 'older',
+      },
+    })
+    const timestamp = Date.parse(lastImportedAt)
+    const get = vi.fn().mockImplementation(async ({ id }: { id: string }) => ({
+      data: {
+        ...message({
+          ...part('Số tiền -21.000 đ\nNgày giờ giao dịch 26/09/2026, 14:43:55'),
+          headers: [{ name: 'Subject', value: '[CAKE] Thông báo giao dịch thành công' }],
+        }),
+        id,
+        internalDate: String(
+          { old: timestamp - 86400000, 'same-second': timestamp - 1, boundary: timestamp, new: timestamp + 1 }[id],
+        ),
+      },
+    }))
+    vi.mocked(getGmailClient).mockResolvedValue({ users: { messages: { list, get } } } as unknown as Awaited<
+      ReturnType<typeof getGmailClient>
+    >)
+    const page = await listGmailMessages('user-1', 'next-page', lastImportedAt)
+    expect(list).toHaveBeenCalledWith(
+      {
+        userId: 'me',
+        labelIds: ['INBOX'],
+        q: '(subject:VPBank OR subject:CAKE) after:1790492400',
+        maxResults: 20,
+        pageToken: 'next-page',
+      },
+      { timeout: 15000 },
+    )
+    expect(page.messages.map((item) => item.id)).toEqual(['new'])
+    expect(page.nextPageToken).toBe('older')
+    expect(page.messages[0].transaction?.occurredAt).toBe('2026-09-26T07:43:55.000Z')
   })
   it.each([
     '[CAKE] Thông báo giao dịch thành công',
@@ -142,6 +223,25 @@ describe('reading Gmail messages', () => {
       ReturnType<typeof getGmailClient>
     >)
     expect(await listGmailMessages('user-1')).toEqual({ messages: [], nextPageToken: 'next' })
+  })
+  it('includes parsed fields in the list without returning the full body', async () => {
+    const list = vi.fn().mockResolvedValue({ data: { messages: [{ id: 'one' }] } })
+    const get = vi.fn().mockResolvedValue({
+      data: message({
+        ...part('Ngày giờ giao dịch 26/09/2026, 14:43:55\nSố tiền -21.000 đ\nPhí giao dịch 0 đ'),
+        headers: [{ name: 'Subject', value: '[CAKE] Thông báo giao dịch thành công' }],
+      }),
+    })
+    vi.mocked(getGmailClient).mockResolvedValue({ users: { messages: { list, get } } } as unknown as Awaited<
+      ReturnType<typeof getGmailClient>
+    >)
+    const page = await listGmailMessages('user-1')
+    expect(page.messages[0].transaction).toEqual({
+      source: 'cake',
+      amount: -21000,
+      occurredAt: '2026-09-26T07:43:55.000Z',
+    })
+    expect(page.messages[0]).not.toHaveProperty('body')
   })
   it('handles empty inboxes and preserves permission errors', async () => {
     const list = vi

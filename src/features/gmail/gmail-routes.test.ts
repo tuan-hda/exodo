@@ -13,7 +13,7 @@ vi.mock('./gmail-cache', () => ({
 }))
 vi.mock('./gmail-service', () => ({ getGmailConnection: vi.fn() }))
 beforeEach(() => {
-  vi.mocked(getGmailConnection).mockResolvedValue('mailbox@example.com')
+  vi.mocked(getGmailConnection).mockResolvedValue({ email: 'mailbox@example.com', lastImportedAt: null })
   vi.mocked(auth).mockResolvedValue({ userId: 'owner' } as Awaited<ReturnType<typeof auth>>)
 })
 afterEach(() => vi.resetAllMocks())
@@ -60,9 +60,35 @@ describe('Gmail read route authorization', () => {
   it('preserves pagination and leaves HTTP responses uncached', async () => {
     vi.mocked(getCachedGmailMessages).mockResolvedValue({ messages: [], nextPageToken: 'older' })
     const response = await list(new Request('https://exodo.test/api/gmail/messages?pageToken=next%2Bpage'))
-    expect(getCachedGmailMessages).toHaveBeenCalledWith('owner', 'mailbox@example.com', 'next+page')
+    expect(getCachedGmailMessages).toHaveBeenCalledWith('owner', 'mailbox@example.com', 'next+page', null)
     expect(await response.json()).toEqual({ messages: [], nextPageToken: 'older' })
     expect(response.headers.get('Cache-Control')).toBe('private, no-store')
+  })
+  it('reads the current import boundary before each cached list lookup', async () => {
+    vi.mocked(getCachedGmailMessages).mockResolvedValue({ messages: [], nextPageToken: null })
+    vi.mocked(getGmailConnection).mockResolvedValueOnce({
+      email: 'mailbox@example.com',
+      lastImportedAt: '2026-09-27T07:00:00.000Z',
+    })
+    await list(new Request('https://exodo.test/api/gmail/messages'))
+    expect(getGmailConnection).toHaveBeenCalledExactlyOnceWith('owner')
+    expect(getCachedGmailMessages).toHaveBeenLastCalledWith(
+      'owner',
+      'mailbox@example.com',
+      undefined,
+      '2026-09-27T07:00:00.000Z',
+    )
+    vi.mocked(getGmailConnection).mockResolvedValueOnce({
+      email: 'mailbox@example.com',
+      lastImportedAt: '2026-09-28T07:00:00.000Z',
+    })
+    await list(new Request('https://exodo.test/api/gmail/messages'))
+    expect(getCachedGmailMessages).toHaveBeenLastCalledWith(
+      'owner',
+      'mailbox@example.com',
+      undefined,
+      '2026-09-28T07:00:00.000Z',
+    )
   })
   it('returns a reconnection action for expired permission', async () => {
     vi.mocked(getCachedGmailMessages).mockRejectedValue({ response: { status: 400, data: { error: 'invalid_grant' } } })

@@ -14,8 +14,14 @@ it('configures twelve-hour revalidation and tags each user separately', async ()
   expect(cacheLife).toHaveBeenCalledWith({ revalidate: 43200, expire: 86400 })
   expect(cacheTag).toHaveBeenNthCalledWith(1, 'gmail:one')
   expect(cacheTag).toHaveBeenNthCalledWith(2, 'gmail:two')
-  expect(listGmailMessages).toHaveBeenCalledWith('one', 'page')
+  expect(listGmailMessages).toHaveBeenCalledWith('one', 'page', null)
   expect(readGmailMessage).toHaveBeenCalledWith('two', 'message')
+})
+
+it('passes the import boundary through the cached function', async () => {
+  vi.mocked(listGmailMessages).mockResolvedValue({ messages: [], nextPageToken: null })
+  await getCachedGmailMessages('one', 'one@example.com', 'page', '2026-09-27T07:00:00.000Z')
+  expect(listGmailMessages).toHaveBeenCalledWith('one', 'page', '2026-09-27T07:00:00.000Z')
 })
 
 it('expires cached results immediately for manual refresh', () => {

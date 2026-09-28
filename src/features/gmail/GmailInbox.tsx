@@ -1,18 +1,17 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ArrowClockwise, EnvelopeSimple } from '@phosphor-icons/react'
+import { ArrowClockwise } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StateMessage } from '@/components/StateMessage'
-import { GmailMessageReader } from './GmailMessageReader'
-import { formatEmailDate, GmailReadError, readGmailJson } from './gmail-client'
+import { GmailTransactionDetails } from './GmailTransactionDetails'
+import { GmailReadError, readGmailJson } from './gmail-client'
 import { parseGmailMessagePage, type GmailMessageSummary } from './types'
 
 export function GmailInbox() {
   const [messages, setMessages] = useState<GmailMessageSummary[]>([])
   const [nextPageToken, setNextPageToken] = useState<string | null>(null)
-  const [selected, setSelected] = useState<GmailMessageSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<GmailReadError | null>(null)
   const requestRef = useRef<AbortController | null>(null)
@@ -41,7 +40,9 @@ export function GmailInbox() {
     } catch (error) {
       if (!controller.signal.aborted)
         setError(
-          error instanceof GmailReadError ? error : new GmailReadError('Could not load your emails. Please try again.'),
+          error instanceof GmailReadError
+            ? error
+            : new GmailReadError('Could not load transactions. Please try again.'),
         )
     } finally {
       if (!controller.signal.aborted) setLoading(false)
@@ -54,9 +55,9 @@ export function GmailInbox() {
   }, [load])
 
   return (
-    <section className="grid min-w-0 gap-4" aria-label="Gmail inbox" aria-busy={loading}>
+    <section className="grid min-w-0 gap-4" aria-label="Transactions" aria-busy={loading}>
       <div className="flex items-center justify-between gap-3">
-        <p className="ui-eyebrow">Transaction emails</p>
+        <p className="ui-eyebrow">Transactions</p>
         <Button variant="outline" disabled={loading} onClick={() => void load(undefined, true)}>
           <ArrowClockwise size={16} /> Refresh
         </Button>
@@ -78,7 +79,7 @@ export function GmailInbox() {
         </div>
       )}
       {loading && !messages.length && (
-        <div className="grid gap-4" role="status" aria-label="Loading emails">
+        <div className="grid gap-4" role="status" aria-label="Loading transactions">
           {[0, 1, 2].map((value) => (
             <div key={value} className="grid gap-2 border-b border-line pb-4">
               <Skeleton className="h-4 w-1/3" />
@@ -90,42 +91,25 @@ export function GmailInbox() {
       )}
       {!loading && !error && !messages.length && (
         <p className="py-8 text-center text-sm text-muted">
-          {nextPageToken
-            ? 'No VPBank or Cake transactions in this page.'
-            : 'No VPBank or Cake transaction emails found.'}
+          {nextPageToken ? 'No VPBank or Cake transactions in this page.' : 'No VPBank or Cake transactions found.'}
         </p>
       )}
       <ul className="m-0 min-w-0 list-none p-0">
-        {messages.map((message) => (
-          <li key={message.id}>
-            <Button
-              variant="list"
-              size="row"
-              onClick={() => setSelected(message)}
-              aria-label={`Read ${message.subject} from ${message.sender}`}>
-              <EnvelopeSimple size={20} weight={message.unread ? 'fill' : 'regular'} />
-              <span className="grid min-w-0 flex-1 gap-1 text-left">
-                <span className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                  <span className="min-w-0 truncate text-xs text-muted">{message.sender || 'Unknown sender'}</span>
-                  <span className="text-[10px] text-muted">{formatEmailDate(message.receivedAt)}</span>
-                </span>
-                <span className={message.unread ? 'truncate text-sm font-semibold' : 'truncate text-sm font-normal'}>
-                  {message.subject}
-                </span>
-                <span className="truncate text-xs font-normal text-muted">{message.snippet}</span>
-              </span>
-            </Button>
-          </li>
-        ))}
+        {messages.map((message) =>
+          message.transaction ? (
+            <li key={message.id} className="border-b border-line py-4">
+              <GmailTransactionDetails transaction={message.transaction} />
+            </li>
+          ) : null,
+        )}
       </ul>
       {nextPageToken && (
         <div className="flex justify-center">
           <Button variant="outline" disabled={loading} onClick={() => void load(nextPageToken)}>
-            {loading ? 'Loading…' : 'Load older emails'}
+            {loading ? 'Loading…' : 'Load older transactions'}
           </Button>
         </div>
       )}
-      {selected && <GmailMessageReader key={selected.id} summary={selected} onClose={() => setSelected(null)} />}
     </section>
   )
 }

@@ -2,7 +2,7 @@ import { convert } from 'html-to-text'
 import { isRecord } from '@/lib/guards'
 import { gmailErrorStatus } from './gmail-api'
 import { getGmailClient } from './gmail-service'
-import { classifyTransactionSubject } from './transaction-parser'
+import { classifyTransactionSubject, parseTransaction } from './transaction-parser'
 import type { GmailMessage, GmailMessageSummary, GmailMessagePage } from './types'
 
 function decodeHeaderText(value: string) {
@@ -52,6 +52,7 @@ export function decodeMessageSummary(value: unknown): GmailMessageSummary {
     snippet: typeof value.snippet === 'string' ? convert(value.snippet, { wordwrap: false }) : '',
     receivedAt: received.toISOString(),
     unread: Array.isArray(value.labelIds) && value.labelIds.includes('UNREAD'),
+    transaction: null,
   }
 }
 
@@ -68,9 +69,10 @@ export async function decodeMessage(
   const summary = decodeMessageSummary(value)
   if (!isRecord(value) || !isRecord(value.payload)) throw new Error('Gmail returned an invalid message body.')
   const plain = findBodyParts(value.payload, 'text/plain')
-  const parts = plain.length ? plain : findBodyParts(value.payload, 'text/html')
-  const texts: string[] = []
-  for (const part of parts) {
+  const html = findBodyParts(value.payload, 'text/html')
+  const plainTexts: string[] = []
+  const htmlTexts: string[] = []
+  for (const part of [...plain, ...html]) {
     if (!isRecord(part.body)) continue
     let body = part.body
     if (typeof body.size === 'number' && body.size > 2_000_000)
@@ -89,8 +91,10 @@ export async function decodeMessage(
     } catch {
       text = bytes.toString('utf8')
     }
+    const isPlain = part.mimeType === 'text/plain'
+    const texts = isPlain ? plainTexts : htmlTexts
     texts.push(
-      plain.length
+      isPlain
         ? text
         : convert(text, {
             wordwrap: false,
@@ -104,13 +108,33 @@ export async function decodeMessage(
           }),
     )
   }
-  return { ...summary, recipient: header(value.payload, 'to'), body: texts.join('\n\n').trim() }
+  const plainBody = plainTexts.join('\n\n').trim()
+  const htmlBody = htmlTexts.join('\n\n').trim()
+  const transaction = parseTransaction(summary.subject, plainBody)
+  const htmlTransaction = parseTransaction(summary.subject, htmlBody)
+  return {
+    ...summary,
+    recipient: header(value.payload, 'to'),
+    body: plainBody || htmlBody,
+    transaction: transaction && {
+      source: transaction.source,
+      amount: transaction.amount ?? htmlTransaction?.amount ?? null,
+      occurredAt: transaction.occurredAt ?? htmlTransaction?.occurredAt ?? null,
+    },
+  }
 }
 
-export async function listGmailMessages(userId: string, pageToken?: string): Promise<GmailMessagePage> {
+export async function listGmailMessages(
+  userId: string,
+  pageToken?: string,
+  lastImportedAt: string | null = null,
+): Promise<GmailMessagePage> {
   const client = await getGmailClient(userId)
+  const lowerBound = lastImportedAt === null ? null : Date.parse(lastImportedAt)
+  const bankQuery = 'subject:VPBank OR subject:CAKE'
+  const q = lowerBound === null ? bankQuery : `(${bankQuery}) after:${Math.floor(lowerBound / 1000)}`
   const { data } = await client.users.messages.list(
-    { userId: 'me', labelIds: ['INBOX'], q: 'subject:VPBank OR subject:CAKE', maxResults: 20, pageToken },
+    { userId: 'me', labelIds: ['INBOX'], q, maxResults: 20, pageToken },
     { timeout: 15_000 },
   )
   const items = data.messages ?? []
@@ -119,13 +143,23 @@ export async function listGmailMessages(userId: string, pageToken?: string): Pro
     const batch = await Promise.all(
       items.slice(offset, offset + 5).map(async (item) => {
         if (!item.id) throw new Error('Gmail returned an invalid message ID.')
+        const messageId = item.id
         try {
           const result = await client.users.messages.get(
-            { userId: 'me', id: item.id, format: 'metadata' },
+            { userId: 'me', id: item.id, format: 'full' },
             { timeout: 15_000 },
           )
           const summary = decodeMessageSummary(result.data)
-          return classifyTransactionSubject(summary.subject) ? summary : null
+          if (lowerBound !== null && Date.parse(summary.receivedAt) <= lowerBound) return null
+          if (!classifyTransactionSubject(summary.subject)) return null
+          const email = await decodeMessage(result.data, async (id) => {
+            const attachment = await client.users.messages.attachments.get(
+              { userId: 'me', messageId, id },
+              { timeout: 15_000 },
+            )
+            return attachment.data
+          })
+          return { ...summary, transaction: email.transaction }
         } catch (error) {
           if (gmailErrorStatus(error) === 404) return null
           throw error
