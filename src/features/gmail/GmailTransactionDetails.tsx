@@ -18,7 +18,14 @@ export function GmailTransactionDetails({ transaction }: { transaction: GmailTra
     <span className="grid min-w-0 gap-1 text-left">
       <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <span className="text-xs text-muted">{sourceLabels[transaction.source]}</span>
-        <span className="ui-number text-base font-semibold">
+        <span
+          className={`ui-number text-base font-semibold ${
+            transaction.amount === null || transaction.amount === 0
+              ? 'text-ink'
+              : transaction.amount > 0
+                ? 'text-success'
+                : 'text-danger'
+          }`}>
           {transaction.amount === null
             ? 'Amount unavailable'
             : `${transaction.amount > 0 ? '+' : ''}${formatMoney(transaction.amount)}`}

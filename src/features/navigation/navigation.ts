@@ -9,7 +9,7 @@ const analysisNavigationItem = {
 } as const
 const notificationsNavigationItem = {
   id: 'notifications',
-  label: 'Notifications',
+  label: 'Inbox',
   mobileLabel: 'Inbox',
   Icon: Bell,
 } as const
@@ -21,7 +21,7 @@ export type SettingsPage = 'menu' | 'budgets' | 'savings' | 'customization'
 export const appTabLabels: Record<AppTab, string> = {
   today: 'Today',
   analysis: 'Analysis',
-  notifications: 'Notifications',
+  notifications: 'Inbox',
   settings: 'Settings',
 }
 

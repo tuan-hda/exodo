@@ -60,17 +60,18 @@ export function NotificationsView() {
   const errorMessage = error || (notice === 'error' ? 'Gmail connection failed. Try again.' : '')
   return (
     <PageShell size={connected ? 'wide' : 'centered'} aria-busy={isLoading}>
-      <div className="grid justify-items-center gap-3">
+      {connected && <GmailInbox key={gmailEmail} />}
+      <div className="mt-20 grid min-h-40 w-full content-center justify-items-center gap-4 rounded-panel border border-line bg-surface p-8 shadow-panel max-md:min-h-32 max-md:p-6">
         {isLoading ? (
-          <Button variant="outline" disabled>
+          <Button variant="secondary" disabled>
             Checking Gmail…
           </Button>
         ) : hasError ? (
-          <Button variant="outline" type="button" onClick={() => setRetryKey((key) => key + 1)}>
+          <Button variant="secondary" type="button" onClick={() => setRetryKey((key) => key + 1)}>
             <ArrowClockwise size={17} /> Try again
           </Button>
         ) : (
-          <Button asChild variant="outline-muted">
+          <Button asChild variant="secondary">
             <a href="/api/gmail/connect">
               <EnvelopeSimple size={17} /> {connected ? 'Reconnect Gmail' : 'Connect Gmail'}
             </a>
@@ -78,7 +79,6 @@ export function NotificationsView() {
         )}
         {errorMessage && <StateMessage tone="danger">{errorMessage}</StateMessage>}
       </div>
-      {connected && <GmailInbox key={gmailEmail} />}
     </PageShell>
   )
 }
