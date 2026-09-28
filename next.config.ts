@@ -4,6 +4,7 @@ import { getClerkAllowedRedirectOrigins, getNextAllowedDevOrigins } from './src/
 const allowedDevOrigins = getNextAllowedDevOrigins(getClerkAllowedRedirectOrigins())
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
   reactStrictMode: true,
   ...(allowedDevOrigins.length ? { allowedDevOrigins } : {}),
 }

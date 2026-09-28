@@ -1,6 +1,8 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { readGmailMessage } from '@/features/gmail/gmail-messages'
+import { getCachedGmailMessage } from '@/features/gmail/gmail-cache'
+import { getGmailConnection } from '@/features/gmail/gmail-service'
+import { GmailDisconnectedError } from '@/features/gmail/gmail-api'
 import { gmailNoStoreHeaders, gmailRouteError } from '@/features/gmail/gmail-route-error'
 
 export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
@@ -10,7 +12,9 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   if (!/^[a-zA-Z0-9_-]{1,128}$/.test(id))
     return NextResponse.json({ error: 'Invalid message ID.' }, { status: 400, headers: gmailNoStoreHeaders })
   try {
-    return NextResponse.json(await readGmailMessage(userId, id), { headers: gmailNoStoreHeaders })
+    const mailbox = await getGmailConnection(userId)
+    if (!mailbox) throw new GmailDisconnectedError()
+    return NextResponse.json(await getCachedGmailMessage(userId, mailbox, id), { headers: gmailNoStoreHeaders })
   } catch (error) {
     return gmailRouteError(error)
   }

@@ -2,6 +2,7 @@ import { convert } from 'html-to-text'
 import { isRecord } from '@/lib/guards'
 import { gmailErrorStatus } from './gmail-api'
 import { getGmailClient } from './gmail-service'
+import { classifyTransactionSubject } from './transaction-parser'
 import type { GmailMessage, GmailMessageSummary, GmailMessagePage } from './types'
 
 function decodeHeaderText(value: string) {
@@ -97,6 +98,8 @@ export async function decodeMessage(
               { selector: 'img', format: 'skip' },
               { selector: 'script', format: 'skip' },
               { selector: 'style', format: 'skip' },
+              { selector: 'td', format: 'block', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
+              { selector: 'th', format: 'block', options: { leadingLineBreaks: 1, trailingLineBreaks: 1 } },
             ],
           }),
     )
@@ -107,7 +110,7 @@ export async function decodeMessage(
 export async function listGmailMessages(userId: string, pageToken?: string): Promise<GmailMessagePage> {
   const client = await getGmailClient(userId)
   const { data } = await client.users.messages.list(
-    { userId: 'me', labelIds: ['INBOX'], maxResults: 20, pageToken },
+    { userId: 'me', labelIds: ['INBOX'], q: 'subject:VPBank OR subject:CAKE', maxResults: 20, pageToken },
     { timeout: 15_000 },
   )
   const items = data.messages ?? []
@@ -121,7 +124,8 @@ export async function listGmailMessages(userId: string, pageToken?: string): Pro
             { userId: 'me', id: item.id, format: 'metadata' },
             { timeout: 15_000 },
           )
-          return decodeMessageSummary(result.data)
+          const summary = decodeMessageSummary(result.data)
+          return classifyTransactionSubject(summary.subject) ? summary : null
         } catch (error) {
           if (gmailErrorStatus(error) === 404) return null
           throw error

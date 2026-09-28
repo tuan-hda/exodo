@@ -10,7 +10,7 @@ export class GmailReadError extends Error {
 }
 
 export async function readGmailJson(path: string, signal: AbortSignal) {
-  const response = await fetch(path, { cache: 'no-store', signal })
+  const response = await fetch(path, { signal })
   const value: unknown = await response.json()
   if (!response.ok) {
     throw new GmailReadError(

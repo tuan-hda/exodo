@@ -90,12 +90,15 @@ describe('reading Gmail messages', () => {
     expect(() => decodeMessageSummary({ ...message(), internalDate: 'invalid' })).toThrow('received date')
   })
   it('passes the page token to the official client and tolerates deleted messages', async () => {
-    const list = vi
-      .fn()
-      .mockResolvedValue({ data: { messages: [{ id: 'one' }, { id: 'two' }], nextPageToken: 'older-page' } })
+    const list = vi.fn().mockResolvedValue({
+      data: { messages: [{ id: 'one' }, { id: 'two' }, { id: 'three' }], nextPageToken: 'older-page' },
+    })
     const get = vi
       .fn()
-      .mockResolvedValueOnce({ data: message() })
+      .mockResolvedValueOnce({
+        data: message({ headers: [{ name: 'Subject', value: 'VPBank - Thông báo biến động số dư/ Balance Changed' }] }),
+      })
+      .mockResolvedValueOnce({ data: { ...message(), id: 'unrelated' } })
       .mockRejectedValueOnce({ response: { status: 404 } })
     vi.mocked(getGmailClient).mockResolvedValue({ users: { messages: { list, get } } } as unknown as Awaited<
       ReturnType<typeof getGmailClient>
@@ -104,9 +107,41 @@ describe('reading Gmail messages', () => {
     expect(page.messages).toHaveLength(1)
     expect(page.nextPageToken).toBe('older-page')
     expect(list).toHaveBeenCalledWith(
-      { userId: 'me', labelIds: ['INBOX'], maxResults: 20, pageToken: 'page-token' },
+      {
+        userId: 'me',
+        labelIds: ['INBOX'],
+        q: 'subject:VPBank OR subject:CAKE',
+        maxResults: 20,
+        pageToken: 'page-token',
+      },
       { timeout: 15000 },
     )
+    expect(get).toHaveBeenCalledWith({ userId: 'me', id: 'one', format: 'metadata' }, { timeout: 15000 })
+    expect(page.messages[0]).not.toHaveProperty('body')
+  })
+  it.each([
+    '[CAKE] Thông báo giao dịch thành công',
+    'VPBank xin thong bao bien dong so du The tin dung cua Quy khach – VPBank would like to inform your credit card’s balance change',
+    'VPBank - Thông báo biến động số dư/ Balance Changed',
+  ])('includes transaction subject %s without requiring a readable body', async (subject) => {
+    const list = vi.fn().mockResolvedValue({ data: { messages: [{ id: 'one' }] } })
+    const get = vi.fn().mockResolvedValue({
+      data: message({
+        headers: [{ name: 'Subject', value: `=?UTF-8?B?${Buffer.from(subject).toString('base64')}?=` }],
+      }),
+    })
+    vi.mocked(getGmailClient).mockResolvedValue({ users: { messages: { list, get } } } as unknown as Awaited<
+      ReturnType<typeof getGmailClient>
+    >)
+    expect((await listGmailMessages('user-1')).messages).toHaveLength(1)
+  })
+  it('retains pagination when every candidate is unrelated', async () => {
+    const list = vi.fn().mockResolvedValue({ data: { messages: [{ id: 'one' }], nextPageToken: 'next' } })
+    const get = vi.fn().mockResolvedValue({ data: message() })
+    vi.mocked(getGmailClient).mockResolvedValue({ users: { messages: { list, get } } } as unknown as Awaited<
+      ReturnType<typeof getGmailClient>
+    >)
+    expect(await listGmailMessages('user-1')).toEqual({ messages: [], nextPageToken: 'next' })
   })
   it('handles empty inboxes and preserves permission errors', async () => {
     const list = vi

@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { connectGmail, gmailOAuthStateCookie } from '@/features/gmail/gmail-service'
 import { gmailErrorLogDetails } from '@/features/gmail/gmail-api'
+import { invalidateGmailCache } from '@/features/gmail/gmail-cache'
 
 export async function GET(request: Request) {
   const { userId } = await auth()
@@ -22,6 +23,7 @@ export async function GET(request: Request) {
 
   try {
     await connectGmail(userId, code)
+    invalidateGmailCache(userId)
     return redirectToNotifications('connected')
   } catch (error) {
     console.error('Failed to connect Gmail', gmailErrorLogDetails(error))

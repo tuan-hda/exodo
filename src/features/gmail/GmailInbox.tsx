@@ -18,7 +18,7 @@ export function GmailInbox() {
   const requestRef = useRef<AbortController | null>(null)
   const failedPageRef = useRef<string | undefined>(undefined)
 
-  const load = useCallback(async (pageToken?: string) => {
+  const load = useCallback(async (pageToken?: string, refresh = false) => {
     requestRef.current?.abort()
     const controller = new AbortController()
     requestRef.current = controller
@@ -26,7 +26,10 @@ export function GmailInbox() {
     setError(null)
     failedPageRef.current = pageToken
     try {
-      const query = pageToken ? `?${new URLSearchParams({ pageToken })}` : ''
+      const params = new URLSearchParams()
+      if (pageToken) params.set('pageToken', pageToken)
+      if (refresh) params.set('refresh', '1')
+      const query = params.size ? `?${params}` : ''
       const page = parseGmailMessagePage(await readGmailJson(`/api/gmail/messages${query}`, controller.signal))
       if (controller.signal.aborted) return
       setMessages((current) =>
@@ -53,8 +56,8 @@ export function GmailInbox() {
   return (
     <section className="grid min-w-0 gap-4" aria-label="Gmail inbox" aria-busy={loading}>
       <div className="flex items-center justify-between gap-3">
-        <p className="ui-eyebrow">Recent emails</p>
-        <Button variant="outline" disabled={loading} onClick={() => void load()}>
+        <p className="ui-eyebrow">Transaction emails</p>
+        <Button variant="outline" disabled={loading} onClick={() => void load(undefined, true)}>
           <ArrowClockwise size={16} /> Refresh
         </Button>
       </div>
@@ -86,7 +89,11 @@ export function GmailInbox() {
         </div>
       )}
       {!loading && !error && !messages.length && (
-        <p className="py-8 text-center text-sm text-muted">Your Gmail inbox is empty.</p>
+        <p className="py-8 text-center text-sm text-muted">
+          {nextPageToken
+            ? 'No VPBank or Cake transactions in this page.'
+            : 'No VPBank or Cake transaction emails found.'}
+        </p>
       )}
       <ul className="m-0 min-w-0 list-none p-0">
         {messages.map((message) => (
