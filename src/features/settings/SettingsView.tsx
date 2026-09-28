@@ -16,6 +16,7 @@ import type { BudgetState } from '@/features/budgets/use-budgets'
 import type { BackgroundPreferenceState } from './use-background-preference'
 import { CustomizationView } from './CustomizationView'
 import { getSettingsPageFromSearch, updateSearchParams, type SettingsPage } from '@/features/navigation/navigation'
+import { clearAllGmailMessagesCaches } from '@/features/gmail/gmail-local-cache'
 
 function getInitialSettingsPage() {
   return typeof window === 'undefined' ? 'menu' : getSettingsPageFromSearch(window.location.search)
@@ -50,6 +51,11 @@ export function SettingsView({
       '',
       updateSearchParams(window.location.href, { section: nextPage === 'menu' ? null : nextPage }),
     )
+  }
+
+  async function handleSignOut() {
+    clearAllGmailMessagesCaches()
+    await signOut()
   }
 
   if (page === 'budgets') return <BudgetSettingsView budgetState={budgets} onBack={() => changePage('menu')} />
@@ -97,7 +103,7 @@ export function SettingsView({
           onClick={() => changePage('customization')}
         />
       </nav>
-      <Button variant="outline-muted" className="w-full" type="button" onClick={() => signOut()}>
+      <Button variant="outline-muted" className="w-full" type="button" onClick={() => void handleSignOut()}>
         <SignOut size={17} /> Sign out
       </Button>
     </PageShell>

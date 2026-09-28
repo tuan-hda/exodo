@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { getCachedGmailMessages, invalidateGmailCache } from '@/features/gmail/gmail-cache'
+import { listGmailMessages } from '@/features/gmail/gmail-messages'
 import { getGmailConnection } from '@/features/gmail/gmail-service'
 import { GmailDisconnectedError } from '@/features/gmail/gmail-api'
 import { gmailNoStoreHeaders, gmailRouteError } from '@/features/gmail/gmail-route-error'
@@ -27,9 +27,8 @@ export async function GET(request: Request) {
   try {
     const connection = await timed('getGmailConnection', () => getGmailConnection(userId))
     if (!connection) throw new GmailDisconnectedError()
-    if (query.get('refresh') === '1') invalidateGmailCache(userId)
-    const messages = await timed('getCachedGmailMessages', () =>
-      getCachedGmailMessages(userId, connection.email, pageToken, connection.lastImportedAt),
+    const messages = await timed('listGmailMessages', () =>
+      listGmailMessages(userId, pageToken, connection.lastImportedAt),
     )
     return NextResponse.json(messages, { headers: gmailNoStoreHeaders })
   } catch (error) {

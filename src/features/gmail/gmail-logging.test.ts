@@ -2,9 +2,6 @@ import { afterEach, expect, it, vi } from 'vitest'
 import { GET as callback } from '@/app/api/gmail/callback/route'
 import { GET as status } from '@/app/api/gmail/status/route'
 import { connectGmail, getGmailConnection } from './gmail-service'
-import { invalidateGmailCache } from './gmail-cache'
-
-vi.mock('./gmail-cache', () => ({ invalidateGmailCache: vi.fn() }))
 
 vi.mock('@clerk/nextjs/server', () => ({ auth: async () => ({ userId: 'user' }) }))
 vi.mock('next/headers', () => ({
@@ -20,10 +17,9 @@ afterEach(() => {
   vi.resetAllMocks()
 })
 
-it('invalidates the user cache after successfully reconnecting Gmail', async () => {
+it('redirects after successfully reconnecting Gmail', async () => {
   const response = await callback(new Request('https://exodo.test/api/gmail/callback?state=state&code=code'))
   expect(response.headers.get('Location')).toContain('gmail=connected')
-  expect(invalidateGmailCache).toHaveBeenCalledExactlyOnceWith('user')
 })
 
 it('keeps OAuth codes, tokens and SDK request configuration out of callback logs', async () => {

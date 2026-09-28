@@ -19,6 +19,7 @@ import type { Entry } from '@/features/entries/types'
 import type { Category } from '@/features/finance/category'
 import { GmailTransactionListItem } from './GmailTransactionListItem'
 import { GmailReadError, readGmailJson } from './gmail-client'
+import { clearGmailMessagesCache, readGmailMessagesCache, writeGmailMessagesCache } from './gmail-local-cache'
 import { parseGmailMessagePage, type GmailMessageSummary } from './types'
 
 function toEntryDateTime(value: string) {
@@ -37,13 +38,18 @@ function toEntryDateTime(value: string) {
 }
 
 export function GmailInbox({
+  gmailEmail,
+  forceRefresh = false,
   onSaveEntries,
   isSaving,
 }: {
+  gmailEmail: string
+  forceRefresh?: boolean
   onSaveEntries: (entries: Entry[]) => Promise<boolean>
   isSaving: boolean
 }) {
   const [messages, setMessages] = useState<GmailMessageSummary[]>([])
+  const messagesRef = useRef<GmailMessageSummary[]>([])
   const [nextPageToken, setNextPageToken] = useState<string | null>(null)
   const [deselectedIds, setDeselectedIds] = useState<Set<string>>(() => new Set())
   const [categoriesById, setCategoriesById] = useState<Record<string, Category>>({})
@@ -57,43 +63,60 @@ export function GmailInbox({
   const requestRef = useRef<AbortController | null>(null)
   const failedPageRef = useRef<string | undefined>(undefined)
 
-  const load = useCallback(async (pageToken?: string, refresh = false) => {
-    requestRef.current?.abort()
-    const controller = new AbortController()
-    requestRef.current = controller
-    setLoading(true)
-    setError(null)
-    failedPageRef.current = pageToken
-    try {
-      const params = new URLSearchParams()
-      if (pageToken) params.set('pageToken', pageToken)
-      if (refresh) params.set('refresh', '1')
-      const query = params.size ? `?${params}` : ''
-      const page = parseGmailMessagePage(await readGmailJson(`/api/gmail/messages${query}`, controller.signal))
-      if (controller.signal.aborted) return
-      setMessages((current) =>
-        pageToken
-          ? [...current, ...page.messages.filter((message) => !current.some((item) => item.id === message.id))]
-          : page.messages,
-      )
-      setNextPageToken(page.nextPageToken)
-      if (!pageToken) setDeselectedIds(new Set())
-    } catch (error) {
-      if (!controller.signal.aborted)
-        setError(
-          error instanceof GmailReadError
-            ? error
-            : new GmailReadError('Could not load transactions. Please try again.'),
-        )
-    } finally {
-      if (!controller.signal.aborted) setLoading(false)
-    }
-  }, [])
+  const load = useCallback(
+    async (pageToken?: string, bypassCache = false) => {
+      requestRef.current?.abort()
+      const controller = new AbortController()
+      requestRef.current = controller
+      if (!pageToken && bypassCache) clearGmailMessagesCache(gmailEmail)
+      setLoading(true)
+      setError(null)
+      failedPageRef.current = pageToken
+      try {
+        const params = new URLSearchParams()
+        if (pageToken) params.set('pageToken', pageToken)
+        const query = params.size ? `?${params}` : ''
+        const page = parseGmailMessagePage(await readGmailJson(`/api/gmail/messages${query}`, controller.signal))
+        if (controller.signal.aborted) return
+        const nextMessages = pageToken
+          ? [
+              ...messagesRef.current,
+              ...page.messages.filter((message) => !messagesRef.current.some((item) => item.id === message.id)),
+            ]
+          : page.messages
+        messagesRef.current = nextMessages
+        setMessages(nextMessages)
+        setNextPageToken(page.nextPageToken)
+        writeGmailMessagesCache(gmailEmail, { messages: nextMessages, nextPageToken: page.nextPageToken })
+        if (!pageToken) setDeselectedIds(new Set())
+      } catch (error) {
+        if (!controller.signal.aborted)
+          setError(
+            error instanceof GmailReadError
+              ? error
+              : new GmailReadError('Could not load transactions. Please try again.'),
+          )
+      } finally {
+        if (!controller.signal.aborted) setLoading(false)
+      }
+    },
+    [gmailEmail],
+  )
 
   useEffect(() => {
-    void load()
+    const cachedPage = forceRefresh ? null : readGmailMessagesCache(gmailEmail)
+    if (cachedPage) {
+      messagesRef.current = cachedPage.messages
+      setMessages(cachedPage.messages)
+      setNextPageToken(cachedPage.nextPageToken)
+      setDeselectedIds(new Set())
+      setError(null)
+      setLoading(false)
+    } else {
+      void load(undefined, forceRefresh)
+    }
     return () => requestRef.current?.abort()
-  }, [load])
+  }, [forceRefresh, gmailEmail, load])
 
   const transactions = messages
     .filter(
@@ -145,9 +168,12 @@ export function GmailInbox({
         (latest, message) => (message.receivedAt > latest ? message.receivedAt : latest),
         selectedMessages[0].receivedAt,
       )
-      setMessages((current) =>
-        current.filter((message) => !selectedMessages.some((selected) => selected.id === message.id)),
+      const remainingMessages = messagesRef.current.filter(
+        (message) => !selectedMessages.some((selected) => selected.id === message.id),
       )
+      messagesRef.current = remainingMessages
+      setMessages(remainingMessages)
+      writeGmailMessagesCache(gmailEmail, { messages: remainingMessages, nextPageToken })
       setDeselectedIds(new Set())
 
       const response = await fetch('/api/gmail/import-state', {
