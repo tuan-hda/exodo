@@ -4,6 +4,7 @@ import { gmailErrorStatus, isGmailGrantExpired, GmailDisconnectedError } from '.
 export const gmailNoStoreHeaders = { 'Cache-Control': 'private, no-store' }
 
 export function gmailRouteError(error: unknown) {
+  console.error('Failed to read Gmail', error)
   const reconnect = isGmailGrantExpired(error) || gmailErrorStatus(error) === 401
   const disconnected = error instanceof GmailDisconnectedError
   const notFound = gmailErrorStatus(error) === 404
