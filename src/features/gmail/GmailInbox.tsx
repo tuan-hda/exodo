@@ -22,7 +22,11 @@ import { clearGmailMessagesCache, readGmailMessagesCache, writeGmailMessagesCach
 import { parseGmailMessagePage, type GmailMessageSummary } from './types'
 
 type InboxMessage = GmailMessageSummary & {
-  transaction: NonNullable<GmailMessageSummary['transaction']> & { title: string; category: string }
+  transaction: NonNullable<GmailMessageSummary['transaction']> & { title: string; category: string; divided?: boolean }
+}
+
+function transactionAmount({ amount, divided }: InboxMessage['transaction']) {
+  return amount !== null && divided ? Math.sign(amount) * Math.round(Math.abs(amount) / 2) : amount
 }
 
 function prepareTransactions(messages: GmailMessageSummary[]): InboxMessage[] {
@@ -149,7 +153,10 @@ export function GmailInbox({
   )
   const allSelected = messages.length > 0 && selectedCount === messages.length
 
-  function updateTransaction(index: number, changes: Partial<Pick<InboxMessage['transaction'], 'title' | 'category'>>) {
+  function updateTransaction(
+    index: number,
+    changes: Partial<Pick<InboxMessage['transaction'], 'title' | 'category' | 'divided'>>,
+  ) {
     const nextMessages = messagesRef.current.map((message, currentIndex) =>
       currentIndex === index ? { ...message, transaction: { ...message.transaction, ...changes } } : message,
     )
@@ -161,12 +168,13 @@ export function GmailInbox({
     if (selectedMessages.length === 0 || selectedHasInvalidAmount || savingBatch || isSaving) return
     const entries: Entry[] = selectedMessages.flatMap((message) => {
       const transaction = message.transaction
-      if (transaction?.amount === null || !transaction) return []
+      const amount = transactionAmount(transaction)
+      if (amount === null) return []
       return [
         {
           id: crypto.randomUUID(),
-          type: transaction.amount > 0 ? 'income' : 'expense',
-          amount: Math.abs(transaction.amount),
+          type: amount > 0 ? 'income' : 'expense',
+          amount: Math.abs(amount),
           occurredAt: toEntryDateTime(transaction.occurredAt ?? message.receivedAt),
           title: transaction.title.trim(),
           category: transaction.category,
@@ -301,10 +309,12 @@ export function GmailInbox({
         {messages.map((message, index) => (
           <GmailTransactionListItem
             key={message.id}
-            transaction={message.transaction}
+            transaction={{ ...message.transaction, amount: transactionAmount(message.transaction) }}
             threadId={message.threadId}
             category={message.transaction.category}
             onCategoryChange={(category) => updateTransaction(index, { category })}
+            divided={message.transaction.divided ?? false}
+            onToggleDivide={() => updateTransaction(index, { divided: !message.transaction.divided })}
             name={message.transaction.title}
             onNameChange={(title) => updateTransaction(index, { title })}
             nameId={`gmail-transaction-${message.id}-name`}

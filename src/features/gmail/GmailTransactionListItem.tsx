@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { CategoryOptionGrid } from '@/features/finance/CategoryOptionGrid'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { GmailTransactionDetails } from './GmailTransactionDetails'
 import { expenseCategories, incomeCategories, type Category } from '@/features/finance/category'
 import type { GmailTransaction } from './types'
@@ -13,6 +14,8 @@ export function GmailTransactionListItem({
   threadId,
   category,
   onCategoryChange,
+  divided,
+  onToggleDivide,
   name,
   onNameChange,
   nameId,
@@ -24,6 +27,8 @@ export function GmailTransactionListItem({
   threadId: string
   category: Category
   onCategoryChange: (category: Category) => void
+  divided: boolean
+  onToggleDivide: () => void
   name: string
   onNameChange: (name: string) => void
   nameId: string
@@ -53,35 +58,45 @@ export function GmailTransactionListItem({
         <GmailTransactionDetails transaction={transaction} threadId={threadId} />
       </div>
       <div className="grid min-w-0 gap-4 pb-4 pl-8">
-        <fieldset className="grid min-w-0 gap-3" aria-label="Transaction name">
-          <div className="flex flex-wrap gap-x-5 gap-y-2">
-            <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm">
-              <input
-                type="radio"
-                name={`${nameId}-mode`}
-                className="size-4 accent-ink"
-                checked={showName}
-                disabled={disabled}
-                onChange={() => setNameEnabled(true)}
-              />
-              Name
-            </label>
-            <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm">
-              <input
-                type="radio"
-                name={`${nameId}-mode`}
-                className="size-4 accent-ink"
-                checked={!showName}
-                disabled={disabled}
-                onChange={() => {
-                  setNameEnabled(false)
-                  onNameChange('')
-                }}
-              />
-              No name
-            </label>
-          </div>
-        </fieldset>
+        <div className="flex items-center justify-between gap-3">
+          <fieldset className="min-w-0" aria-label="Transaction name">
+            <div className="flex flex-wrap gap-x-5 gap-y-2">
+              <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name={`${nameId}-mode`}
+                  className="size-4 accent-ink"
+                  checked={showName}
+                  disabled={disabled}
+                  onChange={() => setNameEnabled(true)}
+                />
+                Name
+              </label>
+              <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name={`${nameId}-mode`}
+                  className="size-4 accent-ink"
+                  checked={!showName}
+                  disabled={disabled}
+                  onChange={() => {
+                    setNameEnabled(false)
+                    onNameChange('')
+                  }}
+                />
+                No name
+              </label>
+            </div>
+          </fieldset>
+          <Button
+            variant={divided ? 'default' : 'secondary'}
+            aria-label="Split transaction amount in half"
+            aria-pressed={divided}
+            disabled={disabled || transaction.amount === null || transaction.amount === 0}
+            onClick={onToggleDivide}>
+            / 2
+          </Button>
+        </div>
         {showName && (
           <Field>
             <FieldLabel htmlFor={nameId} hint="optional">
