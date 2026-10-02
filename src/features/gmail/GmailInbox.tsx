@@ -16,11 +16,34 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StateMessage } from '@/components/StateMessage'
 import type { Entry } from '@/features/entries/types'
-import type { Category } from '@/features/finance/category'
 import { GmailTransactionListItem } from './GmailTransactionListItem'
 import { GmailReadError, readGmailJson } from './gmail-client'
 import { clearGmailMessagesCache, readGmailMessagesCache, writeGmailMessagesCache } from './gmail-local-cache'
 import { parseGmailMessagePage, type GmailMessageSummary } from './types'
+
+type InboxMessage = GmailMessageSummary & {
+  transaction: NonNullable<GmailMessageSummary['transaction']> & { title: string; category: string }
+}
+
+function prepareTransactions(messages: GmailMessageSummary[]): InboxMessage[] {
+  return messages
+    .filter(
+      (message): message is GmailMessageSummary & { transaction: NonNullable<GmailMessageSummary['transaction']> } =>
+        message.transaction !== null,
+    )
+    .map((message) => ({
+      ...message,
+      transaction: {
+        ...message.transaction,
+        title: message.transaction.title ?? '',
+        category: message.transaction.category ?? ((message.transaction.amount ?? 0) > 0 ? 'Income' : 'Dining'),
+      },
+    }))
+    .sort(
+      (a, b) =>
+        Date.parse(a.transaction.occurredAt ?? a.receivedAt) - Date.parse(b.transaction.occurredAt ?? b.receivedAt),
+    )
+}
 
 function toEntryDateTime(value: string) {
   const parts = new Intl.DateTimeFormat('en-CA', {
@@ -48,12 +71,10 @@ export function GmailInbox({
   onSaveEntries: (entries: Entry[]) => Promise<boolean>
   isSaving: boolean
 }) {
-  const [messages, setMessages] = useState<GmailMessageSummary[]>([])
-  const messagesRef = useRef<GmailMessageSummary[]>([])
+  const [messages, setMessages] = useState<InboxMessage[]>([])
+  const messagesRef = useRef<InboxMessage[]>([])
   const [nextPageToken, setNextPageToken] = useState<string | null>(null)
   const [deselectedIds, setDeselectedIds] = useState<Set<string>>(() => new Set())
-  const [categoriesById, setCategoriesById] = useState<Record<string, Category>>({})
-  const [namesById, setNamesById] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [savingBatch, setSavingBatch] = useState(false)
   const [importMessage, setImportMessage] = useState('')
@@ -78,12 +99,14 @@ export function GmailInbox({
         const query = params.size ? `?${params}` : ''
         const page = parseGmailMessagePage(await readGmailJson(`/api/gmail/messages${query}`, controller.signal))
         if (controller.signal.aborted) return
-        const nextMessages = pageToken
-          ? [
-              ...messagesRef.current,
-              ...page.messages.filter((message) => !messagesRef.current.some((item) => item.id === message.id)),
-            ]
-          : page.messages
+        const nextMessages = prepareTransactions(
+          pageToken
+            ? [
+                ...messagesRef.current,
+                ...page.messages.filter((message) => !messagesRef.current.some((item) => item.id === message.id)),
+              ]
+            : page.messages,
+        )
         messagesRef.current = nextMessages
         setMessages(nextMessages)
         setNextPageToken(page.nextPageToken)
@@ -106,8 +129,9 @@ export function GmailInbox({
   useEffect(() => {
     const cachedPage = forceRefresh ? null : readGmailMessagesCache(gmailEmail)
     if (cachedPage) {
-      messagesRef.current = cachedPage.messages
-      setMessages(cachedPage.messages)
+      const cachedMessages = prepareTransactions(cachedPage.messages)
+      messagesRef.current = cachedMessages
+      setMessages(cachedMessages)
       setNextPageToken(cachedPage.nextPageToken)
       setDeselectedIds(new Set())
       setError(null)
@@ -118,21 +142,20 @@ export function GmailInbox({
     return () => requestRef.current?.abort()
   }, [forceRefresh, gmailEmail, load])
 
-  const transactions = messages
-    .filter(
-      (message): message is GmailMessageSummary & { transaction: NonNullable<GmailMessageSummary['transaction']> } =>
-        message.transaction !== null,
-    )
-    .sort(
-      (a, b) =>
-        Date.parse(a.transaction.occurredAt ?? a.receivedAt) - Date.parse(b.transaction.occurredAt ?? b.receivedAt),
-    )
-  const selectedCount = transactions.filter((message) => !deselectedIds.has(message.id)).length
-  const selectedMessages = transactions.filter((message) => !deselectedIds.has(message.id))
+  const selectedMessages = messages.filter((message) => !deselectedIds.has(message.id))
+  const selectedCount = selectedMessages.length
   const selectedHasInvalidAmount = selectedMessages.some(
     (message) => message.transaction.amount === null || message.transaction.amount === 0,
   )
-  const allSelected = transactions.length > 0 && selectedCount === transactions.length
+  const allSelected = messages.length > 0 && selectedCount === messages.length
+
+  function updateTransaction(index: number, changes: Partial<Pick<InboxMessage['transaction'], 'title' | 'category'>>) {
+    const nextMessages = messagesRef.current.map((message, currentIndex) =>
+      currentIndex === index ? { ...message, transaction: { ...message.transaction, ...changes } } : message,
+    )
+    messagesRef.current = nextMessages
+    setMessages(nextMessages)
+  }
 
   async function addSelectedTransactions() {
     if (selectedMessages.length === 0 || selectedHasInvalidAmount || savingBatch || isSaving) return
@@ -145,8 +168,8 @@ export function GmailInbox({
           type: transaction.amount > 0 ? 'income' : 'expense',
           amount: Math.abs(transaction.amount),
           occurredAt: toEntryDateTime(transaction.occurredAt ?? message.receivedAt),
-          title: namesById[message.id]?.trim() ?? '',
-          category: categoriesById[message.id] ?? (transaction.amount > 0 ? 'Income' : 'Dining'),
+          title: transaction.title.trim(),
+          category: transaction.category,
         },
       ]
     })
@@ -245,7 +268,7 @@ export function GmailInbox({
           {nextPageToken ? 'No VPBank or Cake transactions in this page.' : 'No VPBank or Cake transactions found.'}
         </p>
       )}
-      {transactions.length > 0 && (
+      {messages.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
             <input
@@ -257,7 +280,7 @@ export function GmailInbox({
                 if (input) input.indeterminate = selectedCount > 0 && !allSelected
               }}
               onChange={() =>
-                setDeselectedIds(allSelected ? new Set(transactions.map((message) => message.id)) : new Set())
+                setDeselectedIds(allSelected ? new Set(messages.map((message) => message.id)) : new Set())
               }
             />
             Select all loaded
@@ -275,15 +298,15 @@ export function GmailInbox({
         </div>
       )}
       <ul className="m-0 min-w-0 list-none p-0">
-        {transactions.map((message) => (
+        {messages.map((message, index) => (
           <GmailTransactionListItem
             key={message.id}
             transaction={message.transaction}
             threadId={message.threadId}
-            category={categoriesById[message.id] ?? ((message.transaction.amount ?? 0) > 0 ? 'Income' : 'Dining')}
-            onCategoryChange={(category) => setCategoriesById((current) => ({ ...current, [message.id]: category }))}
-            name={namesById[message.id] ?? ''}
-            onNameChange={(name) => setNamesById((current) => ({ ...current, [message.id]: name }))}
+            category={message.transaction.category}
+            onCategoryChange={(category) => updateTransaction(index, { category })}
+            name={message.transaction.title}
+            onNameChange={(title) => updateTransaction(index, { title })}
             nameId={`gmail-transaction-${message.id}-name`}
             selected={!deselectedIds.has(message.id)}
             disabled={loading}
@@ -291,7 +314,7 @@ export function GmailInbox({
           />
         ))}
       </ul>
-      {transactions.length > 0 && (
+      {messages.length > 0 && (
         <div>
           <Button
             variant="default"

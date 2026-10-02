@@ -5,6 +5,8 @@ export type GmailTransaction = {
   source: GmailTransactionSource
   amount: number | null
   occurredAt: string | null
+  title?: string
+  category?: string
 }
 
 export type GmailMessageSummary = {
@@ -27,6 +29,8 @@ function isTransaction(value: unknown): value is GmailTransaction | null {
     (isRecord(value) &&
       ['cake', 'vpbank-credit', 'vpbank-debit'].includes(String(value.source)) &&
       (value.amount === null || (typeof value.amount === 'number' && Number.isSafeInteger(value.amount))) &&
+      (value.title === undefined || typeof value.title === 'string') &&
+      (value.category === undefined || typeof value.category === 'string') &&
       (value.occurredAt === null ||
         (typeof value.occurredAt === 'string' && Number.isFinite(Date.parse(value.occurredAt)))))
   )

@@ -1,5 +1,8 @@
-import { describe, expect, it } from 'vitest'
-import { classifyTransactionSubject, parseTransaction } from './transaction-parser'
+import { describe, expect, it, vi } from 'vitest'
+import { convertToVnd } from '@/lib/currency'
+import { classifyTransactionSubject, createTransactionParser } from './transaction-parser'
+
+const parseTransaction = createTransactionParser({ convertAmount: convertToVnd })
 
 const creditSubject =
   'VPBank xin thong bao bien dong so du The tin dung cua Quy khach – VPBank would like to inform your credit card’s balance change'
@@ -57,6 +60,30 @@ describe('transaction email fields', () => {
     })
   })
 
+  it('converts the supplied VPBank USD credit charge to whole VND', () => {
+    expect(
+      parseTransaction(
+        creditSubject,
+        '##### **- 9.99 USD**\nSố tiền thay đổi / *Changed Amount*\n##### **WUTHERINGWAVES.KUROGAM**',
+      ),
+    ).toEqual({ source: 'vpbank-credit', amount: -261438, occurredAt: null })
+  })
+
+  it.each([
+    ['+9.99 USD', 261438],
+    ['-1,234.56 USD', -32308435],
+    ['-10 USD', -261700],
+  ])('converts USD amounts while preserving their sign: %s', (money, amount) => {
+    expect(parseTransaction(debitSubject, `${money}\nSố tiền thay đổi`)?.amount).toBe(amount)
+  })
+
+  it.each(['-9.999 USD', '-1,23.45 USD', '-9.99 VND', '-9.99 EUR'])(
+    'rejects malformed amounts and unsupported currencies: %s',
+    (money) => {
+      expect(parseTransaction(creditSubject, `${money}\nSố tiền thay đổi`)?.amount).toBeNull()
+    },
+  )
+
   it('parses Cake table text without confusing account numbers or fees with the transaction', () => {
     expect(
       parseTransaction(
@@ -104,5 +131,12 @@ describe('transaction email fields', () => {
 
   it('does not parse unrelated email bodies', () => {
     expect(parseTransaction('Cake promotion', 'Số tiền -21.000 đ')).toBeNull()
+  })
+
+  it('uses the injected converter without assuming a rate', () => {
+    const convertAmount = vi.fn(() => -100)
+    const parseWithCustomConverter = createTransactionParser({ convertAmount })
+    expect(parseWithCustomConverter(creditSubject, '- 9.99 USD\nSố tiền thay đổi')?.amount).toBe(-100)
+    expect(convertAmount).toHaveBeenCalledWith(-9.99, 'USD')
   })
 })

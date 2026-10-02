@@ -31,7 +31,8 @@ export function GmailTransactionListItem({
   disabled: boolean
   onToggle: () => void
 }) {
-  const [showName, setShowName] = useState(name.length > 0)
+  const [nameEnabled, setNameEnabled] = useState(false)
+  const showName = name.length > 0 || nameEnabled
   const availableCategories =
     transaction.amount === null
       ? [...expenseCategories, ...incomeCategories, 'Other']
@@ -61,7 +62,7 @@ export function GmailTransactionListItem({
                 className="size-4 accent-ink"
                 checked={showName}
                 disabled={disabled}
-                onChange={() => setShowName(true)}
+                onChange={() => setNameEnabled(true)}
               />
               Name
             </label>
@@ -72,7 +73,10 @@ export function GmailTransactionListItem({
                 className="size-4 accent-ink"
                 checked={!showName}
                 disabled={disabled}
-                onChange={() => setShowName(false)}
+                onChange={() => {
+                  setNameEnabled(false)
+                  onNameChange('')
+                }}
               />
               No name
             </label>
@@ -87,7 +91,10 @@ export function GmailTransactionListItem({
               id={nameId}
               disabled={disabled}
               value={name}
-              onChange={(event) => onNameChange(event.target.value)}
+              onChange={(event) => {
+                setNameEnabled(true)
+                onNameChange(event.target.value)
+              }}
               placeholder={
                 transaction.amount !== null && transaction.amount > 0 ? 'Salary, bonus...' : 'Coffee, groceries...'
               }

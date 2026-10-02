@@ -1,9 +1,13 @@
 import { convert } from 'html-to-text'
 import { isRecord } from '@/lib/guards'
+import { convertToVnd } from '@/lib/currency'
+import { applyAutoCollectRules } from '@/features/inbox/auto-collect-rules'
 import { gmailErrorStatus } from './gmail-api'
 import { getGmailClient } from './gmail-service'
-import { classifyTransactionSubject, parseTransaction } from './transaction-parser'
+import { classifyTransactionSubject, createTransactionParser } from './transaction-parser'
 import type { GmailMessage, GmailMessageSummary, GmailMessagePage } from './types'
+
+const parseTransaction = createTransactionParser({ convertAmount: convertToVnd })
 
 function decodeHeaderText(value: string) {
   return value
@@ -114,11 +118,13 @@ export async function decodeMessage(
   const htmlBody = htmlTexts.join('\n\n').trim()
   const transaction = parseTransaction(summary.subject, plainBody)
   const htmlTransaction = parseTransaction(summary.subject, htmlBody)
+  const defaults = applyAutoCollectRules(`${plainBody}\n${htmlBody}`)
   return {
     ...summary,
     recipient: header(value.payload, 'to'),
     body: plainBody || htmlBody,
     transaction: transaction && {
+      ...defaults,
       source: transaction.source,
       amount: transaction.amount ?? htmlTransaction?.amount ?? null,
       occurredAt: transaction.occurredAt ?? htmlTransaction?.occurredAt ?? null,

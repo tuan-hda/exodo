@@ -1,4 +1,11 @@
+import { CURRENCY_LABEL_PATTERN, parseCurrencyAmount, type CurrencyConverter } from '@/lib/currency'
 import type { GmailTransaction, GmailTransactionSource } from './types'
+
+type TransactionParserDependencies = { convertAmount: CurrencyConverter }
+
+export function createTransactionParser({ convertAmount }: TransactionParserDependencies) {
+  return (subject: string, body: string) => parseTransaction(subject, body, convertAmount)
+}
 
 export function classifyTransactionSubject(subject: string): GmailTransactionSource | null {
   const title = subject
@@ -32,7 +39,7 @@ function parseTransactionDate(value: string | undefined): string | null {
   return normalized === local ? date.toISOString() : null
 }
 
-export function parseTransaction(subject: string, body: string): GmailTransaction | null {
+function parseTransaction(subject: string, body: string, convertAmount: CurrencyConverter): GmailTransaction | null {
   const source = classifyTransactionSubject(subject)
   if (!source) return null
   const text = body
@@ -43,13 +50,13 @@ export function parseTransaction(subject: string, body: string): GmailTransactio
     .replace(/[|*]/g, ' ')
     .replace(/\s+/g, ' ')
     .toLowerCase()
-  const money = '([+-]?\\s*(?:\\d{1,3}(?:[.,]\\d{3})+|\\d+))\\s*(?:vnd\\b|d\\b|₫)'
+  const money = `([+-]?\\s*\\d[\\d.,]*)\\s*(${CURRENCY_LABEL_PATTERN})`
   const amountMatch =
     source === 'cake'
       ? new RegExp(`\\bso tien\\s*:?\\s+${money}`).exec(text)
       : new RegExp(`(?<![\\d.,])${money}\\s+so tien thay doi`).exec(text)
-  const parsedAmount = amountMatch ? Number(amountMatch[1].replace(/[.,\s]/g, '')) : null
-  const amount = parsedAmount !== null && Number.isSafeInteger(parsedAmount) ? parsedAmount : null
+  const moneyValue = amountMatch ? parseCurrencyAmount(amountMatch[1], amountMatch[2]) : null
+  const amount = moneyValue ? convertAmount(moneyValue.amount, moneyValue.currency) : null
   const timestamp = '(\\d{2}/\\d{2}/\\d{4}[,\\s]+\\d{2}:\\d{2}:\\d{2})'
   const dateMatch =
     source === 'cake'

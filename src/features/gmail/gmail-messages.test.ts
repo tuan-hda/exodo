@@ -28,6 +28,22 @@ const message = (payload: Record<string, unknown> = part('Hello')) => ({
 })
 
 describe('reading Gmail messages', () => {
+  it('applies Inbox defaults from HTML content when plain text has no matching merchant', async () => {
+    const email = await decodeMessage(
+      message({
+        mimeType: 'multipart/alternative',
+        headers: [{ name: 'Subject', value: '[CAKE] Thông báo giao dịch thành công' }],
+        parts: [part('Số tiền -21.000 đ'), part('<p>Payment for WUTHERINGWAVES.KUROGAM</p>', 'text/html')],
+      }),
+    )
+    expect(email.transaction).toEqual({
+      source: 'cake',
+      amount: -21000,
+      occurredAt: null,
+      title: 'Wuwa',
+      category: 'Entertainment',
+    })
+  })
   it.each([false, true])('extracts the supplied Cake HTML with a plain-text alternative: %s', async (hasPlain) => {
     const email = await decodeMessage(
       message({
