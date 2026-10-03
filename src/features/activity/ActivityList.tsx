@@ -48,10 +48,7 @@ export function ActivityList({
   return (
     <section className="ui-page-enter ui-page-enter-delay-260" aria-busy={isLoading}>
       <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="ui-eyebrow mb-3">recent activity</p>
-          <h2 className="ui-section-title m-0">What moved.</h2>
-        </div>
+        <h2 className="ui-section-title m-0">Transactions</h2>
         <IconTile size="md" shape="circle" aria-hidden="true">
           <ClockCounterClockwise className="text-muted" size={19} />
         </IconTile>
@@ -109,7 +106,6 @@ export function ActivityList({
             <span>{previousMonth ? formatActivityMonth(previousMonth) : '—'}</span>
           </Button>
           <div className="grid justify-items-center gap-0.5 px-3 text-center">
-            <span className="ui-label tracking-[.1em]">Viewing</span>
             <strong className="text-sm font-semibold text-ink">
               {activeMonth ? formatActivityMonth(activeMonth) : '—'}
             </strong>
@@ -187,7 +183,6 @@ export function ActivityList({
                 ))}
               </section>
             ))}
-            <p className="ui-label m-0 border-t border-line px-2 py-4 text-center">End of transactions</p>
           </section>
         ) : isLoading ? (
           <div className="mt-4 grid gap-3" role="status" aria-label="Loading activity">
@@ -207,11 +202,7 @@ export function ActivityList({
             className="mt-4"
             icon={<CalendarDots size={21} />}
             title={entries.length ? 'No matching records found' : 'No activity yet'}
-            description={
-              entries.length
-                ? 'Try a different search or choose another month.'
-                : 'Your first record will show up here.'
-            }
+            description={entries.length ? 'Try a different search or choose another month.' : undefined}
           />
         )}
       </div>

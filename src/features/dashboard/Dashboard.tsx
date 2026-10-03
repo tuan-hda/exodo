@@ -105,18 +105,9 @@ function Dashboard() {
           )}
           {activeTab === 'today' && (
             <>
-              <section className="ui-page-enter grid grid-cols-[minmax(0,1.3fr)_minmax(220px,.7fr)] items-end gap-12 pt-16 pb-14 max-md:grid-cols-1 max-md:gap-7 max-md:pt-10 max-md:pb-10">
-                <div>
-                  <p className="ui-eyebrow mb-4">{formatLongDate(currentDay)}</p>
-                  <h1 className="m-0 max-w-[10ch] text-[clamp(48px,7vw,84px)] font-semibold leading-[.92] tracking-[-.095em] max-xs:text-[48px]">
-                    Spend what today
-                    <br />
-                    <em className="not-italic text-ink">makes possible.</em>
-                  </h1>
-                </div>
-                <p className="ui-page-description mb-1 max-md:mb-0">
-                  Income becomes a daily allowance. Each expense makes the rest of today visible.
-                </p>
+              <section className="ui-page-enter pt-10 pb-8">
+                <p className="ui-eyebrow mb-3">{formatLongDate(currentDay)}</p>
+                <h1 className="m-0 text-4xl font-semibold tracking-tight">Today</h1>
               </section>
               <SummaryPanels
                 entries={entries}
@@ -158,7 +149,6 @@ function Dashboard() {
       </main>
       <footer className="ui-dashboard-frame flex justify-between border-t border-line py-5 font-mono text-[10px] tracking-[.06em] text-muted max-md:pb-28">
         <span>exodo / έξοδο</span>
-        <span>money / a daily practice</span>
       </footer>
       <MobileTabBar activeTab={activeTab} onChange={navigate} onRecord={() => composer.open('expense')} />
       {composer.isOpen && (

@@ -37,12 +37,6 @@ export function BudgetProgress({
         label="monthly limits"
         aside="not set"
         ariaLabel="Monthly limits are not configured">
-        <div className="grid gap-2">
-          <h3 className="ui-section-title m-0">Set your pace.</h3>
-          <p className="m-0 max-w-[42ch] text-sm leading-[1.6] text-muted">
-            Add a category limit and Exodo will show what remains available for each day of the month.
-          </p>
-        </div>
         <Button variant="outline-muted" size="sm" className="justify-self-start" onClick={onOpenSettings}>
           Set a category limit
         </Button>
@@ -93,10 +87,12 @@ export function BudgetProgress({
             {formatMoney(dailyPace)} <small className="ui-meta font-normal">/ day</small>
           </strong>
         </div>
-        <span className="ui-meta max-w-[22ch] text-right max-xs:max-w-none max-xs:text-left">
+        <div className='flex justify-end'>
+        <span className="ui-meta max-w-[22ch] text-right max-xs:max-w-none">
           {formatMoney(remainingBudget)} remaining across {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'}{' '}
           including today
         </span>
+        </div>
       </div>
       <div className="mt-6 grid gap-6">
         {budgetRows.map((row) => (

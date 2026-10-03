@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { CaretDown } from '@phosphor-icons/react'
 import { EmptyState } from '@/components/EmptyState'
 import { StateMessage } from '@/components/StateMessage'
 import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SavingsDepositComposer } from './SavingsDepositComposer'
 import { SavingsGoalList } from './SavingsGoalList'
@@ -34,16 +36,16 @@ export function SavingsGoalsPanel({ savings }: { savings: SavingsState }) {
   const { goals, deposits, isLoading, isSaving, error, addDeposit, deleteDeposit } = savings
   const [depositGoal, setDepositGoal] = useState<string | null>(null)
   const selectedGoal = goals.find((goal) => goal.id === depositGoal)
-  const showHeader = Boolean(error) || isLoading || goals.length > 0
   const countLabel = isLoading && goals.length === 0 ? 'loading' : `${goals.length} tracked`
   return (
-    <section aria-label="Savings goals" aria-busy={isLoading}>
-      {showHeader && (
-        <div className="flex items-center justify-between gap-4 border-b border-line pb-3">
-          <span className="ui-eyebrow">savings goals</span>
+    <details className="group/savings" aria-label="Savings goals" aria-busy={isLoading}>
+      <Button asChild variant="ghost" size="row">
+        <summary>
+          <span className="ui-eyebrow flex-1">Savings goals</span>
           <span className="ui-eyebrow">{countLabel}</span>
-        </div>
-      )}
+          <CaretDown size={16} className="transition-transform group-open/savings:rotate-180" />
+        </summary>
+      </Button>
       {error && (
         <StateMessage tone="danger" className="mb-4">
           {error}
@@ -81,6 +83,6 @@ export function SavingsGoalsPanel({ savings }: { savings: SavingsState }) {
           onSave={(value, note) => addDeposit(selectedGoal.id, value, note)}
         />
       )}
-    </section>
+    </details>
   )
 }

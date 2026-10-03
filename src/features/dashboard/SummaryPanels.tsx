@@ -42,7 +42,6 @@ export function SummaryPanels({
       <FadeContent>
         <DashboardValuePanel
           className={clsx(availableToday < 0 && 'border-danger/40')}
-          minHeightClassName="min-h-[240px]"
           label="available today"
           aside={
             <span className={clsx(entriesLoading ? 'text-muted' : availableToday < 0 ? 'text-danger' : 'text-success')}>
@@ -51,12 +50,11 @@ export function SummaryPanels({
           }
           ariaLabel="Today's available amount"
           ariaBusy={entriesLoading}
-          valueLabel="spendable now"
           value={<CountUp value={availableToday} formatValue={formatMoney} />}
           description={
             todayIncome
               ? `${formatMoney(todayIncome)} allocated - ${formatMoney(todaySpent)} spent`
-              : 'Add income to set your daily pace'
+              : 'Add income to calculate your daily allowance'
           }
           icon={entriesLoading ? <CircleNotch className="animate-spin" size={24} /> : <Check size={24} weight="bold" />}
         />
