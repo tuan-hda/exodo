@@ -15,12 +15,15 @@ export function roundSavingsAmount(amount: number) {
   return Math.round(amount * 100) / 100
 }
 
-export function calculateMonthlyRemainder(entries: Entry[], date = new Date()) {
-  const key = monthKey(date)
+export function getPreviousSavingsMonth(date = new Date()) {
+  return monthKey(new Date(date.getFullYear(), date.getMonth() - 1, 1, 12))
+}
+
+export function calculateMonthlyRemainder(entries: Entry[], calculationMonth: string) {
   return Math.max(
     0,
     entries
-      .filter((entry) => monthKey(entry.occurredAt) === key)
+      .filter((entry) => monthKey(entry.occurredAt) === calculationMonth)
       .reduce((sum, entry) => sum + (entry.type === 'income' ? entry.amount : -entry.amount), 0),
   )
 }

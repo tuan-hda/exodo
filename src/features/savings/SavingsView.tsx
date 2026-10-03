@@ -220,6 +220,26 @@ export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack
         onDelete={(id) => void deleteDeposit(id)}
         onReorder={reorderGoals}
       />
+      {process.env.NODE_ENV === 'development' && (
+        <Card className="grid gap-3 p-5">
+          <p className="text-sm text-muted">
+            Calculate last month's savings. Already-calculated months skip the entry reload.
+          </p>
+          <div>
+            <Button
+              variant="secondary"
+              disabled={isLoading || isSaving || !goals.length}
+              onClick={async () => {
+                setNotice('')
+                if (await savings.testMonthlyCalculation()) {
+                  setNotice('Monthly check complete. Already-calculated months are skipped.')
+                }
+              }}>
+              {isSaving ? 'Checking…' : 'Test monthly calculation'}
+            </Button>
+          </div>
+        </Card>
+      )}
       {selectedGoal && (
         <SavingsDepositComposer
           goal={selectedGoal}

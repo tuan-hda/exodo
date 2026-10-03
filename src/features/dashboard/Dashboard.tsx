@@ -37,6 +37,7 @@ function Dashboard() {
     saveEntries,
     removeEntry,
     refreshEntries,
+    reloadEntries,
   } = useEntries(user?.id)
   const { pullDistance, isRefreshing } = usePullToRefresh(refreshEntries)
   const currentDayKey = useDayBoundary()
@@ -44,7 +45,7 @@ function Dashboard() {
   const [viewMonth, setViewMonth] = useState(new Date(currentDay.getFullYear(), currentDay.getMonth(), 1, 12))
   const { activeTab, navigate } = useAppNavigation()
   const budgetState = useBudgets(user?.id)
-  const savings = useSavings(user?.id, entries, entriesLoading)
+  const savings = useSavings(user?.id, reloadEntries)
   const composer = useEntryComposer({ saveEntry, removeEntry })
 
   const moveMonth = useCallback((delta: number) => {

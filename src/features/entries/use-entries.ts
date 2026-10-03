@@ -190,23 +190,28 @@ export function useEntries(userId?: string) {
     [getSupabase, userId],
   )
 
+  const reloadEntries = useCallback(async () => {
+    if (!userId) throw new Error('Sign in to load records.')
+    const nextEntries = await fetchEntries()
+    entriesRef.current = nextEntries
+    setEntries(nextEntries)
+    setAccumulation(calculateAccumulation(nextEntries))
+    writeEntriesCache(userId, nextEntries)
+    setPersistenceError('')
+    return nextEntries
+  }, [fetchEntries, userId])
+
   const refreshEntries = useCallback(async () => {
     if (!userId) return false
     try {
-      const nextEntries = await fetchEntries()
-      const nextAccumulation = calculateAccumulation(nextEntries)
-      entriesRef.current = nextEntries
-      setEntries(nextEntries)
-      setAccumulation(nextAccumulation)
-      writeEntriesCache(userId, nextEntries)
-      setPersistenceError('')
+      await reloadEntries()
       return true
     } catch (error) {
       console.error('Failed to refresh entries from Supabase', error)
       setPersistenceError('Could not refresh your records. Please try again.')
       return false
     }
-  }, [fetchEntries, userId])
+  }, [reloadEntries, userId])
 
   return {
     entries,
@@ -218,5 +223,6 @@ export function useEntries(userId?: string) {
     saveEntries,
     removeEntry,
     refreshEntries,
+    reloadEntries,
   }
 }

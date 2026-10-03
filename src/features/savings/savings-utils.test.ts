@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { monthKey } from '@/lib/date'
 import {
   allocateRemainder,
   buildAutomaticSavingsPlan,
   calculateMonthlyRemainder,
+  getPreviousSavingsMonth,
   normalizeSavingsDeposit,
   normalizeSavingsGoal,
   reorderSavingsGoals,
@@ -41,15 +41,22 @@ describe('savings calculations', () => {
     expect(reorderSavingsGoals(goals, ['first', 'unknown'])).toBeNull()
   })
 
-  it('calculates the current month remainder', () => {
+  it('calculates the previous month remainder and excludes the current month', () => {
     const entries = [
       { id: 'income', type: 'income' as const, amount: 10_000, occurredAt: '2026-09-03T09:00', title: '' },
       { id: 'expense', type: 'expense' as const, amount: 2_500, occurredAt: '2026-09-08T12:00', title: '' },
       { id: 'old', type: 'income' as const, amount: 9_000, occurredAt: '2026-08-31T12:00', title: '' },
+      { id: 'current', type: 'income' as const, amount: 50_000, occurredAt: '2026-10-01T12:00', title: '' },
     ]
 
-    expect(calculateMonthlyRemainder(entries, new Date('2026-09-09T12:00:00'))).toBe(7_500)
-    expect(monthKey(new Date('2026-09-09T12:00:00'))).toBe('2026-09')
+    const calculationMonth = getPreviousSavingsMonth(new Date('2026-10-01T00:00:00'))
+    expect(calculationMonth).toBe('2026-09')
+    expect(calculateMonthlyRemainder(entries, calculationMonth)).toBe(7_500)
+  })
+
+  it('handles January and month-end dates when selecting the previous month', () => {
+    expect(getPreviousSavingsMonth(new Date('2026-01-01T00:00:00'))).toBe('2025-12')
+    expect(getPreviousSavingsMonth(new Date('2026-03-31T12:00:00'))).toBe('2026-02')
   })
 
   it('allocates remainder by priority and caps each goal', () => {

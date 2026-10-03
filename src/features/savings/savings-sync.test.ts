@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { AutomaticSavingsPlanItem } from './savings-utils'
+import { calculateMonthlyRemainder, getPreviousSavingsMonth, type AutomaticSavingsPlanItem } from './savings-utils'
 import { applyAutomaticSavingsPlan, calculateSavingsOncePerMonth, deleteSavingsContribution } from './savings-sync'
 
 function createSupabaseStub(
@@ -78,40 +78,111 @@ describe('once-per-month savings calculation', () => {
   it('does not recreate a deleted contribution when the month is already calculated', async () => {
     const calls: string[] = []
     const supabase = createSupabaseStub(calls, null, { lastCalculatedMonth: '2026-10' })
-    expect(await calculateSavingsOncePerMonth(supabase, 'user-1', [goal], 500, '2026-10')).toBe(false)
+    const loadRemainder = vi.fn(async () => 500)
+    expect(await calculateSavingsOncePerMonth(supabase, 'user-1', [goal], loadRemainder, '2026-10')).toBe(false)
+    expect(loadRemainder).not.toHaveBeenCalled()
     expect(calls).toEqual(['eq:savings_automation_state:user_id:user-1'])
   })
 
   it('calculates a new month and records its completion after allocating', async () => {
     const calls: string[] = []
     const supabase = createSupabaseStub(calls, null, { lastCalculatedMonth: '2026-09' })
-    expect(await calculateSavingsOncePerMonth(supabase, 'user-1', [goal], 500, '2026-10')).toBe(true)
+    expect(await calculateSavingsOncePerMonth(supabase, 'user-1', [goal], async () => 500, '2026-10')).toBe(true)
     expect(calls).toContain('update:savings_goals:{"saved_amount":1500}')
     expect(calls.at(-1)).toBe('upsert:savings_automation_state:{"user_id":"user-1","last_calculated_month":"2026-10"}')
+  })
+
+  it('in October imports September remainder and stores September as the calculated month', async () => {
+    const calls: string[] = []
+    const supabase = createSupabaseStub(calls, null, { lastCalculatedMonth: '2026-08' })
+    const calculationMonth = getPreviousSavingsMonth(new Date('2026-10-01T00:00:00'))
+    const entries = [
+      { id: 'sep-income', type: 'income' as const, amount: 800, occurredAt: '2026-09-30T12:00', title: '' },
+      { id: 'sep-expense', type: 'expense' as const, amount: 300, occurredAt: '2026-09-30T13:00', title: '' },
+      { id: 'oct-income', type: 'income' as const, amount: 9000, occurredAt: '2026-10-01T12:00', title: '' },
+    ]
+    expect(
+      await calculateSavingsOncePerMonth(
+        supabase,
+        'user-1',
+        [goal],
+        async () => calculateMonthlyRemainder(entries, calculationMonth),
+        calculationMonth,
+      ),
+    ).toBe(true)
+    expect(calls).toContain('update:savings_goals:{"saved_amount":1500}')
+    expect(calls.find((call) => call.startsWith('insert:savings_deposits:'))).toContain('"month_key":"2026-09"')
+    expect(calls.at(-1)).toBe('upsert:savings_automation_state:{"user_id":"user-1","last_calculated_month":"2026-09"}')
   })
 
   it('calculates once even when the remainder or goal changes later in the month', async () => {
     const calls: string[] = []
     const supabase = createSupabaseStub(calls)
-    await calculateSavingsOncePerMonth(supabase, 'user-1', [goal], 500, '2026-10')
+    await calculateSavingsOncePerMonth(supabase, 'user-1', [goal], async () => 500, '2026-10')
     calls.length = 0
     expect(
-      await calculateSavingsOncePerMonth(supabase, 'user-1', [{ ...goal, savedAmount: 1_500 }], 900, '2026-10'),
+      await calculateSavingsOncePerMonth(
+        supabase,
+        'user-1',
+        [{ ...goal, savedAmount: 1_500 }],
+        async () => 900,
+        '2026-10',
+      ),
     ).toBe(false)
     expect(calls).toEqual(['eq:savings_automation_state:user_id:user-1'])
   })
 
   it('marks a zero-remainder month as calculated too', async () => {
     const calls: string[] = []
-    expect(await calculateSavingsOncePerMonth(createSupabaseStub(calls), 'user-1', [goal], 0, '2026-10')).toBe(false)
+    expect(
+      await calculateSavingsOncePerMonth(createSupabaseStub(calls), 'user-1', [goal], async () => 0, '2026-10'),
+    ).toBe(false)
     expect(calls.at(-1)).toBe('upsert:savings_automation_state:{"user_id":"user-1","last_calculated_month":"2026-10"}')
+  })
+
+  it('waits for fresh entries before making any savings writes', async () => {
+    const calls: string[] = []
+    let resolveRemainder!: (amount: number) => void
+    const freshRemainder = new Promise<number>((resolve) => {
+      resolveRemainder = resolve
+    })
+    const calculation = calculateSavingsOncePerMonth(
+      createSupabaseStub(calls),
+      'user-1',
+      [goal],
+      () => freshRemainder,
+      '2026-10',
+    )
+    await Promise.resolve()
+    expect(calls).toEqual(['eq:savings_automation_state:user_id:user-1'])
+    resolveRemainder(500)
+    expect(await calculation).toBe(true)
+    expect(calls).toContain('update:savings_goals:{"saved_amount":1500}')
+  })
+
+  it('does not write contributions or mark the month when fresh entries fail to load', async () => {
+    const calls: string[] = []
+    await expect(
+      calculateSavingsOncePerMonth(
+        createSupabaseStub(calls),
+        'user-1',
+        [goal],
+        async () => {
+          throw new Error('Entries unavailable')
+        },
+        '2026-10',
+      ),
+    ).rejects.toThrow('Entries unavailable')
+    expect(calls).toEqual(['eq:savings_automation_state:user_id:user-1'])
   })
 
   it('does not mark a month complete when allocation fails', async () => {
     const calls: string[] = []
     const error = new Error('Insert failed')
     const supabase = createSupabaseStub(calls, null, { insertError: error })
-    await expect(calculateSavingsOncePerMonth(supabase, 'user-1', [goal], 500, '2026-10')).rejects.toThrow(error)
+    await expect(calculateSavingsOncePerMonth(supabase, 'user-1', [goal], async () => 500, '2026-10')).rejects.toThrow(
+      error,
+    )
     expect(calls.some((call) => call.startsWith('upsert:'))).toBe(false)
   })
 })

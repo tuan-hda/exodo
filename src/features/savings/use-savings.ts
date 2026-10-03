@@ -3,10 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSupabase } from '@/hooks/use-supabase'
 import { readStorageCache, storageCacheTtl, writeStorageCache } from '@/lib/storage'
-import { monthKey } from '@/lib/date'
 import type { Entry } from '@/features/entries/types'
 import {
   calculateMonthlyRemainder,
+  getPreviousSavingsMonth,
   normalizeSavingsDeposit,
   normalizeSavingsGoal,
   reorderSavingsGoals,
@@ -40,7 +40,7 @@ function writeSavingsCache(userId: string, goals: SavingsGoal[], deposits: Savin
   writeStorageCache(savingsCacheKey(userId), { goals, deposits })
 }
 
-export function useSavings(userId: string | undefined, entries: Entry[], entriesLoading: boolean) {
+export function useSavings(userId: string | undefined, reloadEntries: () => Promise<Entry[]>) {
   const { getSupabase } = useSupabase()
   const [goals, setGoals] = useState<SavingsGoal[]>([])
   const [deposits, setDeposits] = useState<SavingsDeposit[]>([])
@@ -313,32 +313,69 @@ export function useSavings(userId: string | undefined, entries: Entry[], entries
 
   const syncAutomaticRemainder = useCallback(async () => {
     if (automaticSyncInFlightRef.current) return
-    const currentMonth = monthKey()
-    if (calculatedMonthRef.current === currentMonth) return
+    const calculationMonth = getPreviousSavingsMonth()
+    if (calculatedMonthRef.current === calculationMonth) return
     const currentGoals = goalsRef.current
     if (!userId || !currentGoals.length) return
     automaticSyncInFlightRef.current = true
     try {
-      const remainder = calculateMonthlyRemainder(entries)
       const supabase = await getSupabase()
-      const changed = await calculateSavingsOncePerMonth(supabase, userId, currentGoals, remainder, currentMonth)
-      calculatedMonthRef.current = currentMonth
+      const changed = await calculateSavingsOncePerMonth(
+        supabase,
+        userId,
+        currentGoals,
+        async () => calculateMonthlyRemainder(await reloadEntries(), calculationMonth),
+        calculationMonth,
+      )
+      calculatedMonthRef.current = calculationMonth
       if (changed) await refresh(undefined, false)
     } finally {
       automaticSyncInFlightRef.current = false
     }
-  }, [entries, getSupabase, refresh, userId])
+  }, [reloadEntries, getSupabase, refresh, userId])
+
+  const testMonthlyCalculation = useCallback(async () => {
+    if (!userId || isLoading || isSaving || !goalsRef.current.length || !savingsLoadedRef.current) return false
+    setIsSaving(true)
+    setError('')
+    try {
+      await automaticSyncPromiseRef.current?.catch(() => undefined)
+      calculatedMonthRef.current = null
+      const sync = syncAutomaticRemainder()
+      automaticSyncPromiseRef.current = sync
+      await sync
+      return true
+    } catch (syncError) {
+      console.error('Failed to test monthly savings calculation', syncError)
+      setError('Could not check monthly savings.')
+      return false
+    } finally {
+      setIsSaving(false)
+    }
+  }, [userId, isLoading, isSaving, syncAutomaticRemainder])
 
   useEffect(() => {
-    if (isLoading || isSaving || entriesLoading || !goals.length || !savingsLoadedRef.current) return
+    if (isLoading || isSaving || !goals.length || !savingsLoadedRef.current) return
     const sync = syncAutomaticRemainder()
     automaticSyncPromiseRef.current = sync
     sync.catch((syncError) => {
       console.error('Failed to sync automatic savings remainder', syncError)
       setError('Could not update automatic savings.')
     })
-  }, [entriesLoading, goals, isLoading, isSaving, syncAutomaticRemainder])
-  return { goals, deposits, isLoading, isSaving, error, saveGoal, reorderGoals, addDeposit, deleteDeposit, refresh }
+  }, [goals, isLoading, isSaving, syncAutomaticRemainder])
+  return {
+    goals,
+    deposits,
+    isLoading,
+    isSaving,
+    error,
+    saveGoal,
+    reorderGoals,
+    addDeposit,
+    deleteDeposit,
+    refresh,
+    testMonthlyCalculation,
+  }
 }
 
 export type SavingsState = ReturnType<typeof useSavings>

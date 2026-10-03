@@ -38,7 +38,7 @@ export async function applyAutomaticSavingsPlan(
   supabase: SupabaseClient,
   userId: string,
   plan: AutomaticSavingsPlanItem[],
-  currentMonth: string,
+  calculationMonth: string,
 ) {
   for (const { goal, amount, nextSavedAmount } of plan) {
     const depositResult = await supabase.from('savings_deposits').insert({
@@ -47,7 +47,7 @@ export async function applyAutomaticSavingsPlan(
       amount,
       occurred_at: new Date().toISOString(),
       source: 'automatic',
-      month_key: currentMonth,
+      month_key: calculationMonth,
       note: 'Monthly remainder',
     })
     if (depositResult.error) throw depositResult.error
@@ -66,8 +66,8 @@ export async function calculateSavingsOncePerMonth(
   supabase: SupabaseClient,
   userId: string,
   goals: SavingsGoal[],
-  remainder: number,
-  currentMonth: string,
+  loadRemainder: () => Promise<number>,
+  calculationMonth: string,
 ) {
   const state = await supabase
     .from('savings_automation_state')
@@ -75,13 +75,14 @@ export async function calculateSavingsOncePerMonth(
     .eq('user_id', userId)
     .maybeSingle()
   if (state.error) throw state.error
-  if (state.data?.last_calculated_month === currentMonth) return false
+  if (state.data?.last_calculated_month === calculationMonth) return false
 
+  const remainder = await loadRemainder()
   const plan = buildAutomaticSavingsPlan(goals, remainder)
-  const changed = await applyAutomaticSavingsPlan(supabase, userId, plan, currentMonth)
+  const changed = await applyAutomaticSavingsPlan(supabase, userId, plan, calculationMonth)
   const saved = await supabase.from('savings_automation_state').upsert({
     user_id: userId,
-    last_calculated_month: currentMonth,
+    last_calculated_month: calculationMonth,
   })
   if (saved.error) throw saved.error
   return changed
