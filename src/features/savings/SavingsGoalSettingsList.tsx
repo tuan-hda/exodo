@@ -13,6 +13,7 @@ function SortableGoal({
   disabled,
   onEdit,
   onAdd,
+  onDelete,
   onMove,
   onDrop,
 }: {
@@ -21,6 +22,7 @@ function SortableGoal({
   disabled: boolean
   onEdit: (goal: SavingsGoal) => void
   onAdd: (id: string) => void
+  onDelete: (depositId: string) => void
   onMove: (id: string, delta: number) => void
   onDrop: () => void
 }) {
@@ -38,6 +40,8 @@ function SortableGoal({
         goal={goal}
         deposits={deposits}
         onAdd={disabled ? undefined : onAdd}
+        onDelete={onDelete}
+        disabled={disabled}
         actions={
           <>
             <Button variant="outline" size="sm" disabled={disabled} onClick={() => onEdit(goal)}>
@@ -72,6 +76,7 @@ export function SavingsGoalSettingsList({
   disabled,
   onEdit,
   onAdd,
+  onDelete,
   onReorder,
 }: {
   goals: SavingsGoal[]
@@ -79,6 +84,7 @@ export function SavingsGoalSettingsList({
   disabled: boolean
   onEdit: (goal: SavingsGoal) => void
   onAdd: (id: string) => void
+  onDelete: (depositId: string) => void
   onReorder: (ids: string[]) => Promise<boolean>
 }) {
   const [order, setOrder] = useState(goals.map((goal) => goal.id))
@@ -125,6 +131,7 @@ export function SavingsGoalSettingsList({
               disabled={disabled}
               onEdit={onEdit}
               onAdd={onAdd}
+              onDelete={onDelete}
               onDrop={() => void saveOrder()}
               onMove={(goalId, delta) => {
                 const ids = [...orderRef.current]

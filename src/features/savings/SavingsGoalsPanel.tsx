@@ -31,7 +31,7 @@ export function SavingsGoalsLoading() {
 }
 
 export function SavingsGoalsPanel({ savings }: { savings: SavingsState }) {
-  const { goals, deposits, isLoading, isSaving, error, addDeposit } = savings
+  const { goals, deposits, isLoading, isSaving, error, addDeposit, deleteDeposit } = savings
   const [depositGoal, setDepositGoal] = useState<string | null>(null)
   const selectedGoal = goals.find((goal) => goal.id === depositGoal)
   const showHeader = Boolean(error) || isLoading || goals.length > 0
@@ -63,7 +63,13 @@ export function SavingsGoalsPanel({ savings }: { savings: SavingsState }) {
       )}
       {goals.length > 0 && (
         <div className="mt-4">
-          <SavingsGoalList goals={goals} deposits={deposits} onAdd={setDepositGoal} />
+          <SavingsGoalList
+            goals={goals}
+            deposits={deposits}
+            onAdd={setDepositGoal}
+            onDelete={(id) => void deleteDeposit(id)}
+            disabled={isSaving || isLoading}
+          />
         </div>
       )}
       {selectedGoal && (

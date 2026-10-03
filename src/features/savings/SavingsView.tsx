@@ -26,7 +26,7 @@ type GoalValidationError = {
 }
 
 export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack?: () => void }) {
-  const { goals, deposits, isLoading, isSaving, error, saveGoal, reorderGoals, addDeposit } = savings
+  const { goals, deposits, isLoading, isSaving, error, saveGoal, reorderGoals, addDeposit, deleteDeposit } = savings
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [name, setName] = useState('')
@@ -217,6 +217,7 @@ export function SavingsView({ savings, onBack }: { savings: SavingsState; onBack
         disabled={isSaving || isLoading}
         onEdit={openGoalForm}
         onAdd={setDepositGoal}
+        onDelete={(id) => void deleteDeposit(id)}
         onReorder={reorderGoals}
       />
       {selectedGoal && (

@@ -126,60 +126,17 @@ export function allocateRemainder(goals: SavingsGoal[], remainder: number) {
   })
 }
 
-export function getAutomaticSavingsBaseline(goals: SavingsGoal[], deposits: SavingsDeposit[], currentMonth: string) {
-  const automaticAmounts = new Map<string, number>()
-  for (const deposit of deposits) {
-    if (deposit.source !== 'automatic' || deposit.monthKey !== currentMonth) continue
-    automaticAmounts.set(deposit.goalId, (automaticAmounts.get(deposit.goalId) ?? 0) + deposit.amount)
-  }
-
-  return goals.map((goal) => ({
-    ...goal,
-    savedAmount: Math.max(0, roundSavingsAmount(goal.savedAmount - (automaticAmounts.get(goal.id) ?? 0))),
-  }))
-}
-
 export type AutomaticSavingsPlanItem = {
   goal: SavingsGoal
   amount: number
-  existingAmount: number
-  primaryDeposit: SavingsDeposit | null
-  duplicateDeposits: SavingsDeposit[]
   nextSavedAmount: number
 }
 
-export function buildAutomaticSavingsPlan(
-  goals: SavingsGoal[],
-  deposits: SavingsDeposit[],
-  remainder: number,
-  currentMonth: string,
-): AutomaticSavingsPlanItem[] {
-  const automaticDeposits = deposits.filter(
-    (deposit) => deposit.monthKey === currentMonth && deposit.source === 'automatic',
-  )
-  const depositsByGoal = new Map<string, SavingsDeposit[]>()
-  for (const deposit of automaticDeposits) {
-    const depositsForGoal = depositsByGoal.get(deposit.goalId) ?? []
-    depositsForGoal.push(deposit)
-    depositsByGoal.set(deposit.goalId, depositsForGoal)
-  }
-  const allocations = allocateRemainder(getAutomaticSavingsBaseline(goals, deposits, currentMonth), remainder)
-  const desiredAmounts = new Map(
-    allocations.map((allocation) => [allocation.goalId, roundSavingsAmount(allocation.amount)]),
-  )
-
-  return goals.map((goal) => {
-    const existingDeposits = depositsByGoal.get(goal.id) ?? []
-    const existingAmount = roundSavingsAmount(existingDeposits.reduce((sum, deposit) => sum + deposit.amount, 0))
-    const [primaryDeposit = null, ...duplicateDeposits] = existingDeposits
-    const amount = desiredAmounts.get(goal.id) ?? 0
-    return {
-      goal,
-      amount,
-      existingAmount,
-      primaryDeposit,
-      duplicateDeposits,
-      nextSavedAmount: Math.max(0, roundSavingsAmount(goal.savedAmount - existingAmount + amount)),
-    }
+export function buildAutomaticSavingsPlan(goals: SavingsGoal[], remainder: number): AutomaticSavingsPlanItem[] {
+  const goalsById = new Map(goals.map((goal) => [goal.id, goal]))
+  return allocateRemainder(goals, remainder).flatMap((allocation) => {
+    const goal = goalsById.get(allocation.goalId)!
+    const amount = roundSavingsAmount(allocation.amount)
+    return amount > 0 ? [{ goal, amount, nextSavedAmount: roundSavingsAmount(goal.savedAmount + amount) }] : []
   })
 }

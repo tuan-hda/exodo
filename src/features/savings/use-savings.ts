@@ -6,13 +6,12 @@ import { readStorageCache, storageCacheTtl, writeStorageCache } from '@/lib/stor
 import { monthKey } from '@/lib/date'
 import type { Entry } from '@/features/entries/types'
 import {
-  buildAutomaticSavingsPlan,
   calculateMonthlyRemainder,
   normalizeSavingsDeposit,
   normalizeSavingsGoal,
   reorderSavingsGoals,
 } from './savings-utils'
-import { applyAutomaticSavingsPlan } from './savings-sync'
+import { calculateSavingsOncePerMonth, deleteSavingsContribution } from './savings-sync'
 import type { SavingsDeposit, SavingsGoal } from './types'
 
 function savingsCacheKey(userId: string) {
@@ -53,6 +52,8 @@ export function useSavings(userId: string | undefined, entries: Entry[], entries
   const previousUserIdRef = useRef<string | undefined>(userId)
   const automaticSyncInFlightRef = useRef(false)
   const automaticSyncPromiseRef = useRef<Promise<void> | null>(null)
+  const calculatedMonthRef = useRef<string | null>(null)
+  const savingsLoadedRef = useRef(false)
 
   const refresh = useCallback(
     async (signal?: AbortSignal, showLoading = true) => {
@@ -94,6 +95,7 @@ export function useSavings(userId: string | undefined, entries: Entry[], entries
         })
         goalsRef.current = nextGoals
         depositsRef.current = nextDeposits
+        savingsLoadedRef.current = true
         setGoals(nextGoals)
         setDeposits(nextDeposits)
         writeSavingsCache(userId, nextGoals, nextDeposits)
@@ -113,6 +115,8 @@ export function useSavings(userId: string | undefined, entries: Entry[], entries
     const userChanged = previousUserIdRef.current !== userId
     previousUserIdRef.current = userId
     if (userChanged) {
+      savingsLoadedRef.current = false
+      calculatedMonthRef.current = null
       goalsRef.current = []
       depositsRef.current = []
       setGoals([])
@@ -275,18 +279,50 @@ export function useSavings(userId: string | undefined, entries: Entry[], entries
     [getSupabase, refresh, userId],
   )
 
+  const deleteDeposit = useCallback(
+    async (depositId: string) => {
+      if (!userId || isSaving) return false
+      setIsSaving(true)
+      setError('')
+      try {
+        await automaticSyncPromiseRef.current?.catch(() => undefined)
+        const deposit = depositsRef.current.find((item) => item.id === depositId)
+        const goal = goalsRef.current.find((item) => item.id === deposit?.goalId)
+        if (!deposit || !goal) throw new Error('Contribution is no longer available.')
+        const supabase = await getSupabase()
+        const savedAmount = await deleteSavingsContribution(supabase, userId, deposit, goal)
+        const nextGoals = goalsRef.current.map((item) => (item.id === goal.id ? { ...item, savedAmount } : item))
+        const nextDeposits = depositsRef.current.filter((item) => item.id !== depositId)
+        goalsRef.current = nextGoals
+        depositsRef.current = nextDeposits
+        setGoals(nextGoals)
+        setDeposits(nextDeposits)
+        writeSavingsCache(userId, nextGoals, nextDeposits)
+        return true
+      } catch (deleteError) {
+        console.error('Failed to delete savings contribution', deleteError)
+        await refresh(undefined, false)
+        setError('Could not delete this contribution. Please try again.')
+        return false
+      } finally {
+        setIsSaving(false)
+      }
+    },
+    [getSupabase, isSaving, refresh, userId],
+  )
+
   const syncAutomaticRemainder = useCallback(async () => {
     if (automaticSyncInFlightRef.current) return
+    const currentMonth = monthKey()
+    if (calculatedMonthRef.current === currentMonth) return
     const currentGoals = goalsRef.current
-    const currentDeposits = depositsRef.current
     if (!userId || !currentGoals.length) return
     automaticSyncInFlightRef.current = true
     try {
       const remainder = calculateMonthlyRemainder(entries)
-      const currentMonth = monthKey()
       const supabase = await getSupabase()
-      const plan = buildAutomaticSavingsPlan(currentGoals, currentDeposits, remainder, currentMonth)
-      const changed = await applyAutomaticSavingsPlan(supabase, userId, plan, currentMonth)
+      const changed = await calculateSavingsOncePerMonth(supabase, userId, currentGoals, remainder, currentMonth)
+      calculatedMonthRef.current = currentMonth
       if (changed) await refresh(undefined, false)
     } finally {
       automaticSyncInFlightRef.current = false
@@ -294,7 +330,7 @@ export function useSavings(userId: string | undefined, entries: Entry[], entries
   }, [entries, getSupabase, refresh, userId])
 
   useEffect(() => {
-    if (isLoading || isSaving || entriesLoading || !goals.length) return
+    if (isLoading || isSaving || entriesLoading || !goals.length || !savingsLoadedRef.current) return
     const sync = syncAutomaticRemainder()
     automaticSyncPromiseRef.current = sync
     sync.catch((syncError) => {
@@ -302,7 +338,7 @@ export function useSavings(userId: string | undefined, entries: Entry[], entries
       setError('Could not update automatic savings.')
     })
   }, [entriesLoading, goals, isLoading, isSaving, syncAutomaticRemainder])
-  return { goals, deposits, isLoading, isSaving, error, saveGoal, reorderGoals, addDeposit, refresh }
+  return { goals, deposits, isLoading, isSaving, error, saveGoal, reorderGoals, addDeposit, deleteDeposit, refresh }
 }
 
 export type SavingsState = ReturnType<typeof useSavings>

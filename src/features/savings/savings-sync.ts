@@ -1,62 +1,37 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { AutomaticSavingsPlanItem } from './savings-utils'
+import { buildAutomaticSavingsPlan, roundSavingsAmount, type AutomaticSavingsPlanItem } from './savings-utils'
+import type { SavingsDeposit, SavingsGoal } from './types'
 
-async function deleteDeposit(supabase: SupabaseClient, userId: string, depositId: string) {
-  const result = await supabase.from('savings_deposits').delete().eq('id', depositId).eq('user_id', userId)
-  if (result.error) throw result.error
-}
-
-async function syncAutomaticDeposit(
+export async function deleteSavingsContribution(
   supabase: SupabaseClient,
   userId: string,
-  item: AutomaticSavingsPlanItem,
-  currentMonth: string,
+  deposit: SavingsDeposit,
+  goal: SavingsGoal,
 ) {
-  let changed = false
-  for (const duplicate of item.duplicateDeposits) {
-    await deleteDeposit(supabase, userId, duplicate.id)
-    changed = true
-  }
-
-  const { primaryDeposit, amount, goal } = item
-  if (primaryDeposit && amount <= 0) {
-    await deleteDeposit(supabase, userId, primaryDeposit.id)
-    return true
-  }
-  if (primaryDeposit && Math.abs(amount - primaryDeposit.amount) >= 0.01) {
-    const result = await supabase
-      .from('savings_deposits')
-      .update({ amount })
-      .eq('id', primaryDeposit.id)
-      .eq('user_id', userId)
-    if (result.error) throw result.error
-    return true
-  }
-  if (!primaryDeposit && amount > 0) {
-    const result = await supabase.from('savings_deposits').insert({
-      user_id: userId,
-      goal_id: goal.id,
-      amount,
-      occurred_at: new Date().toISOString(),
-      source: 'automatic',
-      month_key: currentMonth,
-      note: 'Monthly remainder',
-    })
-    if (result.error) throw result.error
-    return true
-  }
-  return changed
-}
-
-async function syncGoalAmount(supabase: SupabaseClient, userId: string, item: AutomaticSavingsPlanItem) {
-  if (Math.abs(item.nextSavedAmount - item.goal.savedAmount) < 0.01) return false
-  const result = await supabase
+  const savedAmount = Math.max(0, roundSavingsAmount(goal.savedAmount - deposit.amount))
+  const goalResult = await supabase
     .from('savings_goals')
-    .update({ saved_amount: item.nextSavedAmount })
-    .eq('id', item.goal.id)
+    .update({ saved_amount: savedAmount })
+    .eq('id', goal.id)
     .eq('user_id', userId)
-  if (result.error) throw result.error
-  return true
+  if (goalResult.error) throw goalResult.error
+
+  const depositResult = await supabase
+    .from('savings_deposits')
+    .delete()
+    .eq('id', deposit.id)
+    .eq('goal_id', goal.id)
+    .eq('user_id', userId)
+  if (depositResult.error) {
+    const restored = await supabase
+      .from('savings_goals')
+      .update({ saved_amount: goal.savedAmount })
+      .eq('id', goal.id)
+      .eq('user_id', userId)
+    if (restored.error) throw restored.error
+    throw depositResult.error
+  }
+  return savedAmount
 }
 
 export async function applyAutomaticSavingsPlan(
@@ -65,10 +40,49 @@ export async function applyAutomaticSavingsPlan(
   plan: AutomaticSavingsPlanItem[],
   currentMonth: string,
 ) {
-  let changed = false
-  for (const item of plan) {
-    changed = (await syncAutomaticDeposit(supabase, userId, item, currentMonth)) || changed
-    changed = (await syncGoalAmount(supabase, userId, item)) || changed
+  for (const { goal, amount, nextSavedAmount } of plan) {
+    const depositResult = await supabase.from('savings_deposits').insert({
+      user_id: userId,
+      goal_id: goal.id,
+      amount,
+      occurred_at: new Date().toISOString(),
+      source: 'automatic',
+      month_key: currentMonth,
+      note: 'Monthly remainder',
+    })
+    if (depositResult.error) throw depositResult.error
+
+    const goalResult = await supabase
+      .from('savings_goals')
+      .update({ saved_amount: nextSavedAmount })
+      .eq('id', goal.id)
+      .eq('user_id', userId)
+    if (goalResult.error) throw goalResult.error
   }
+  return plan.length > 0
+}
+
+export async function calculateSavingsOncePerMonth(
+  supabase: SupabaseClient,
+  userId: string,
+  goals: SavingsGoal[],
+  remainder: number,
+  currentMonth: string,
+) {
+  const state = await supabase
+    .from('savings_automation_state')
+    .select('last_calculated_month')
+    .eq('user_id', userId)
+    .maybeSingle()
+  if (state.error) throw state.error
+  if (state.data?.last_calculated_month === currentMonth) return false
+
+  const plan = buildAutomaticSavingsPlan(goals, remainder)
+  const changed = await applyAutomaticSavingsPlan(supabase, userId, plan, currentMonth)
+  const saved = await supabase.from('savings_automation_state').upsert({
+    user_id: userId,
+    last_calculated_month: currentMonth,
+  })
+  if (saved.error) throw saved.error
   return changed
 }

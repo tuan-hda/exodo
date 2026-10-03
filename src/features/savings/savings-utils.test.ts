@@ -4,12 +4,11 @@ import {
   allocateRemainder,
   buildAutomaticSavingsPlan,
   calculateMonthlyRemainder,
-  getAutomaticSavingsBaseline,
   normalizeSavingsDeposit,
   normalizeSavingsGoal,
   reorderSavingsGoals,
 } from './savings-utils'
-import type { SavingsDeposit, SavingsGoal } from './types'
+import type { SavingsGoal } from './types'
 
 const goal = (id: string, priority: number, targetAmount = 1_000) =>
   ({
@@ -62,67 +61,26 @@ describe('savings calculations', () => {
     ])
   })
 
-  it('removes current-month automatic deposits before recalculating allocations', () => {
-    const goals = [goal('first', 1, 2_000), { ...goal('second', 2), savedAmount: 500 }]
-    const deposits: SavingsDeposit[] = [
-      {
-        id: 'automatic',
-        goalId: 'first',
-        amount: 400,
-        occurredAt: '2026-09-10T12:00:00.000Z',
-        source: 'automatic',
-        monthKey: '2026-09',
-        note: 'Monthly remainder',
-      },
-    ]
-
-    expect(getAutomaticSavingsBaseline(goals, deposits, '2026-09')).toMatchObject([
-      { id: 'first', savedAmount: 0 },
-      { id: 'second', savedAmount: 500 },
+  it('allocates from current saved balances without subtracting earlier contributions', () => {
+    const goals = [{ ...goal('first', 1, 2_000), savedAmount: 500 }, goal('second', 2)]
+    expect(buildAutomaticSavingsPlan(goals, 2_000)).toMatchObject([
+      { goal: { id: 'first', savedAmount: 500 }, amount: 1_500, nextSavedAmount: 2_000 },
+      { goal: { id: 'second', savedAmount: 0 }, amount: 500, nextSavedAmount: 500 },
     ])
+    expect(goals[0].savedAmount).toBe(500)
   })
 
-  it('builds a deterministic reconciliation plan and isolates duplicate deposits', () => {
-    const goals = [{ ...goal('first', 1, 2_000), savedAmount: 500 }, goal('second', 2)]
-    const deposits: SavingsDeposit[] = [
-      {
-        id: 'primary',
-        goalId: 'first',
-        amount: 400,
-        occurredAt: '2026-09-10T12:00:00.000Z',
-        source: 'automatic',
-        monthKey: '2026-09',
-        note: 'Monthly remainder',
-      },
-      {
-        id: 'duplicate',
-        goalId: 'first',
-        amount: 100,
-        occurredAt: '2026-09-09T12:00:00.000Z',
-        source: 'automatic',
-        monthKey: '2026-09',
-        note: 'Monthly remainder',
-      },
-    ]
-
-    expect(buildAutomaticSavingsPlan(goals, deposits, 2_500, '2026-09')).toMatchObject([
-      {
-        goal: { id: 'first' },
-        amount: 2_000,
-        existingAmount: 500,
-        primaryDeposit: { id: 'primary' },
-        duplicateDeposits: [{ id: 'duplicate' }],
-        nextSavedAmount: 2_000,
-      },
-      {
-        goal: { id: 'second' },
-        amount: 500,
-        existingAmount: 0,
-        primaryDeposit: null,
-        duplicateDeposits: [],
-        nextSavedAmount: 500,
-      },
-    ])
+  it('creates no contributions for a zero remainder or full and paused goals', () => {
+    expect(buildAutomaticSavingsPlan([goal('first', 0)], 0)).toEqual([])
+    expect(
+      buildAutomaticSavingsPlan(
+        [
+          { ...goal('full', 0), savedAmount: 1_000 },
+          { ...goal('paused', 1), status: 'paused' },
+        ],
+        500,
+      ),
+    ).toEqual([])
   })
 
   it('normalizes persisted goals and deposits while rejecting malformed rows', () => {

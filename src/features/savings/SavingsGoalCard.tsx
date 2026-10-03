@@ -1,6 +1,17 @@
 import type { ReactNode } from 'react'
-import { Plus } from '@phosphor-icons/react'
+import { Plus, Trash } from '@phosphor-icons/react'
 import { IconTile } from '@/components/IconTile'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -13,11 +24,15 @@ export function SavingsGoalCard({
   goal,
   deposits,
   onAdd,
+  onDelete,
+  disabled = false,
   actions,
 }: {
   goal: SavingsGoal
   deposits: SavingsDeposit[]
   onAdd?: (goalId: string) => void
+  onDelete: (depositId: string) => void
+  disabled?: boolean
   actions?: ReactNode
 }) {
   const percentage = goal.targetAmount ? Math.min(100, (goal.savedAmount / goal.targetAmount) * 100) : 0
@@ -67,9 +82,37 @@ export function SavingsGoalCard({
         <div className="mt-5 border-t border-line pt-3">
           <p className="ui-eyebrow mb-2">Recent contributions</p>
           {recentDeposits.map((deposit) => (
-            <div className="flex justify-between py-1 text-xs" key={deposit.id}>
+            <div className="flex items-center justify-between gap-3 py-1 text-xs" key={deposit.id}>
               <span>{deposit.source === 'automatic' ? 'Monthly remainder' : 'Manual deposit'}</span>
-              <strong className="ui-number font-normal text-ink">+{formatMoney(deposit.amount)}</strong>
+              <div className="flex shrink-0 items-center gap-2">
+                <strong className="ui-number font-normal text-ink">+{formatMoney(deposit.amount)}</strong>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive-ghost"
+                      size="icon-lg"
+                      disabled={disabled}
+                      aria-label={`Delete ${formatMoney(deposit.amount)} contribution to ${goal.name}`}>
+                      <Trash size={16} />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete this contribution?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete the {formatMoney(deposit.amount)} contribution to {goal.name} and
+                        reduce its saved amount.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction variant="destructive" disabled={disabled} onClick={() => onDelete(deposit.id)}>
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
           ))}
         </div>
