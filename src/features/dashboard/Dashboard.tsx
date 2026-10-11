@@ -133,7 +133,9 @@ function Dashboard() {
               </div>
             </>
           )}
-          {activeTab === 'notifications' && <NotificationsView onSaveEntries={saveEntries} isSaving={isSaving} />}
+          {activeTab === 'notifications' && (
+            <NotificationsView onSaveEntries={saveEntries} isSaving={isSaving} onCapturesImported={reloadEntries} />
+          )}
           {activeTab === 'analysis' && (
             <AnalysisView
               entries={entries}

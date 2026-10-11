@@ -20,6 +20,7 @@ describe('capture Clerk exemption', () => {
   it.each([
     ['/api/notifications/capture', false],
     ['/api/notifications/capture?test=1', false],
+    ['/api/notifications/captures', true],
     ['/api/notifications/capture-extra', true],
     ['/api/notifications/capture/nested', true],
     ['/api/gmail/status', true],
