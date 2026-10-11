@@ -66,14 +66,21 @@ describe('notification capture storage', () => {
   })
 
   it('fails closed on database write errors', async () => {
-    mocks.insert.mockResolvedValue({ error: { code: '42P01' } })
-    await expect(createCaptureStore()(capture)).rejects.toThrow('database write failed')
+    const error = {
+      code: '42P01',
+      message: 'Table missing',
+      details: 'notification_captures',
+      hint: 'Apply the migration',
+    }
+    mocks.insert.mockResolvedValue({ error })
+    await expect(createCaptureStore()(capture)).rejects.toBe(error)
     expect(mocks.single).not.toHaveBeenCalled()
   })
 
   it('fails closed when a duplicate cannot be verified', async () => {
     mocks.insert.mockResolvedValue({ error: { code: '23505' } })
-    mocks.single.mockResolvedValue({ data: null, error: { code: 'PGRST116' } })
-    await expect(createCaptureStore()(capture)).rejects.toThrow('duplicate verification failed')
+    const error = { code: 'PGRST116', message: 'No matching row', details: '0 rows', hint: '' }
+    mocks.single.mockResolvedValue({ data: null, error })
+    await expect(createCaptureStore()(capture)).rejects.toBe(error)
   })
 })

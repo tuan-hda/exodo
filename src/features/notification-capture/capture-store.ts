@@ -13,7 +13,7 @@ export function createCaptureStore(client: SupabaseClient = createAdminSupabaseC
       payload: capture,
     })
     if (!inserted.error) return 'stored'
-    if (inserted.error.code !== '23505') throw new Error('Capture database write failed')
+    if (inserted.error.code !== '23505') throw inserted.error
 
     const existing = await client
       .from('notification_captures')
@@ -21,7 +21,8 @@ export function createCaptureStore(client: SupabaseClient = createAdminSupabaseC
       .eq('device_id', capture.device_id)
       .eq('event_id', capture.event_id)
       .single()
-    if (existing.error || !existing.data) throw new Error('Capture duplicate verification failed')
+    if (existing.error) throw existing.error
+    if (!existing.data) throw new Error('Capture duplicate verification returned no row')
     const previous = parseCapture(existing.data.payload)
     return JSON.stringify(previous) === JSON.stringify(capture) ? 'stored' : 'conflict'
   }

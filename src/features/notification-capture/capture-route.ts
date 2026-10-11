@@ -1,7 +1,13 @@
 import { randomUUID } from 'node:crypto'
 import { MAX_CAPTURE_BYTES } from './contract'
 import { createCaptureStore } from './capture-store'
-import { hasCaptureAuthorization, isCaptureCredential, receiveCapture, type CaptureResult } from './receive-capture'
+import {
+  captureErrorDetails,
+  hasCaptureAuthorization,
+  isCaptureCredential,
+  receiveCapture,
+  type CaptureResult,
+} from './receive-capture'
 
 export async function handleCaptureRequest(request: Request): Promise<Response> {
   const requestId = randomUUID()
@@ -107,7 +113,7 @@ export async function handleCaptureRequest(request: Request): Promise<Response> 
   if (bytesRead > MAX_CAPTURE_BYTES) return reject(413, 'payload_too_large', { max_bytes: MAX_CAPTURE_BYTES })
   try {
     return respond(await receiveCapture(bytes, createCaptureStore()))
-  } catch {
-    return reject(503, 'storage_failed', { stage: 'persistence' })
+  } catch (error) {
+    return reject(503, 'storage_failed', { stage: 'persistence', storage_error: captureErrorDetails(error) })
   }
 }

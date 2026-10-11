@@ -141,6 +141,36 @@ describe('deployed notification capture route', () => {
     const response = await POST(request())
     expect(response.status).toBe(result === 'conflict' ? 409 : 503)
     expect((await response.json()).durable).toBe(false)
-    expect(JSON.stringify(log.mock.calls)).not.toContain('secret-database-details')
+    if (result === 'failure') expect(JSON.stringify(log.mock.calls)).toContain('secret-database-details')
+  })
+
+  it('carries Supabase error details into correlated server logs', async () => {
+    const error = {
+      code: '23502',
+      message: 'null value in column user_id',
+      details: 'Failing row',
+      hint: 'Apply ALTER migration',
+    }
+    persist.mockRejectedValue(error)
+    const response = await POST(request())
+    expect(response.status).toBe(503)
+    expect(await response.json()).toEqual({ accepted: false, durable: false, error: 'storage_failed' })
+    const failure = log.mock.calls
+      .map((call) => JSON.parse(call[1] as string))
+      .find((entry) => entry.error === 'storage_failed')
+    expect(failure.storage_error).toEqual(error)
+    expect(failure.request_id).toBe(response.headers.get('X-Request-ID'))
+  })
+
+  it('logs storage initialization errors instead of discarding them', async () => {
+    vi.mocked(createCaptureStore).mockImplementation(() => {
+      throw new Error('Invalid Supabase URL')
+    })
+    const response = await POST(request())
+    expect(response.status).toBe(503)
+    const failure = log.mock.calls
+      .map((call) => JSON.parse(call[1] as string))
+      .find((entry) => entry.error === 'storage_failed')
+    expect(failure.storage_error.message).toBe('Invalid Supabase URL')
   })
 })

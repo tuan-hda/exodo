@@ -1,6 +1,19 @@
 import { timingSafeEqual } from 'node:crypto'
 import { captureValidationIssues, parseCapture } from './contract'
 import type { PersistCapture } from './capture-store'
+import { isRecord } from '../../lib/guards'
+
+export function captureErrorDetails(error: unknown) {
+  if (!isRecord(error)) return { message: String(error) }
+  return {
+    name: error.name,
+    code: error.code,
+    message: error.message,
+    details: error.details,
+    hint: error.hint,
+    stack: error.stack,
+  }
+}
 
 export function isCaptureCredential(value: unknown): value is string {
   return typeof value === 'string' && /^[A-Za-z0-9_-]{32,256}$/.test(value)
@@ -46,9 +59,10 @@ export async function receiveCapture(bytes: Uint8Array, persist: PersistCapture)
         hint: 'The same device/event ID already belongs to a different payload',
       })
     }
-  } catch {
+  } catch (error) {
     return reject(503, 'storage_failed', {
       stage: 'persistence',
+      storage_error: captureErrorDetails(error),
       hint: 'Check Supabase configuration, notification_captures migration, and database connectivity; keep the local file for retry',
     })
   }
