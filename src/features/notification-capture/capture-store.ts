@@ -4,14 +4,9 @@ import { parseCapture, type CaptureEvent } from './contract'
 
 export type PersistCapture = (capture: CaptureEvent) => Promise<'stored' | 'conflict'>
 
-export function createCaptureStore(
-  userId: string,
-  client: SupabaseClient = createAdminSupabaseClient(),
-): PersistCapture {
-  if (!userId.trim()) throw new Error('EXODO_SHORTCUT_USER_ID is required')
+export function createCaptureStore(client: SupabaseClient = createAdminSupabaseClient()): PersistCapture {
   return async (capture) => {
     const inserted = await client.from('notification_captures').insert({
-      user_id: userId,
       device_id: capture.device_id,
       event_id: capture.event_id,
       type: capture.type,
@@ -23,7 +18,6 @@ export function createCaptureStore(
     const existing = await client
       .from('notification_captures')
       .select('payload')
-      .eq('user_id', userId)
       .eq('device_id', capture.device_id)
       .eq('event_id', capture.event_id)
       .single()

@@ -10,16 +10,17 @@ Sync sends pending files to the single deployed endpoint below. Preserve each fi
 
 ## Deploy
 
-1. Apply [the original SQL migration](../supabase-notification-captures-migration.sql), then [the type column migration](../supabase-notification-captures-type-migration.sql) in your existing Supabase SQL editor before deploying the updated receiver. Existing rows default to `notification`; their saved payloads remain unchanged.
+1. Apply [the SQL migration](../supabase-notification-captures-migration.sql) once in your existing Supabase SQL editor before deploying the receiver. It creates the table with `type` accepting `notification` or `mail`, defaulting to `notification`.
 2. Set these variables in your existing Exodo hosting environment:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
-   - `EXODO_SHORTCUT_USER_ID` — your Clerk user ID
    - `EXODO_SHORTCUT_TEST_TOKEN` — the same receiver token used by Sync
 3. Redeploy Exodo through its existing Next.js deployment workflow.
 4. Set Sync's URL to `https://YOUR_EXODO_DOMAIN/api/notifications/capture`, method POST, and header `Authorization: Bearer YOUR_TOKEN`. Choose JSON request body. Keep database credentials on the server.
 
 This exact route authenticates the bearer token instead of requiring a Clerk browser session. Other application routes retain their existing protection. Hosting deployment protection must also permit requests from the phone. There is no separate receiver process, port, tunnel, or receipt-only mode.
+
+If you already created the table with `user_id`, run only [the remove-user-id migration](../supabase-notification-captures-remove-user-id-migration.sql) before deploying this receiver. It removes that column and replaces the primary key with `(device_id, event_id)`, preserving capture rows and other columns. Duplicate device/event pairs abort the transaction without deleting captures. Re-running the original CREATE TABLE script does not alter an existing table.
 
 ## Payload
 
@@ -37,7 +38,7 @@ This exact route authenticates the bearer token instead of requiring a Clerk bro
 }
 ```
 
-Version accepts `1` or `"1"` and normalizes to `1`. Event ID, device ID, source, and capture time must be nonempty strings; there are no identifier patterns or timestamp-format checks. Continue sending ISO 8601 from the phone. Missing/null title, subtitle, and message become empty strings. Other supplied text types are rejected. Extra fields are ignored. Body limit: 64 KiB. Ownership comes from the server setting, not the payload.
+Version accepts `1` or `"1"` and normalizes to `1`. Event ID, device ID, source, and capture time must be nonempty strings; there are no identifier patterns or timestamp-format checks. Continue sending ISO 8601 from the phone. Missing/null title, subtitle, and message become empty strings. Other supplied text types are rejected. Extra fields are ignored. Body limit: 64 KiB. This capture endpoint is single-user; it does not assign user ownership. Duplicate protection uses `(device_id, event_id)`.
 
 `type` accepts only `notification` or `mail`; omitted type defaults to `notification` so existing queued files still work. Add `type` with text value `notification` to both Capture's saved Dictionary and Sync's JSON request body. The table stores the normalized type in its own column and in new JSON payloads. Type is part of payload comparison: changing it for an existing event returns a conflict. Accepting `mail` does not add Gmail ingestion or email parsing.
 
@@ -49,7 +50,7 @@ Send the synthetic payload above. Confirm the stored row in `notification_captur
 {"event_id":"synthetic-capture-001","accepted":true,"durable":true}
 ```
 
-Resend the same payload: one row must remain. A retry with changed content under the same owner/device/event identity returns `409 event_conflict`; the original row stays unchanged. Storage failures return `503 storage_failed` and never authorize deletion. Missing configuration returns `503 receiver_not_configured`; wrong token returns `401`; invalid fields return `400`; wrong content type returns `415`; oversized bodies return `413`.
+Resend the same payload: one row must remain. A retry with changed content under the same device/event identity returns `409 event_conflict`; the original row stays unchanged. Storage failures return `503 storage_failed` and never authorize deletion. Missing configuration returns `503 receiver_not_configured`; wrong token returns `401`; invalid fields return `400`; wrong content type returns `415`; oversized bodies return `413`.
 
 Hosting logs include request IDs, detailed rejection reasons, and authenticated raw bodies capped at 64 KiB. Authorization headers stay hidden. The response's `X-Request-ID` matches its log entries.
 

@@ -17,11 +17,10 @@ beforeEach(() => {
 })
 
 describe('notification capture storage', () => {
-  it('assigns server-controlled ownership and inserts the complete normalized capture', async () => {
-    expect(await createCaptureStore('user_owner')(capture)).toBe('stored')
+  it('inserts the complete normalized capture without user ownership', async () => {
+    expect(await createCaptureStore()(capture)).toBe('stored')
     expect(mocks.from).toHaveBeenCalledWith('notification_captures')
     expect(mocks.insert).toHaveBeenCalledExactlyOnceWith({
-      user_id: 'user_owner',
       device_id: capture.device_id,
       event_id: capture.event_id,
       type: 'notification',
@@ -34,9 +33,8 @@ describe('notification capture storage', () => {
     mocks.insert.mockResolvedValue({ error: { code: '23505' } })
     const reordered = Object.fromEntries(Object.entries(capture).reverse())
     mocks.single.mockResolvedValue({ data: { payload: reordered }, error: null })
-    expect(await createCaptureStore('user_owner')(capture)).toBe('stored')
+    expect(await createCaptureStore()(capture)).toBe('stored')
     expect(mocks.eq.mock.calls).toEqual([
-      ['user_id', 'user_owner'],
       ['device_id', capture.device_id],
       ['event_id', capture.event_id],
     ])
@@ -45,13 +43,13 @@ describe('notification capture storage', () => {
   it('rejects conflicting retries while preserving the existing record', async () => {
     mocks.insert.mockResolvedValue({ error: { code: '23505' } })
     mocks.single.mockResolvedValue({ data: { payload: { ...capture, message: 'different content' } }, error: null })
-    expect(await createCaptureStore('user_owner')(capture)).toBe('conflict')
+    expect(await createCaptureStore()(capture)).toBe('conflict')
     expect(mocks.insert).toHaveBeenCalledTimes(1)
   })
 
   it('stores mail type in both the table column and payload', async () => {
     const mail = { ...capture, type: 'mail' as const }
-    expect(await createCaptureStore('user_owner')(mail)).toBe('stored')
+    expect(await createCaptureStore()(mail)).toBe('stored')
     expect(mocks.insert).toHaveBeenCalledWith(expect.objectContaining({ type: 'mail', payload: mail }))
   })
 
@@ -59,27 +57,23 @@ describe('notification capture storage', () => {
     const { type: _type, ...legacy } = capture
     mocks.insert.mockResolvedValue({ error: { code: '23505' } })
     mocks.single.mockResolvedValue({ data: { payload: legacy }, error: null })
-    expect(await createCaptureStore('user_owner')(capture)).toBe('stored')
+    expect(await createCaptureStore()(capture)).toBe('stored')
   })
 
   it('rejects a retry that changes the capture type', async () => {
     mocks.insert.mockResolvedValue({ error: { code: '23505' } })
-    expect(await createCaptureStore('user_owner')({ ...capture, type: 'mail' })).toBe('conflict')
+    expect(await createCaptureStore()({ ...capture, type: 'mail' })).toBe('conflict')
   })
 
   it('fails closed on database write errors', async () => {
     mocks.insert.mockResolvedValue({ error: { code: '42P01' } })
-    await expect(createCaptureStore('user_owner')(capture)).rejects.toThrow('database write failed')
+    await expect(createCaptureStore()(capture)).rejects.toThrow('database write failed')
     expect(mocks.single).not.toHaveBeenCalled()
   })
 
   it('fails closed when a duplicate cannot be verified', async () => {
     mocks.insert.mockResolvedValue({ error: { code: '23505' } })
     mocks.single.mockResolvedValue({ data: null, error: { code: 'PGRST116' } })
-    await expect(createCaptureStore('user_owner')(capture)).rejects.toThrow('duplicate verification failed')
-  })
-
-  it('requires configured ownership', () => {
-    expect(() => createCaptureStore(' ')).toThrow('EXODO_SHORTCUT_USER_ID')
+    await expect(createCaptureStore()(capture)).rejects.toThrow('duplicate verification failed')
   })
 })

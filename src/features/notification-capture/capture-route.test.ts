@@ -24,7 +24,6 @@ function request(
 beforeEach(() => {
   vi.clearAllMocks()
   vi.stubEnv('EXODO_SHORTCUT_TEST_TOKEN', credential)
-  vi.stubEnv('EXODO_SHORTCUT_USER_ID', 'user_owner')
   vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://example.supabase.co')
   vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'server-only-test-key')
   vi.mocked(createCaptureStore).mockReturnValue(persist)
@@ -50,11 +49,11 @@ describe('deployed notification capture route', () => {
     expect(persist).not.toHaveBeenCalled()
   })
 
-  it('stores normalized content under the configured owner without a Clerk session', async () => {
+  it('stores normalized content without user ownership or a Clerk session', async () => {
     const response = await POST(request(JSON.stringify({ ...capture, version: '1', user_id: 'attacker' })))
     expect(response.status).toBe(200)
     expect(await response.json()).toEqual({ event_id: capture.event_id, accepted: true, durable: true })
-    expect(createCaptureStore).toHaveBeenCalledExactlyOnceWith('user_owner')
+    expect(createCaptureStore).toHaveBeenCalledExactlyOnceWith()
     expect(persist).toHaveBeenCalledExactlyOnceWith(capture)
     expect(response.headers.get('Cache-Control')).toBe('no-store')
     const bodyLog = log.mock.calls
@@ -94,18 +93,16 @@ describe('deployed notification capture route', () => {
     },
   )
 
-  it.each([
-    'EXODO_SHORTCUT_TEST_TOKEN',
-    'EXODO_SHORTCUT_USER_ID',
-    'NEXT_PUBLIC_SUPABASE_URL',
-    'SUPABASE_SERVICE_ROLE_KEY',
-  ])('fails closed without %s', async (name) => {
-    vi.stubEnv(name, '')
-    const response = await POST(request())
-    expect(response.status).toBe(503)
-    expect((await response.json()).error).toBe('receiver_not_configured')
-    expect(persist).not.toHaveBeenCalled()
-  })
+  it.each(['EXODO_SHORTCUT_TEST_TOKEN', 'NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'])(
+    'fails closed without %s',
+    async (name) => {
+      vi.stubEnv(name, '')
+      const response = await POST(request())
+      expect(response.status).toBe(503)
+      expect((await response.json()).error).toBe('receiver_not_configured')
+      expect(persist).not.toHaveBeenCalled()
+    },
+  )
 
   it.each(['{invalid', 'null', '[]', JSON.stringify({ ...capture, captured_at: '' })])(
     'rejects invalid JSON/schema %#',

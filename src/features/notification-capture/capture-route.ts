@@ -43,16 +43,14 @@ export async function handleCaptureRequest(request: Request): Promise<Response> 
       details,
     })
   const credential = process.env.EXODO_SHORTCUT_TEST_TOKEN
-  const userId = process.env.EXODO_SHORTCUT_USER_ID
   if (
     !isCaptureCredential(credential) ||
-    !userId?.trim() ||
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !process.env.SUPABASE_SERVICE_ROLE_KEY
   ) {
     return reject(503, 'receiver_not_configured', {
       stage: 'configuration',
-      hint: 'Configure receiver token, Clerk owner ID, Supabase URL, and service-role key on the server',
+      hint: 'Configure receiver token, Supabase URL, and service-role key on the server',
     })
   }
   if (!hasCaptureAuthorization(request.headers.get('authorization'), credential)) {
@@ -108,7 +106,7 @@ export async function handleCaptureRequest(request: Request): Promise<Response> 
   }
   if (bytesRead > MAX_CAPTURE_BYTES) return reject(413, 'payload_too_large', { max_bytes: MAX_CAPTURE_BYTES })
   try {
-    return respond(await receiveCapture(bytes, createCaptureStore(userId)))
+    return respond(await receiveCapture(bytes, createCaptureStore()))
   } catch {
     return reject(503, 'storage_failed', { stage: 'persistence' })
   }

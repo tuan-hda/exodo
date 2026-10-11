@@ -1,14 +1,15 @@
--- Raw notification captures, separate from parsed financial entries.
+-- Raw notification and mail captures, separate from parsed financial entries.
 -- Apply in the existing Exodo Supabase project's SQL editor.
 begin;
 
 create table if not exists public.notification_captures (
-  user_id text not null,
   device_id text not null,
   event_id text not null,
+  type text not null default 'notification'
+    constraint notification_capture_type_check check (type in ('notification', 'mail')),
   payload jsonb not null check (jsonb_typeof(payload) = 'object'),
   received_at timestamptz not null default now(),
-  primary key (user_id, device_id, event_id),
+  primary key (device_id, event_id),
   constraint notification_capture_identity_matches check (
     payload ?& array['device_id', 'event_id']
     and payload ->> 'device_id' = device_id
