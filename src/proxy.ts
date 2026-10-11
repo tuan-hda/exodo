@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-const isPublicRoute = createRouteMatcher(['/sign-in(.*)'])
+// Capture authenticates its own bearer token; Shortcuts has no Clerk browser session.
+const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/api/notifications/capture'])
 
 export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) await auth.protect()

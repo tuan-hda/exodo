@@ -35,6 +35,10 @@ Use `bun install --frozen-lockfile` for reproducible installs. Commit `bun.lock`
 
 Environment variables are documented in `.env.example`. For LAN testing, set `NEXT_PUBLIC_CLERK_ALLOWED_REDIRECT_ORIGINS` to the full origin(s) that should receive Clerk redirects, separated by commas. This single setting configures both Clerk redirects and Next.js development-origin checks. Clerk handles authentication; Supabase is accessed with the authenticated Clerk token on the client and a server-only service role key for protected Gmail callbacks.
 
+## Notification capture
+
+`POST /api/notifications/capture` receives Techcombank iPhone Shortcuts captures using a server-configured bearer token, without a Clerk browser session. Apply `docs/supabase-notification-captures-migration.sql` and configure `EXODO_SHORTCUT_TEST_TOKEN`, `EXODO_SHORTCUT_USER_ID`, `NEXT_PUBLIC_SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY` in your hosting environment. Identical retries preserve one stored capture; durable acceptance follows successful storage. See [deployment and phone setup](docs/shortcuts/setup.md).
+
 ## Gmail reading
 
 Enable Gmail API in Google Cloud and create a Web application OAuth client with
