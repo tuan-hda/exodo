@@ -10,7 +10,7 @@ Sync sends pending files to the single deployed endpoint below. Preserve each fi
 
 ## Deploy
 
-1. Apply [the SQL migration](../supabase-notification-captures-migration.sql) in your existing Supabase SQL editor.
+1. Apply [the original SQL migration](../supabase-notification-captures-migration.sql), then [the type column migration](../supabase-notification-captures-type-migration.sql) in your existing Supabase SQL editor before deploying the updated receiver. Existing rows default to `notification`; their saved payloads remain unchanged.
 2. Set these variables in your existing Exodo hosting environment:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
@@ -26,6 +26,7 @@ This exact route authenticates the bearer token instead of requiring a Clerk bro
 ```json
 {
   "version": 1,
+  "type": "notification",
   "event_id": "synthetic-capture-001",
   "device_id": "iphone01",
   "source_app": "techcombank",
@@ -37,6 +38,8 @@ This exact route authenticates the bearer token instead of requiring a Clerk bro
 ```
 
 Version accepts `1` or `"1"` and normalizes to `1`. Event ID, device ID, source, and capture time must be nonempty strings; there are no identifier patterns or timestamp-format checks. Continue sending ISO 8601 from the phone. Missing/null title, subtitle, and message become empty strings. Other supplied text types are rejected. Extra fields are ignored. Body limit: 64 KiB. Ownership comes from the server setting, not the payload.
+
+`type` accepts only `notification` or `mail`; omitted type defaults to `notification` so existing queued files still work. Add `type` with text value `notification` to both Capture's saved Dictionary and Sync's JSON request body. The table stores the normalized type in its own column and in new JSON payloads. Type is part of payload comparison: changing it for an existing event returns a conflict. Accepting `mail` does not add Gmail ingestion or email parsing.
 
 ## Verify and debug
 

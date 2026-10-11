@@ -4,6 +4,7 @@ export const MAX_CAPTURE_BYTES = 64 * 1024
 
 export type CaptureEvent = {
   version: 1
+  type: 'notification' | 'mail'
   event_id: string
   device_id: string
   source_app: string
@@ -25,6 +26,9 @@ export function captureValidationIssues(value: unknown): string[] {
   if (!isRecord(value)) return ['body must be a JSON object']
   const issues: string[] = []
   if (value.version !== 1 && value.version !== '1') issues.push('version must be 1 or "1"')
+  if (value.type !== undefined && value.type !== 'notification' && value.type !== 'mail') {
+    issues.push('type must be "notification" or "mail"')
+  }
   for (const field of ['event_id', 'device_id', 'source_app', 'captured_at'] as const) {
     if (!isNonemptyText(value[field])) issues.push(`${field} must be a nonempty string`)
   }
@@ -41,6 +45,7 @@ export function parseCapture(value: unknown): CaptureEvent {
   const capture = value as CaptureEvent
   return {
     version: 1,
+    type: capture.type ?? 'notification',
     event_id: capture.event_id,
     device_id: capture.device_id,
     source_app: capture.source_app,

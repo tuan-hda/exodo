@@ -37,7 +37,7 @@ Environment variables are documented in `.env.example`. For LAN testing, set `NE
 
 ## Notification capture
 
-`POST /api/notifications/capture` receives Techcombank iPhone Shortcuts captures using a server-configured bearer token, without a Clerk browser session. Apply `docs/supabase-notification-captures-migration.sql` and configure `EXODO_SHORTCUT_TEST_TOKEN`, `EXODO_SHORTCUT_USER_ID`, `NEXT_PUBLIC_SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY` in your hosting environment. Identical retries preserve one stored capture; durable acceptance follows successful storage. See [deployment and phone setup](docs/shortcuts/setup.md).
+`POST /api/notifications/capture` receives Techcombank iPhone Shortcuts captures using a server-configured bearer token, without a Clerk browser session. Apply `docs/supabase-notification-captures-migration.sql` followed by `docs/supabase-notification-captures-type-migration.sql`, then configure `EXODO_SHORTCUT_TEST_TOKEN`, `EXODO_SHORTCUT_USER_ID`, `NEXT_PUBLIC_SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY` in your hosting environment. Identical retries preserve one stored capture; durable acceptance follows successful storage. See [deployment and phone setup](docs/shortcuts/setup.md).
 
 ## Gmail reading
 

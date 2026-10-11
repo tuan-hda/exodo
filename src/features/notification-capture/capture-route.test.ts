@@ -33,6 +33,23 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs())
 
 describe('deployed notification capture route', () => {
+  it('passes mail type through to storage', async () => {
+    const mail = { ...capture, type: 'mail' }
+    expect((await POST(request(JSON.stringify(mail)))).status).toBe(200)
+    expect(persist).toHaveBeenCalledWith(mail)
+  })
+
+  it('accepts older notification inputs without type', async () => {
+    const { type: _type, ...legacy } = capture
+    expect((await POST(request(JSON.stringify(legacy)))).status).toBe(200)
+    expect(persist).toHaveBeenCalledWith(capture)
+  })
+
+  it('rejects unsupported types before persistence', async () => {
+    expect((await POST(request(JSON.stringify({ ...capture, type: 'sms' })))).status).toBe(400)
+    expect(persist).not.toHaveBeenCalled()
+  })
+
   it('stores normalized content under the configured owner without a Clerk session', async () => {
     const response = await POST(request(JSON.stringify({ ...capture, version: '1', user_id: 'attacker' })))
     expect(response.status).toBe(200)

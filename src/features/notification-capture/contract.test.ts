@@ -3,6 +3,19 @@ import { parseCapture } from './contract'
 import { captureFixture as capture } from './test-fixture'
 
 describe('simple capture contract', () => {
+  it.each(['notification', 'mail'] as const)('accepts type %s', (type) => {
+    expect(parseCapture({ ...capture, type }).type).toBe(type)
+  })
+
+  it('defaults omitted type to notification for existing queued files', () => {
+    const { type: _type, ...legacy } = capture
+    expect(parseCapture(legacy)).toEqual(capture)
+  })
+
+  it.each(['sms', '', null, 1])('rejects unsupported type %j', (type) => {
+    expect(() => parseCapture({ ...capture, type })).toThrow('Invalid capture payload')
+  })
+
   it.each([1, '1'])('normalizes version %j and preserves notification text', (version) => {
     expect(parseCapture({ ...capture, version })).toEqual(capture)
   })

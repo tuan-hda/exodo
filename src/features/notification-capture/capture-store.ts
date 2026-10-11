@@ -14,6 +14,7 @@ export function createCaptureStore(
       user_id: userId,
       device_id: capture.device_id,
       event_id: capture.event_id,
+      type: capture.type,
       payload: capture,
     })
     if (!inserted.error) return 'stored'

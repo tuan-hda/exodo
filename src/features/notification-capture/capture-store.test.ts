@@ -24,6 +24,7 @@ describe('notification capture storage', () => {
       user_id: 'user_owner',
       device_id: capture.device_id,
       event_id: capture.event_id,
+      type: 'notification',
       payload: capture,
     })
     expect(mocks.single).not.toHaveBeenCalled()
@@ -46,6 +47,24 @@ describe('notification capture storage', () => {
     mocks.single.mockResolvedValue({ data: { payload: { ...capture, message: 'different content' } }, error: null })
     expect(await createCaptureStore('user_owner')(capture)).toBe('conflict')
     expect(mocks.insert).toHaveBeenCalledTimes(1)
+  })
+
+  it('stores mail type in both the table column and payload', async () => {
+    const mail = { ...capture, type: 'mail' as const }
+    expect(await createCaptureStore('user_owner')(mail)).toBe('stored')
+    expect(mocks.insert).toHaveBeenCalledWith(expect.objectContaining({ type: 'mail', payload: mail }))
+  })
+
+  it('recognizes a notification retry against a legacy payload without type', async () => {
+    const { type: _type, ...legacy } = capture
+    mocks.insert.mockResolvedValue({ error: { code: '23505' } })
+    mocks.single.mockResolvedValue({ data: { payload: legacy }, error: null })
+    expect(await createCaptureStore('user_owner')(capture)).toBe('stored')
+  })
+
+  it('rejects a retry that changes the capture type', async () => {
+    mocks.insert.mockResolvedValue({ error: { code: '23505' } })
+    expect(await createCaptureStore('user_owner')({ ...capture, type: 'mail' })).toBe('conflict')
   })
 
   it('fails closed on database write errors', async () => {

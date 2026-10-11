@@ -2,6 +2,7 @@ import type { CaptureEvent } from './contract'
 
 export const captureFixture: CaptureEvent = {
   version: 1,
+  type: 'notification',
   event_id: 'synthetic-capture-001',
   device_id: 'synthetic-iphone-001',
   source_app: 'techcombank',
