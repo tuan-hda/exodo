@@ -85,14 +85,11 @@ it('does not save or delete when the selected capture disappeared', async () => 
   expect(mocks.rpc).not.toHaveBeenCalled()
 })
 
-it.each(['unsupported', 'Số tiền 0 đ'])(
-  'does not import unparsed or zero amounts: %s',
-  async (message) => {
-    mocks.in.mockResolvedValue({ data: [{ ...row, payload: { ...capture, message } }], error: null })
-    expect((await POST(request())).status).toBe(400)
-    expect(mocks.rpc).not.toHaveBeenCalled()
-  },
-)
+it.each(['unsupported', 'Số tiền 0 đ'])('does not import unparsed or zero amounts: %s', async (message) => {
+  mocks.in.mockResolvedValue({ data: [{ ...row, payload: { ...capture, message } }], error: null })
+  expect((await POST(request())).status).toBe(400)
+  expect(mocks.rpc).not.toHaveBeenCalled()
+})
 
 it('does not report success when the atomic database operation fails', async () => {
   const error = { code: '42501', message: 'Migration required' }

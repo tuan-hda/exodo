@@ -37,6 +37,15 @@ export function CaptureTransactionSummary({ transaction }: { transaction: Captur
           ? transactionDate.format(new Date(transaction.occurredAt))
           : 'Transaction date unavailable'}
       </p>
+      {transaction.counterparty && (
+        <p className="text-sm">
+          <span className="text-xs text-muted">{transaction.counterparty.role === 'sender' ? 'From' : 'To'} </span>
+          {transaction.counterparty.name}
+          {transaction.counterparty.bank && (
+            <span className="text-xs text-muted"> · {transaction.counterparty.bank}</span>
+          )}
+        </p>
+      )}
       <div className="grid gap-1">
         <p className="text-xs text-muted">Content</p>
         <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">

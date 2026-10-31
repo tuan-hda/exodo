@@ -7,6 +7,36 @@ import { applyAutoCollectRules } from '@/features/inbox/auto-collect-rules'
 export type CaptureTransaction = Omit<GmailTransaction, 'source'> & {
   source: GmailTransaction['source'] | 'techcombank'
   content: string | null
+  counterparty?: Counterparty
+}
+
+export type Counterparty = { role: 'sender' | 'receiver'; name: string; bank: string | null }
+
+function field(text: string, label: string) {
+  const match = new RegExp(`^\\s*${label}\\s+(\\S.*?)\\s*$`, 'mu').exec(text)
+  return match?.[1] ?? null
+}
+
+function mailCounterparty(
+  body: string,
+  source: GmailTransaction['source'],
+  amount: number | null,
+  content: string | null,
+): Counterparty | undefined {
+  const text = body.normalize('NFC').replace(/\r/g, '')
+  if (source === 'cake') {
+    for (const [role, verb] of [
+      ['sender', 'chuyển'],
+      ['receiver', 'nhận'],
+    ] as const) {
+      const name = field(text, `Tên người ${verb}`)
+      if (name) return { role, name, bank: field(text, `Ngân hàng ${verb}`) }
+    }
+    const provider = field(text, 'Nhà cung cấp')
+    return provider ? { role: 'receiver', name: provider, bank: null } : undefined
+  }
+  const name = content?.split('\n')[0]?.trim()
+  return name && amount ? { role: amount < 0 ? 'receiver' : 'sender', name, bank: null } : undefined
 }
 
 const parseMailTransaction = createTransactionParser({ convertAmount: convertToVnd })
@@ -38,13 +68,14 @@ function transactionContent(body: string, source: GmailTransaction['source']): s
 export function parseCaptureTransaction(capture: CaptureEvent): CaptureTransaction | null {
   if (capture.type === 'mail') {
     const transaction = parseMailTransaction(capture.title, capture.message)
-    return (
-      transaction && {
-        ...applyAutoCollectRules(capture.message),
-        ...transaction,
-        content: transactionContent(capture.message, transaction.source),
-      }
-    )
+    if (!transaction) return null
+    const content = transactionContent(capture.message, transaction.source)
+    return {
+      ...applyAutoCollectRules(capture.message),
+      ...transaction,
+      content,
+      counterparty: mailCounterparty(capture.message, transaction.source, transaction.amount, content),
+    }
   }
   if (capture.source_app.trim().toLowerCase() !== 'techcombank') return null
 

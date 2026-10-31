@@ -189,20 +189,22 @@ export function CaptureInbox({ onImported }: { onImported: () => Promise<unknown
         </div>
       )}
       <ul className="m-0 min-w-0 list-none p-0">
-        {captures.map((capture) => (
-          <CaptureReviewRow
-            key={captureKey(capture)}
-            capture={capture}
-            selected={!deselected.has(captureKey(capture))}
-            disabled={busy}
-            onToggle={() => toggle(capture)}
-            onChange={(changes) =>
-              setCaptures((current) =>
-                current.map((item) => (captureKey(item) === captureKey(capture) ? { ...item, ...changes } : item)),
-              )
-            }
-          />
-        ))}
+        {[...captures]
+          .sort((a, b) => captureSourceTime(b) - captureSourceTime(a))
+          .map((capture) => (
+            <CaptureReviewRow
+              key={captureKey(capture)}
+              capture={capture}
+              selected={!deselected.has(captureKey(capture))}
+              disabled={busy}
+              onToggle={() => toggle(capture)}
+              onChange={(changes) =>
+                setCaptures((current) =>
+                  current.map((item) => (captureKey(item) === captureKey(capture) ? { ...item, ...changes } : item)),
+                )
+              }
+            />
+          ))}
       </ul>
       {nextOffset !== null && (
         <Button variant="outline" disabled={busy} onClick={() => void load(nextOffset)}>

@@ -56,6 +56,7 @@ Hạn mức còn lại / *Available Limit*`
     expect(parseCaptureTransaction(mail(title, body))).toEqual({
       ...parseV1(title, body),
       content: 'PAYOO-HIGHLANDS 30873',
+      counterparty: { role: 'receiver', name: 'PAYOO-HIGHLANDS 30873', bank: null },
     })
   })
 
@@ -67,6 +68,7 @@ Hạn mức còn lại / *Available Limit*`
       amount: -261438,
       occurredAt: null,
       content: 'Grab* A-EXAMPLE',
+      counterparty: { role: 'receiver', name: 'Grab* A-EXAMPLE', bank: null },
     })
   })
 
@@ -124,5 +126,32 @@ describe('Techcombank notification parsing', () => {
     expect(parseCaptureTransaction(notification({ title: 'Số dư VND 100,000' }))).toBeNull()
     expect(parseCaptureTransaction(notification({ source_app: 'momo' }))).toBeNull()
     expect(parseCaptureTransaction(notification({ title: '+ VND 2.00' }))?.amount).toBeNull()
+  })
+})
+
+describe('counterparty', () => {
+  const cake = (lines: string) =>
+    parseCaptureTransaction(
+      mail(
+        cakeTitle,
+        `Thông tin tài khoản\n${lines}\nThông tin giao dịch\nNgày giờ giao dịch 31/10/2026, 10:14:27 \nSố tiền -208.000 đ \nNội dung giao dịch x \n`,
+      ),
+    )
+  it('reads Cake receiver, sender and provider', () => {
+    expect(cake('Tên người nhận DAO TAN TAI \nNgân hàng nhận Vietcombank ')?.counterparty).toEqual({
+      role: 'receiver',
+      name: 'DAO TAN TAI',
+      bank: 'Vietcombank',
+    })
+    expect(cake('Tên người chuyển PHAN THANH TU \nNgân hàng chuyển CTG ')?.counterparty).toEqual({
+      role: 'sender',
+      name: 'PHAN THANH TU',
+      bank: 'CTG',
+    })
+    expect(cake('Nhà cung cấp beGroup \nMã khách hàng 1')?.counterparty).toEqual({
+      role: 'receiver',
+      name: 'beGroup',
+      bank: null,
+    })
   })
 })
