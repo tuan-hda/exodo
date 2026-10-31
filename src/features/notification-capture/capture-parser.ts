@@ -32,8 +32,7 @@ function mailCounterparty(
       const name = field(text, `Tên người ${verb}`)
       if (name) return { role, name, bank: field(text, `Ngân hàng ${verb}`) }
     }
-    const provider = field(text, 'Nhà cung cấp')
-    return provider ? { role: 'receiver', name: provider, bank: null } : undefined
+    return undefined
   }
   const name = content?.split('\n')[0]?.trim()
   return name && amount ? { role: amount < 0 ? 'receiver' : 'sender', name, bank: null } : undefined

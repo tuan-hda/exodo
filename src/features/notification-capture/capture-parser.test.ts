@@ -137,7 +137,7 @@ describe('counterparty', () => {
         `Thông tin tài khoản\n${lines}\nThông tin giao dịch\nNgày giờ giao dịch 31/10/2026, 10:14:27 \nSố tiền -208.000 đ \nNội dung giao dịch x \n`,
       ),
     )
-  it('reads Cake receiver, sender and provider', () => {
+  it('reads Cake receiver and sender', () => {
     expect(cake('Tên người nhận DAO TAN TAI \nNgân hàng nhận Vietcombank ')?.counterparty).toEqual({
       role: 'receiver',
       name: 'DAO TAN TAI',
@@ -148,10 +148,6 @@ describe('counterparty', () => {
       name: 'PHAN THANH TU',
       bank: 'CTG',
     })
-    expect(cake('Nhà cung cấp beGroup \nMã khách hàng 1')?.counterparty).toEqual({
-      role: 'receiver',
-      name: 'beGroup',
-      bank: null,
-    })
+    expect(cake('Nhà cung cấp beGroup \nMã khách hàng 1')?.counterparty).toBeUndefined()
   })
 })
