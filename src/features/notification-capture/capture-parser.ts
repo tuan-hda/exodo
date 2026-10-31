@@ -17,25 +17,16 @@ function field(text: string, label: string) {
   return match?.[1] ?? null
 }
 
-function mailCounterparty(
-  body: string,
-  source: GmailTransaction['source'],
-  amount: number | null,
-  content: string | null,
-): Counterparty | undefined {
+function mailCounterparty(body: string, source: GmailTransaction['source']): Counterparty | undefined {
+  if (source !== 'cake') return undefined
   const text = body.normalize('NFC').replace(/\r/g, '')
-  if (source === 'cake') {
-    for (const [role, verb] of [
-      ['sender', 'chuyển'],
-      ['receiver', 'nhận'],
-    ] as const) {
-      const name = field(text, `Tên người ${verb}`)
-      if (name) return { role, name, bank: field(text, `Ngân hàng ${verb}`) }
-    }
-    return undefined
+  for (const [role, verb] of [
+    ['sender', 'chuyển'],
+    ['receiver', 'nhận'],
+  ] as const) {
+    const name = field(text, `Tên người ${verb}`)
+    if (name) return { role, name, bank: field(text, `Ngân hàng ${verb}`) }
   }
-  const name = content?.split('\n')[0]?.trim()
-  return name && amount ? { role: amount < 0 ? 'receiver' : 'sender', name, bank: null } : undefined
 }
 
 const parseMailTransaction = createTransactionParser({ convertAmount: convertToVnd })
@@ -73,7 +64,7 @@ export function parseCaptureTransaction(capture: CaptureEvent): CaptureTransacti
       ...applyAutoCollectRules(capture.message),
       ...transaction,
       content,
-      counterparty: mailCounterparty(capture.message, transaction.source, transaction.amount, content),
+      counterparty: mailCounterparty(capture.message, transaction.source),
     }
   }
   if (capture.source_app.trim().toLowerCase() !== 'techcombank') return null

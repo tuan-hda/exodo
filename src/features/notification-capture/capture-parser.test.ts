@@ -56,7 +56,6 @@ Hạn mức còn lại / *Available Limit*`
     expect(parseCaptureTransaction(mail(title, body))).toEqual({
       ...parseV1(title, body),
       content: 'PAYOO-HIGHLANDS 30873',
-      counterparty: { role: 'receiver', name: 'PAYOO-HIGHLANDS 30873', bank: null },
     })
   })
 
@@ -68,7 +67,6 @@ Hạn mức còn lại / *Available Limit*`
       amount: -261438,
       occurredAt: null,
       content: 'Grab* A-EXAMPLE',
-      counterparty: { role: 'receiver', name: 'Grab* A-EXAMPLE', bank: null },
     })
   })
 
