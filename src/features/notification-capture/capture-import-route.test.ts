@@ -3,8 +3,12 @@ import { auth } from '@clerk/nextjs/server'
 import { POST } from '@/app/api/notifications/captures/import/route'
 import { captureFixture } from './test-fixture'
 
-const mocks = vi.hoisted(() => ({ from: vi.fn(), in: vi.fn(), rpc: vi.fn() }))
+const mocks = vi.hoisted(() => ({ from: vi.fn(), in: vi.fn(), rpc: vi.fn(), splitBill: vi.fn() }))
 vi.mock('@clerk/nextjs/server', () => ({ auth: vi.fn() }))
+vi.mock('../bill-split/ratio-client', async (original) => ({
+  ...(await original<typeof import('../bill-split/ratio-client')>()),
+  splitBill: mocks.splitBill,
+}))
 vi.mock('../../lib/supabase-admin', () => ({ createAdminSupabaseClient: () => ({ from: mocks.from, rpc: mocks.rpc }) }))
 
 const capture = {
@@ -102,3 +106,31 @@ it('does not report success when the atomic database operation fails', async () 
     log.mockRestore()
   }
 })
+
+it('bills ratio before importing and records only the owner share', async () => {
+  mocks.splitBill.mockResolvedValue({ people: 2, share: 15000 })
+  const split = { ...item, divided: false, split: { config: 'more' } }
+  expect((await POST(request({ items: [split] }))).status).toBe(200)
+  const [input] = mocks.splitBill.mock.calls[0]
+  expect(input).toMatchObject({ title: 'Coffee', amount: 47000, config: 'more' })
+  expect(input.key).toMatch(/^exodo-[0-9a-f]{64}$/)
+  expect(mocks.rpc.mock.calls[0][1].p_items[0].entry.amount).toBe(17000)
+  expect(mocks.splitBill.mock.invocationCallOrder[0]).toBeLessThan(mocks.rpc.mock.invocationCallOrder[0])
+})
+
+it('does not import when ratio rejects the split', async () => {
+  const { RatioError } = await import('../bill-split/ratio-client')
+  mocks.splitBill.mockRejectedValue(new RatioError('unknown config', 400))
+  const response = await POST(request({ items: [{ ...item, divided: false, split: { config: 'nope' } }] }))
+  expect(response.status).toBe(400)
+  expect(await response.json()).toEqual({ error: 'Bill split: unknown config' })
+  expect(mocks.rpc).not.toHaveBeenCalled()
+})
+
+it.each([{ split: { config: 1 } }, { divided: true, split: {} }])(
+  'rejects invalid split options: %j',
+  async (extra) => {
+    expect((await POST(request({ items: [{ ...item, divided: false, ...extra }] }))).status).toBe(400)
+    expect(mocks.splitBill).not.toHaveBeenCalled()
+  },
+)

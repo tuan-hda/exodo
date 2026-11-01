@@ -5,6 +5,14 @@ import { parseCapture } from '@/features/notification-capture/contract'
 import { parseCaptureTransaction } from '@/features/notification-capture/capture-parser'
 import { captureEntry, captureKey, prepareCapture } from '@/features/notification-capture/capture-review'
 import { captureErrorDetails } from '@/features/notification-capture/receive-capture'
+import {
+  ownerShare,
+  parseBillSplit,
+  RatioError,
+  splitBill,
+  splitKey,
+  type BillSplit,
+} from '@/features/bill-split/ratio-client'
 
 const headers = { 'Cache-Control': 'private, no-store' }
 
@@ -32,7 +40,9 @@ export async function importCaptureRequest(request: Request) {
         typeof item.category === 'string' &&
         item.category.length > 0 &&
         item.category.length <= 100 &&
-        typeof item.divided === 'boolean',
+        typeof item.divided === 'boolean' &&
+        parseBillSplit(item.split) !== null &&
+        !(item.divided && item.split),
     )
   ) {
     return Response.json({ error: 'Select between 1 and 200 valid transactions.' }, { status: 400, headers })
@@ -43,6 +53,7 @@ export async function importCaptureRequest(request: Request) {
     name: string
     category: string
     divided: boolean
+    split?: unknown
   }[]
   if (new Set(items.map(captureKey)).size !== items.length) {
     return Response.json({ error: 'Duplicate selection.' }, { status: 400, headers })
@@ -58,25 +69,40 @@ export async function importCaptureRequest(request: Request) {
       )
     if (error) throw error
     const batch = []
+    const splits: { entry: { amount: number; title: string }; split: BillSplit; key: string }[] = []
     for (const item of items) {
       const row = data?.find((row) => row.device_id === item.device_id && row.event_id === item.event_id)
       if (!row)
         return Response.json({ error: 'Selected captures changed. Refresh the inbox.' }, { status: 409, headers })
       const capture = parseCapture({ ...row.payload, type: row.type })
+      const { split: rawSplit, ...edits } = item
+      const split = parseBillSplit(rawSplit)
       const review = {
         ...prepareCapture({ ...capture, received_at: row.received_at, transaction: parseCaptureTransaction(capture) }),
-        ...item,
+        ...edits,
       }
       const entry = review.transaction ? captureEntry(review) : null
       if (!entry)
         return Response.json({ error: 'Deselect transactions without a valid amount.' }, { status: 400, headers })
+      if (split && (entry.type !== 'expense' || !entry.title))
+        return Response.json({ error: 'Only named expenses can be split.' }, { status: 400, headers })
       entry.id = JSON.stringify(['capture', userId, item.device_id, item.event_id])
+      if (split) splits.push({ entry, split, key: await splitKey('capture', userId, item.device_id, item.event_id) })
       batch.push({ device_id: item.device_id, event_id: item.event_id, payload: row.payload, entry })
+    }
+    // Bill first: a failed import can be retried, and the idempotency key keeps ratio from billing twice
+    for (const { entry, split, key } of splits) {
+      entry.amount = ownerShare(
+        entry.amount,
+        await splitBill({ key, title: entry.title, amount: entry.amount, ...split }),
+      )
     }
     const result = await client.rpc('import_captures', { p_user_id: userId, p_items: batch })
     if (result.error) throw result.error
     return Response.json(result.data, { headers })
   } catch (error) {
+    if (error instanceof RatioError && error.status === 400)
+      return Response.json({ error: `Bill split: ${error.message}` }, { status: 400, headers })
     console.error('[capture-import]', captureErrorDetails(error))
     return Response.json({ error: 'Import failed. Refresh the inbox before retrying.' }, { status: 503, headers })
   }
