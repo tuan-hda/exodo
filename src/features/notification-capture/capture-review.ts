@@ -5,6 +5,8 @@ export type ReviewCapture = CaptureInboxItem & {
   name: string
   category: string
   divided: boolean
+  split: boolean
+  splitConfig: string
 }
 
 export function captureKey(capture: Pick<CaptureInboxItem, 'device_id' | 'event_id'>) {
@@ -17,6 +19,8 @@ export function prepareCapture(capture: CaptureInboxItem): ReviewCapture {
     name: capture.transaction?.title ?? '',
     category: capture.transaction?.category ?? ((capture.transaction?.amount ?? 0) > 0 ? 'Income' : 'Dining'),
     divided: false,
+    split: false,
+    splitConfig: 'rent',
   }
 }
 

@@ -98,6 +98,7 @@ export function CaptureInbox({ onImported }: { onImported: () => Promise<unknown
     setNotice('')
     setError('')
     let saved = false
+    let rejection = ''
     try {
       const response = await fetch('/api/notifications/captures/import', {
         method: 'POST',
@@ -109,10 +110,15 @@ export function CaptureInbox({ onImported }: { onImported: () => Promise<unknown
             name: capture.name,
             category: capture.category,
             divided: capture.divided,
+            split: capture.split ? { config: capture.splitConfig.trim() || undefined } : undefined,
           })),
         }),
       })
-      if (!response.ok) throw new Error('Import failed. Refresh the inbox before retrying.')
+      if (!response.ok) {
+        const body = await response.json().catch(() => null)
+        if (response.status === 400 && typeof body?.error === 'string') rejection = body.error
+        throw new Error('Import failed.')
+      }
       const receipt = await response.json()
       saved = true
       setNotice(`${receipt.imported} transactions added. ${receipt.deleted} captures deleted through the cutoff.`)
@@ -121,7 +127,7 @@ export function CaptureInbox({ onImported }: { onImported: () => Promise<unknown
       setNotice(
         saved
           ? 'Transactions saved and captures deleted. Refresh your records to see the changes.'
-          : 'Import could not be confirmed. Refresh the inbox before retrying.',
+          : rejection || 'Import could not be confirmed. Refresh the inbox before retrying.',
       )
     } finally {
       await load()

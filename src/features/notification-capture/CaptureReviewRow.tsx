@@ -2,6 +2,8 @@
 
 import { useId } from 'react'
 import { TransactionReviewFields } from '@/features/inbox/TransactionReviewFields'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { CaptureTransactionSummary } from './CaptureTransactionSummary'
 import { reviewAmount, type ReviewCapture } from './capture-review'
 
@@ -21,9 +23,10 @@ export function CaptureReviewRow({
   selected: boolean
   disabled: boolean
   onToggle: () => void
-  onChange: (changes: Partial<Pick<ReviewCapture, 'name' | 'category' | 'divided'>>) => void
+  onChange: (changes: Partial<Pick<ReviewCapture, 'name' | 'category' | 'divided' | 'split' | 'splitConfig'>>) => void
 }) {
   const nameId = useId()
+  const canSplit = (capture.transaction?.amount ?? 0) < 0 && capture.name.trim().length > 0
   return (
     <li className="grid min-w-0 gap-2 border-b border-line py-4 [overflow-wrap:anywhere]">
       {capture.transaction ? (
@@ -44,12 +47,37 @@ export function CaptureReviewRow({
             category={capture.category}
             onCategoryChange={(category) => onChange({ category })}
             divided={capture.divided}
-            onToggleDivide={() => onChange({ divided: !capture.divided })}
+            onToggleDivide={() => onChange({ divided: !capture.divided, split: false })}
             name={capture.name}
             onNameChange={(name) => onChange({ name })}
             nameId={nameId}
             disabled={disabled}
           />
+          {(capture.transaction.amount ?? 0) < 0 && (
+            <div className="grid min-w-0 gap-2 pb-4 pl-8">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs text-muted">
+                  {capture.split ? 'Bills others in ratio on import' : canSplit ? 'Split bill' : 'Add a name to split'}
+                </span>
+                <Button
+                  variant={capture.split ? 'default' : 'secondary'}
+                  aria-pressed={capture.split}
+                  disabled={disabled || (!capture.split && !canSplit)}
+                  onClick={() => onChange({ split: !capture.split, divided: false })}>
+                  Split
+                </Button>
+              </div>
+              {capture.split && (
+                <Input
+                  aria-label="Split config"
+                  disabled={disabled}
+                  value={capture.splitConfig}
+                  onChange={(event) => onChange({ splitConfig: event.target.value })}
+                  placeholder="Config id (optional)"
+                />
+              )}
+            </div>
+          )}
         </>
       ) : (
         <p className="text-xs text-muted">Transaction not recognized</p>
