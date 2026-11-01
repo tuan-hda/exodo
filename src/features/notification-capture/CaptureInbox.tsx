@@ -244,7 +244,7 @@ export function CaptureInbox({ onImported }: { onImported: () => Promise<unknown
                 setConfirmOpen(false)
                 void importSelected()
               }}>
-              Add and delete through cutoff
+              Add
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
