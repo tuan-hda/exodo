@@ -9,9 +9,11 @@ import {
   ownerShare,
   parseBillSplit,
   RatioError,
+  reportPayment,
   splitBill,
   splitKey,
   type BillSplit,
+  type PaymentResult,
 } from '@/features/bill-split/ratio-client'
 
 const headers = { 'Cache-Control': 'private, no-store' }
@@ -69,6 +71,7 @@ export async function importCaptureRequest(request: Request) {
       )
     if (error) throw error
     const batch = []
+    const payments: { content: string; amount: number }[] = []
     const splits: { entry: { amount: number; title: string }; split: BillSplit; key: string }[] = []
     for (const item of items) {
       const row = data?.find((row) => row.device_id === item.device_id && row.event_id === item.event_id)
@@ -87,6 +90,8 @@ export async function importCaptureRequest(request: Request) {
       if (split && (entry.type !== 'expense' || !entry.title))
         return Response.json({ error: 'Only named expenses can be split.' }, { status: 400, headers })
       entry.id = JSON.stringify(['capture', userId, item.device_id, item.event_id])
+      const received = review.transaction?.amount ?? 0
+      if (received > 0) payments.push({ content: review.transaction?.content ?? capture.message, amount: received })
       if (split) splits.push({ entry, split, key: await splitKey('capture', userId, item.device_id, item.event_id) })
       batch.push({ device_id: item.device_id, event_id: item.event_id, payload: row.payload, entry })
     }
@@ -97,13 +102,30 @@ export async function importCaptureRequest(request: Request) {
         await splitBill({ key, title: entry.title, amount: entry.amount, ...split }),
       )
     }
+    const paid = await reportPayments(payments)
     const result = await client.rpc('import_captures', { p_user_id: userId, p_items: batch })
     if (result.error) throw result.error
-    return Response.json(result.data, { headers })
+    return Response.json(paid.length > 0 ? { ...result.data, payments: paid } : result.data, { headers })
   } catch (error) {
     if (error instanceof RatioError && error.status === 400)
       return Response.json({ error: `Bill split: ${error.message}` }, { status: 400, headers })
     console.error('[capture-import]', captureErrorDetails(error))
     return Response.json({ error: 'Import failed. Refresh the inbox before retrying.' }, { status: 503, headers })
   }
+}
+
+// Lets ratio mark bills paid by incoming transfers. Runs before saving, since a retried import only
+// gets already_done back. A failure here never blocks the import.
+async function reportPayments(payments: { content: string; amount: number }[]) {
+  const results: PaymentResult[] = []
+  for (const payment of payments) {
+    try {
+      const paid = await reportPayment(payment)
+      if (paid.result !== 'no_bill_id') results.push(paid)
+    } catch (error) {
+      console.error('[capture-import] ratio payment', captureErrorDetails(error))
+      results.push({ result: 'failed' })
+    }
+  }
+  return results
 }

@@ -61,3 +61,24 @@ export async function splitKey(...parts: string[]) {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(parts)))
   return `exodo-${Buffer.from(digest).toString('hex')}`
 }
+
+export type PaymentResult = { result: string; billId?: number }
+
+// Server-only. Ratio finds the bill id in the content and marks that bill done only when the amount
+// matches. Repeating a payment returns already_done, so retries are harmless.
+export async function reportPayment(input: { content: string; amount: number }): Promise<PaymentResult> {
+  const url = process.env.RATIO_API_URL
+  const apiKey = process.env.RATIO_API_KEY
+  if (!url || !apiKey) throw new RatioError('Ratio is not configured.', 503)
+  const response = await fetch(new URL('/api/external/payments', url), {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+    cache: 'no-store',
+  })
+  const body: unknown = await response.json().catch(() => null)
+  if (!isRecord(body) || typeof body.result !== 'string')
+    throw new RatioError('Unexpected payment response.', response.status)
+  const billId = Number.isSafeInteger(body.billId) ? (body.billId as number) : undefined
+  return { result: body.result, billId }
+}

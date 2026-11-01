@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
-import { ownerShare, parseBillSplit, RatioError, splitBill, splitKey } from './ratio-client'
+import { ownerShare, parseBillSplit, RatioError, reportPayment, splitBill, splitKey } from './ratio-client'
 
 const fetchMock = vi.fn()
 
@@ -68,4 +68,23 @@ it('derives a stable, bounded idempotency key', async () => {
   expect(key).toBe(await splitKey('capture', 'owner', 'device', 'event'))
   expect(key).not.toBe(await splitKey('capture', 'owner', 'device', 'other'))
   expect(key.length).toBeLessThanOrEqual(128)
+})
+
+it('reports a payment and returns ratio results, including non-2xx ones', async () => {
+  fetchMock.mockResolvedValue(
+    Response.json({ result: 'amount_mismatch', billId: 7, expected: 5, received: 4 }, { status: 409 }),
+  )
+  await expect(reportPayment({ content: 'RATIO PTTU 7', amount: 4 })).resolves.toEqual({
+    result: 'amount_mismatch',
+    billId: 7,
+  })
+  const [url, init] = fetchMock.mock.calls[0]
+  expect(String(url)).toBe('https://ratio.test/api/external/payments')
+  expect(init.headers).toMatchObject({ Authorization: 'Bearer secret' })
+  expect(JSON.parse(init.body)).toEqual({ content: 'RATIO PTTU 7', amount: 4 })
+})
+
+it('throws on unexpected payment responses', async () => {
+  fetchMock.mockResolvedValue(Response.json({ error: 'unauthorized' }, { status: 401 }))
+  await expect(reportPayment({ content: 'RATIO PTTU 7', amount: 4 })).rejects.toMatchObject({ status: 401 })
 })

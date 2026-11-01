@@ -3,11 +3,18 @@ import { auth } from '@clerk/nextjs/server'
 import { POST } from '@/app/api/notifications/captures/import/route'
 import { captureFixture } from './test-fixture'
 
-const mocks = vi.hoisted(() => ({ from: vi.fn(), in: vi.fn(), rpc: vi.fn(), splitBill: vi.fn() }))
+const mocks = vi.hoisted(() => ({
+  from: vi.fn(),
+  in: vi.fn(),
+  rpc: vi.fn(),
+  splitBill: vi.fn(),
+  reportPayment: vi.fn(),
+}))
 vi.mock('@clerk/nextjs/server', () => ({ auth: vi.fn() }))
 vi.mock('../bill-split/ratio-client', async (original) => ({
   ...(await original<typeof import('../bill-split/ratio-client')>()),
   splitBill: mocks.splitBill,
+  reportPayment: mocks.reportPayment,
 }))
 vi.mock('../../lib/supabase-admin', () => ({ createAdminSupabaseClient: () => ({ from: mocks.from, rpc: mocks.rpc }) }))
 
@@ -134,3 +141,38 @@ it.each([{ split: { config: 1 } }, { divided: true, split: {} }])(
     expect(mocks.splitBill).not.toHaveBeenCalled()
   },
 )
+
+const income = (content: string) => ({
+  ...row,
+  payload: {
+    ...capture,
+    message: `Số tiền +200.000 đ\nNgày giờ giao dịch 11/10/2026, 15:31:40\nNội dung giao dịch ${content}`,
+  },
+})
+
+it('sends incoming transfers to ratio before importing and returns its results', async () => {
+  mocks.in.mockResolvedValue({ data: [income('RATIO PTTU 7')], error: null })
+  mocks.reportPayment.mockResolvedValue({ result: 'done', billId: 7 })
+  const response = await POST(request({ items: [{ ...item, category: 'Income', divided: false }] }))
+  expect(response.status).toBe(200)
+  expect(mocks.reportPayment).toHaveBeenCalledWith({ content: 'RATIO PTTU 7', amount: 200000 })
+  expect(mocks.reportPayment.mock.invocationCallOrder[0]).toBeLessThan(mocks.rpc.mock.invocationCallOrder[0])
+  expect((await response.json()).payments).toEqual([{ result: 'done', billId: 7 }])
+})
+
+it('imports even when ratio fails, and hides transfers without a bill id', async () => {
+  mocks.in.mockResolvedValue({ data: [income('Luong')], error: null })
+  mocks.reportPayment.mockResolvedValue({ result: 'no_bill_id' })
+  const quiet = await POST(request({ items: [{ ...item, category: 'Income', divided: false }] }))
+  expect(await quiet.json()).not.toHaveProperty('payments')
+
+  mocks.reportPayment.mockRejectedValue(new Error('offline'))
+  const failed = await POST(request({ items: [{ ...item, category: 'Income', divided: false }] }))
+  expect(failed.status).toBe(200)
+  expect((await failed.json()).payments).toEqual([{ result: 'failed' }])
+})
+
+it('does not send expenses to ratio', async () => {
+  await POST(request())
+  expect(mocks.reportPayment).not.toHaveBeenCalled()
+})
