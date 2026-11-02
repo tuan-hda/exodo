@@ -3,7 +3,7 @@
 import { useId } from 'react'
 import { TransactionReviewFields } from '@/features/inbox/TransactionReviewFields'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { NativeSelect } from '@/components/ui/native-select'
 import { CaptureTransactionSummary } from './CaptureTransactionSummary'
 import { reviewAmount, type ReviewCapture } from './capture-review'
 
@@ -68,13 +68,14 @@ export function CaptureReviewRow({
                 </Button>
               </div>
               {capture.split && (
-                <Input
+                <NativeSelect
                   aria-label="Split config"
                   disabled={disabled}
                   value={capture.splitConfig}
-                  onChange={(event) => onChange({ splitConfig: event.target.value })}
-                  placeholder="Config id (optional)"
-                />
+                  onChange={(event) => onChange({ splitConfig: event.target.value })}>
+                  <option value="">None</option>
+                  <option value="rent">Rent</option>
+                </NativeSelect>
               )}
             </div>
           )}

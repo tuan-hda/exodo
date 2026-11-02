@@ -20,7 +20,7 @@ export function prepareCapture(capture: CaptureInboxItem): ReviewCapture {
     category: capture.transaction?.category ?? ((capture.transaction?.amount ?? 0) > 0 ? 'Income' : 'Dining'),
     divided: false,
     split: false,
-    splitConfig: 'rent',
+    splitConfig: '',
   }
 }
 
